@@ -35,11 +35,11 @@ func (r *Random) Open() {
 	for i := 0; i < 120; i++ {
 		seed := seeds[rand.Intn(len(seeds))]
 		tags := map[string]string{
-			"type": seed["type"],
+			"type":     seed["type"],
 			"group_id": seed["group_id"],
-			"units": seed["units"],
-			"issue": seed["issue"],
-			"hostname": fmt.Sprintf("example.%03d.com", i / 4),
+			"units":    seed["units"],
+			"issue":    seed["issue"],
+			"hostname": fmt.Sprintf("example.%03d.com", i/4),
 		}
 		r.Items = append(r.Items, Item{
 			Id:   fmt.Sprintf("hello_kitty_%v", i),

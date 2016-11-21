@@ -43,7 +43,7 @@ func (h Router) handleStatus(w http.ResponseWriter, r *http.Request) {
 func (h Router) handleList(w http.ResponseWriter, r *http.Request) {
 
 	res := []backend.Item{}
-	
+
 	if tags, ok := r.Form["tags"]; ok && len(tags) > 0 {
 		fmt.Printf("%v\n\n", ParseTags(tags[0]))
 		res = h.backend.GetItemList(ParseTags(tags[0]))
