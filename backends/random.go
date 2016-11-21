@@ -42,7 +42,7 @@ func (r *Random) Open() {
 			"hostname": fmt.Sprintf("example.%03d.com", i/4),
 		}
 		r.Items = append(r.Items, Item{
-			Id:   fmt.Sprintf("hello_kitty_%v", i),
+			Id:   fmt.Sprintf("hello_kitty_%3d", i),
 			Tags: tags})
 	}
 }
