@@ -24,7 +24,7 @@ func (r *Router) Add(method string, path string, handler func(http.ResponseWrite
 }
 
 func (r Router) Match(route route, method string, segments []string) (bool, map[string]string) {
-	argv := map[string]string{}
+	argv := make(map[string]string)
 
 	// check method and segments list length
 	if method != route.method || len(segments) != len(route.segments) {
@@ -48,11 +48,13 @@ func (r Router) Match(route route, method string, segments []string) (bool, map[
 }
 
 func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	var argv map[string]string
+
+	// log request
 	log.Printf("%s %4s %s", request.RemoteAddr, request.Method, request.URL)
 
 	// get the path
 	path := request.URL.EscapedPath()
-	argv := map[string]string{}
 
 	// check path prefix
 	if !strings.HasPrefix(path, r.Prefix) {

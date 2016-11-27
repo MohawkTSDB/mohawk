@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,7 +18,8 @@ type Handler struct {
 }
 
 func (h Handler) parseTags(tags string) map[string]string {
-	vsf := map[string]string{}
+	vsf := make(map[string]string)
+
 	tagsList := strings.Split(tags, ",")
 	for _, tag := range tagsList {
 		t := strings.Split(tag, ":")
@@ -30,10 +32,15 @@ func (h Handler) parseTags(tags string) map[string]string {
 
 func (h Handler) BadRequest(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u interface{}
+
 	json.NewDecoder(r.Body).Decode(&u)
 	r.ParseForm()
 
 	w.WriteHeader(404)
+
+	log.Printf("BadRequest:\n")
+	log.Printf("Request: %+v\n", r)
+	log.Printf("Body: %+v\n", u)
 
 	fmt.Fprintf(w, "Error:")
 	fmt.Fprintf(w, "Request: %+v\n", r)
@@ -48,9 +55,9 @@ func (h Handler) GetStatus(w http.ResponseWriter, r *http.Request, argv map[stri
 }
 
 func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	res := []backend.Item{}
-	r.ParseForm()
+	var res []backend.Item
 
+	r.ParseForm()
 	if tags, ok := r.Form["tags"]; ok && len(tags) > 0 {
 		res = h.backend.GetItemList(h.parseTags(tags[0]))
 	} else {
@@ -63,8 +70,6 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 }
 
 func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	r.ParseForm()
-
 	var resStr string
 	var id string
 	var end int64
@@ -77,6 +82,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	id = argv["id"]
 
 	// get data from the form arguments
+	r.ParseForm()
 	if v, ok := r.Form["end"]; ok && len(v) > 0 {
 		i, _ := strconv.Atoi(v[0])
 		end = int64(i)

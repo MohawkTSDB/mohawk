@@ -10,7 +10,7 @@ type Random struct {
 }
 
 func FilterItems(vs []Item, f func(Item) bool) []Item {
-	var vsf []Item
+	vsf := make([]Item, 0)
 
 	for _, v := range vs {
 		if f(v) {
@@ -21,7 +21,7 @@ func FilterItems(vs []Item, f func(Item) bool) []Item {
 }
 
 func (r *Random) Open() {
-	r.Items = []Item{}
+	r.Items = make([]Item, 0)
 
 	seeds := []map[string]string{
 		map[string]string{"type": "node", "group_id": "cpu/usage_rate", "units": "cpu", "issue": "42"},
@@ -61,7 +61,8 @@ func (r Random) GetItemList(tags map[string]string) []Item {
 }
 
 func (r Random) GetRawData(id string, end int64, start int64, limit int64, order string) []DataItem {
-	res := []DataItem{}
+	res := make([]DataItem, 0)
+
 	delta := int64(5 * 60 * 1000)
 
 	for i := limit; i > 0; i-- {
@@ -75,7 +76,8 @@ func (r Random) GetRawData(id string, end int64, start int64, limit int64, order
 }
 
 func (r Random) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration string) []StatItem {
-	res := []StatItem{}
+	res := make([]StatItem, 0)
+
 	delta := int64(5 * 60 * 1000)
 
 	for i := limit; i > 0; i-- {
