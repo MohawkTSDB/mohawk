@@ -19,7 +19,7 @@ func main() {
 	}
 	r := router.Router{
 		Prefix:           "/hawkular/metrics/",
-		HandleBadRequest: h.handleBadRequest,
+		HandleBadRequest: h.BadRequest,
 	}
 
 	r.Add("GET", "status", h.GetStatus)

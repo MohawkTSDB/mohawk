@@ -15,7 +15,7 @@ type Handler struct {
 	backend backend.Backend
 }
 
-func (h Handler) ParseTags(tags string) map[string]string {
+func (h Handler) parseTags(tags string) map[string]string {
 	vsf := map[string]string{}
 	tagsList := strings.Split(tags, ",")
 	for _, tag := range tagsList {
@@ -27,7 +27,7 @@ func (h Handler) ParseTags(tags string) map[string]string {
 	return vsf
 }
 
-func (h Handler) handleBadRequest(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h Handler) BadRequest(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u interface{}
 	json.NewDecoder(r.Body).Decode(&u)
 	r.ParseForm()
@@ -51,7 +51,7 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	r.ParseForm()
 
 	if tags, ok := r.Form["tags"]; ok && len(tags) > 0 {
-		res = h.backend.GetItemList(h.ParseTags(tags[0]))
+		res = h.backend.GetItemList(h.parseTags(tags[0]))
 	} else {
 		res = h.backend.GetItemList(map[string]string{})
 	}
@@ -75,14 +75,4 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, string(resJSON))
-}
-
-func (h Handler) handlePushData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	w.WriteHeader(200)
-	fmt.Fprintln(w, "{}")
-}
-
-func (h Handler) handleUpdateTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	w.WriteHeader(200)
-	fmt.Fprintln(w, "{}")
 }
