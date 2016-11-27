@@ -10,7 +10,13 @@ import (
 	"github.com/yaacov/mohawk/backends"
 )
 
-func ParseTags(tags string) map[string]string {
+const VER = "0.21.0"
+
+type Handler struct {
+	backend backend.Backend
+}
+
+func (_ Handler) ParseTags(tags string) map[string]string {
 	vsf := map[string]string{}
 	tagsList := strings.Split(tags, ",")
 	for _, tag := range tagsList {
@@ -22,7 +28,7 @@ func ParseTags(tags string) map[string]string {
 	return vsf
 }
 
-func (h Router) handleBadRequest(w http.ResponseWriter, r *http.Request) {
+func (h Handler) handleBadRequest(w http.ResponseWriter, r *http.Request) {
 	var u interface{}
 	json.NewDecoder(r.Body).Decode(&u)
 
@@ -33,18 +39,18 @@ func (h Router) handleBadRequest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Body: %+v\n", u)
 }
 
-func (h Router) handleStatus(w http.ResponseWriter, r *http.Request) {
+func (h Handler) handleStatus(w http.ResponseWriter, r *http.Request) {
 	res := fmt.Sprintf("{\"MetricsService\":\"STARTED\",\"Implementation-Version\":\"%s\"}", VER)
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
 }
 
-func (h Router) handleList(w http.ResponseWriter, r *http.Request) {
+func (h Handler) handleMetrics(w http.ResponseWriter, r *http.Request) {
 	res := []backend.Item{}
 
 	if tags, ok := r.Form["tags"]; ok && len(tags) > 0 {
-		res = h.backend.GetItemList(ParseTags(tags[0]))
+		res = h.backend.GetItemList(h.ParseTags(tags[0]))
 	} else {
 		res = h.backend.GetItemList(map[string]string{})
 	}
@@ -54,8 +60,10 @@ func (h Router) handleList(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(resJson))
 }
 
-func (h Router) handleGetData(w http.ResponseWriter, r *http.Request) {
-	id := "id"
+func (h Handler) handleGetData(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	id := r.Form["id"][0]
 	end := int64(0)
 	start := int64(time.Now().Unix() * 1000)
 	limit := int64(100)
@@ -68,12 +76,12 @@ func (h Router) handleGetData(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(resJson))
 }
 
-func (h Router) handlePushData(w http.ResponseWriter, r *http.Request) {
+func (h Handler) handlePushData(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }
 
-func (h Router) handleUpdateTags(w http.ResponseWriter, r *http.Request) {
+func (h Handler) handleUpdateTags(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }
