@@ -30,9 +30,9 @@ func (h Handler) ParseTags(tags string) map[string]string {
 func (h Handler) handleBadRequest(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u interface{}
 	json.NewDecoder(r.Body).Decode(&u)
+	r.ParseForm()
 
 	w.WriteHeader(404)
-	r.ParseForm()
 
 	fmt.Fprintf(w, "Error:")
 	fmt.Fprintf(w, "Request: %+v\n", r)
@@ -48,6 +48,7 @@ func (h Handler) GetStatus(w http.ResponseWriter, r *http.Request, argv map[stri
 
 func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	res := []backend.Item{}
+	r.ParseForm()
 
 	if tags, ok := r.Form["tags"]; ok && len(tags) > 0 {
 		res = h.backend.GetItemList(h.ParseTags(tags[0]))

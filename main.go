@@ -15,10 +15,12 @@ func main() {
 
 	h := Handler{
 		backend: db,
-		version: "0.21.0"}
+		version: "0.21.0",
+	}
 	r := router.Router{
 		Prefix:           "/hawkular/metrics/",
-		HandleBadRequest: h.handleBadRequest}
+		HandleBadRequest: h.handleBadRequest,
+	}
 
 	r.Add("GET", "status", h.GetStatus)
 	r.Add("GET", "metrics", h.GetMetrics)
