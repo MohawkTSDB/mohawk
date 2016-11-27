@@ -23,24 +23,24 @@ func (router *Router) Add(method string, path string, handler func(http.Response
 	router.Routes = append(router.Routes, Route{method, strings.Split(path, "/"), handler})
 }
 
-func (_ Router) Find(r Route, paths []string, w http.ResponseWriter, req *http.Request) bool {
+func (_ Router) Find(route Route, paths []string, w http.ResponseWriter, r *http.Request) bool {
 	// check method
-	if req.Method != r.Method || len(paths) != len(r.paths) {
+	if r.Method != route.Method || len(paths) != len(route.paths) {
 		return false
 	}
 
 	// check path
-	for i, p := range r.paths {
+	for i, p := range route.paths {
 		if p[0] != ':' && paths[i] != p {
 			return false
 		}
 	}
 
 	// get arguments
-	for i, p := range r.paths {
+	for i, p := range route.paths {
 		if p[0] == ':' {
 			e, _ := url.QueryUnescape(paths[i])
-			req.Form.Add(p[1:], e)
+			r.Form.Add(p[1:], e)
 		}
 	}
 
