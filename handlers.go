@@ -68,7 +68,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	end := int64(0)
 	start := int64(time.Now().Unix() * 1000)
 	limit := int64(100)
-	order := "Asc"
+	order := "ASC"
 
 	res := h.backend.GetRawData(id, end, start, limit, order)
 	resJSON, _ := json.Marshal(res)

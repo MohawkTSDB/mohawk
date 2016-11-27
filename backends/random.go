@@ -5,18 +5,19 @@ import (
 	"math/rand"
 )
 
+type Random struct {
+	Items []Item
+}
+
 func FilterItems(vs []Item, f func(Item) bool) []Item {
-	vsf := make([]Item, 0)
+	var vsf []Item
+
 	for _, v := range vs {
 		if f(v) {
 			vsf = append(vsf, v)
 		}
 	}
 	return vsf
-}
-
-type Random struct {
-	Items []Item
 }
 
 func (r *Random) Open() {
@@ -66,7 +67,30 @@ func (r Random) GetRawData(id string, end int64, start int64, limit int64, order
 	for i := limit; i > 0; i-- {
 		res = append(res, DataItem{
 			Timestamp: start - i*delta,
-			Value:     float64(50 + rand.Intn(50))})
+			Value:     float64(50 + rand.Intn(50)),
+		})
+	}
+
+	return res
+}
+
+func (r Random) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration string, buckets int64) []StatItem {
+	res := []StatItem{}
+	delta := int64(5 * 60 * 1000)
+
+	for i := limit; i > 0; i-- {
+		value := float64(50 + rand.Intn(50))
+		res = append(res, StatItem{
+			Start:   start - i*delta,
+			End:     start,
+			Empty:   false,
+			Samples: 1,
+			Min:     value,
+			Max:     value,
+			Avg:     value,
+			Median:  value,
+			Sum:     value,
+		})
 	}
 
 	return res
