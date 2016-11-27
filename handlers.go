@@ -28,7 +28,7 @@ func (_ Handler) ParseTags(tags string) map[string]string {
 	return vsf
 }
 
-func (h Handler) handleBadRequest(w http.ResponseWriter, r *http.Request) {
+func (_ Handler) handleBadRequest(w http.ResponseWriter, r *http.Request) {
 	var u interface{}
 	json.NewDecoder(r.Body).Decode(&u)
 
@@ -39,7 +39,7 @@ func (h Handler) handleBadRequest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Body: %+v\n", u)
 }
 
-func (h Handler) handleStatus(w http.ResponseWriter, r *http.Request) {
+func (_ Handler) handleStatus(w http.ResponseWriter, r *http.Request) {
 	res := fmt.Sprintf("{\"MetricsService\":\"STARTED\",\"Implementation-Version\":\"%s\"}", VER)
 
 	w.WriteHeader(200)

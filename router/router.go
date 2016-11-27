@@ -19,11 +19,11 @@ type Router struct {
 	Routes           []Route
 }
 
-func (h *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request)) {
-	h.Routes = append(h.Routes, Route{method, strings.Split(path, "/"), handler})
+func (router *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request)) {
+	router.Routes = append(router.Routes, Route{method, strings.Split(path, "/"), handler})
 }
 
-func (h Router) Find(r Route, paths []string, w http.ResponseWriter, req *http.Request) bool {
+func (_ Router) Find(r Route, paths []string, w http.ResponseWriter, req *http.Request) bool {
 	// check method
 	if req.Method != r.Method || len(paths) != len(r.paths) {
 		return false
