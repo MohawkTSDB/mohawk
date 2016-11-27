@@ -28,11 +28,12 @@ func main() {
 	r.Add("GET", "counters/:id/raw", h.GetData)
 
 	srv := &http.Server{
-		Addr:           ":8443",
+		Addr:           "0.0.0.0:8443",
 		Handler:        r,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+	log.Printf("Start server, listen on https://%+v", srv.Addr)
 	log.Fatal(srv.ListenAndServeTLS("server.pem", "server.key"))
 }
