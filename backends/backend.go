@@ -25,5 +25,5 @@ type StatItem struct {
 type Backend interface {
 	GetItemList(tags map[string]string) []Item
 	GetRawData(id string, end int64, start int64, limit int64, order string) []DataItem
-	GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration string, buckets int64) []StatItem
+	GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration string) []StatItem
 }

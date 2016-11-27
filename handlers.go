@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -64,15 +65,59 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	r.ParseForm()
 
-	id := argv["id"]
-	end := int64(0)
-	start := int64(time.Now().Unix() * 1000)
-	limit := int64(100)
-	order := "ASC"
+	var resStr string
+	var id string
+	var end int64
+	var start int64
+	var limit int64
+	var bucketDuration string
+	var order string
 
-	res := h.backend.GetRawData(id, end, start, limit, order)
-	resJSON, _ := json.Marshal(res)
+	// use the id from the argv list
+	id = argv["id"]
 
+	// get data from the form arguments
+	if v, ok := r.Form["end"]; ok && len(v) > 0 {
+		i, _ := strconv.Atoi(v[0])
+		end = int64(i)
+	} else {
+		end = int64(0)
+	}
+	if v, ok := r.Form["start"]; ok && len(v) > 0 {
+		i, _ := strconv.Atoi(v[0])
+		start = int64(i)
+	} else {
+		start = int64(time.Now().Unix() * 1000)
+	}
+	if v, ok := r.Form["limit"]; ok && len(v) > 0 {
+		i, _ := strconv.Atoi(v[0])
+		limit = int64(i)
+	} else {
+		limit = int64(100)
+	}
+	if v, ok := r.Form["order"]; ok && len(v) > 0 {
+		order = v[0]
+	} else {
+		order = "ASC"
+	}
+	if v, ok := r.Form["bucketDuration"]; ok && len(v) > 0 {
+		bucketDuration = v[0]
+	} else {
+		bucketDuration = ""
+	}
+
+	// call backend for data
+	if bucketDuration == "" {
+		res := h.backend.GetRawData(id, end, start, limit, order)
+		resJSON, _ := json.Marshal(res)
+		resStr = string(resJSON)
+	} else {
+		res := h.backend.GetStatData(id, end, start, limit, order, bucketDuration)
+		resJSON, _ := json.Marshal(res)
+		resStr = string(resJSON)
+	}
+
+	// output to client
 	w.WriteHeader(200)
-	fmt.Fprintln(w, string(resJSON))
+	fmt.Fprintln(w, resStr)
 }

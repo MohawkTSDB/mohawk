@@ -74,7 +74,7 @@ func (r Random) GetRawData(id string, end int64, start int64, limit int64, order
 	return res
 }
 
-func (r Random) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration string, buckets int64) []StatItem {
+func (r Random) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration string) []StatItem {
 	res := []StatItem{}
 	delta := int64(5 * 60 * 1000)
 
