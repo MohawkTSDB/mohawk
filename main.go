@@ -25,6 +25,7 @@ func main() {
 	r.Add("GET", "status", h.GetStatus)
 	r.Add("GET", "metrics", h.GetMetrics)
 	r.Add("GET", "gauges/:id/raw", h.GetData)
+	r.Add("GET", "counters/:id/raw", h.GetData)
 
 	srv := &http.Server{
 		Addr:           ":8443",
