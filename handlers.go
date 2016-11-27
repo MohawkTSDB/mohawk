@@ -10,13 +10,12 @@ import (
 	"github.com/yaacov/mohawk/backends"
 )
 
-const VER = "0.21.0"
-
 type Handler struct {
+	version string
 	backend backend.Backend
 }
 
-func (_ Handler) ParseTags(tags string) map[string]string {
+func (h Handler) ParseTags(tags string) map[string]string {
 	vsf := map[string]string{}
 	tagsList := strings.Split(tags, ",")
 	for _, tag := range tagsList {
@@ -40,14 +39,14 @@ func (h Handler) handleBadRequest(w http.ResponseWriter, r *http.Request, argv m
 	fmt.Fprintf(w, "Body: %+v\n", u)
 }
 
-func (h Handler) handleStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	res := fmt.Sprintf("{\"MetricsService\":\"STARTED\",\"Implementation-Version\":\"%s\"}", VER)
+func (h Handler) GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	res := fmt.Sprintf("{\"MetricsService\":\"STARTED\",\"Implementation-Version\":\"%s\"}", h.version)
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
 }
 
-func (h Handler) handleMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	res := []backend.Item{}
 
 	if tags, ok := r.Form["tags"]; ok && len(tags) > 0 {
@@ -55,13 +54,13 @@ func (h Handler) handleMetrics(w http.ResponseWriter, r *http.Request, argv map[
 	} else {
 		res = h.backend.GetItemList(map[string]string{})
 	}
-	resJson, _ := json.Marshal(res)
+	resJSON, _ := json.Marshal(res)
 
 	w.WriteHeader(200)
-	fmt.Fprintln(w, string(resJson))
+	fmt.Fprintln(w, string(resJSON))
 }
 
-func (h Handler) handleGetData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	r.ParseForm()
 
 	id := argv["id"]
@@ -71,10 +70,10 @@ func (h Handler) handleGetData(w http.ResponseWriter, r *http.Request, argv map[
 	order := "Asc"
 
 	res := h.backend.GetRawData(id, end, start, limit, order)
-	resJson, _ := json.Marshal(res)
+	resJSON, _ := json.Marshal(res)
 
 	w.WriteHeader(200)
-	fmt.Fprintln(w, string(resJson))
+	fmt.Fprintln(w, string(resJSON))
 }
 
 func (h Handler) handlePushData(w http.ResponseWriter, r *http.Request, argv map[string]string) {

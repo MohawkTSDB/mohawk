@@ -7,42 +7,39 @@ import (
 	"strings"
 )
 
-type Route struct {
-	Method  string
-	paths   []string
-	handler func(http.ResponseWriter, *http.Request, map[string]string)
+type route struct {
+	method   string
+	segments []string
+	handler  func(http.ResponseWriter, *http.Request, map[string]string)
 }
 
 type Router struct {
 	Prefix           string
 	HandleBadRequest func(http.ResponseWriter, *http.Request, map[string]string)
-	Routes           []Route
+	Routes           []route
 }
 
-func (router *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request, map[string]string)) {
-	router.Routes = append(router.Routes, Route{method, strings.Split(path, "/"), handler})
+func (r *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request, map[string]string)) {
+	r.Routes = append(r.Routes, route{method, strings.Split(path, "/"), handler})
 }
 
-func (_ Router) Match(route Route, paths []string, method string) (bool, map[string]string) {
+func (r Router) Match(route route, method string, segments []string) (bool, map[string]string) {
 	argv := map[string]string{}
 
-	// check method
-	if method != route.Method || len(paths) != len(route.paths) {
+	// check method and segments list length
+	if method != route.method || len(segments) != len(route.segments) {
 		return false, argv
 	}
 
-	// check path
-	for i, p := range route.paths {
-		if p[0] != ':' && paths[i] != p {
+	// check segments
+	for i, segment := range route.segments {
+		if segment[0] == ':' {
+			// if this is an argument segments, parse it
+			value, _ := url.QueryUnescape(segments[i])
+			argv[segment[1:]] = value
+		} else if segments[i] != segment {
+			// if this segment does not match the route exit
 			return false, argv
-		}
-	}
-
-	// get arguments
-	for i, p := range route.paths {
-		if p[0] == ':' {
-			e, _ := url.QueryUnescape(paths[i])
-			argv[p[1:]] = e
 		}
 	}
 
@@ -50,37 +47,37 @@ func (_ Router) Match(route Route, paths []string, method string) (bool, map[str
 	return true, argv
 }
 
-func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("%s %4s %s", r.RemoteAddr, r.Method, r.URL)
+func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	log.Printf("%s %4s %s", request.RemoteAddr, request.Method, request.URL)
 
 	// get the path
-	path := r.URL.EscapedPath()
+	path := request.URL.EscapedPath()
 	argv := map[string]string{}
 
 	// check path prefix
-	if !strings.HasPrefix(path, router.Prefix) {
-		router.HandleBadRequest(w, r, argv)
+	if !strings.HasPrefix(path, r.Prefix) {
+		r.HandleBadRequest(writer, request, argv)
 		return
 	}
 
 	// clean the path
-	path = path[len(router.Prefix):]
+	path = path[len(r.Prefix):]
 	if path[len(path)-1] == '/' {
 		path = path[:len(path)-1]
 	}
 
 	// try to match the path to a route
-	paths := strings.Split(path, "/")
-	for _, route := range router.Routes {
-		found, argv := router.Match(route, paths, r.Method)
+	segments := strings.Split(path, "/")
+	for _, route := range r.Routes {
+		found, argv := r.Match(route, request.Method, segments)
 
 		// if found a match, run the handler for this route
 		if found {
-			route.handler(w, r, argv)
+			route.handler(writer, request, argv)
 			return
 		}
 	}
 
 	// handle page not found
-	router.HandleBadRequest(w, r, argv)
+	r.HandleBadRequest(writer, request, argv)
 }
