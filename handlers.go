@@ -109,7 +109,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 		i, _ := strconv.Atoi(v[0])
 		start = int64(i)
 	} else {
-		start = end - int64(8 * 60 * 60 * 1000)
+		start = end - int64(8*60*60*1000)
 	}
 	if v, ok := r.Form["limit"]; ok && len(v) > 0 {
 		i, _ := strconv.Atoi(v[0])
@@ -123,7 +123,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 		order = "DESC"
 	}
 	if v, ok := r.Form["bucketDuration"]; ok && len(v) > 0 {
-		i, _ := strconv.Atoi(v[0][:len(v[0]) - 1])
+		i, _ := strconv.Atoi(v[0][:len(v[0])-1])
 		bucketDuration = int64(i)
 	} else {
 		bucketDuration = int64(0)

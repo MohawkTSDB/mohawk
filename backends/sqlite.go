@@ -219,13 +219,13 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 		where timestamp > %d and timestamp <= %d
 		group by start
 		order by start %s limit %d`,
-		bucketDuration * 1000, bucketDuration * 1000, id, start, end, order, limit)
+		bucketDuration*1000, bucketDuration*1000, id, start, end, order, limit)
 	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-	t = int64(start / (bucketDuration * 1000)) * (bucketDuration * 1000)
+	t = int64(start/(bucketDuration*1000)) * (bucketDuration * 1000)
 	for rows.Next() {
 		var samples int64
 		var startT int64
@@ -239,12 +239,12 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		// append missing
-		for t < (startT - bucketDuration * 1000) {
+		for t < (startT - bucketDuration*1000) {
 			res = append(res, StatItem{
 				Start:   t,
-				End:     t + bucketDuration * 1000,
+				End:     t + bucketDuration*1000,
 				Empty:   true,
 				Samples: 0,
 				Min:     0,
@@ -255,11 +255,11 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 			})
 			t += bucketDuration * 1000
 		}
-		
+
 		// add data
 		res = append(res, StatItem{
 			Start:   startT,
-			End:     startT + bucketDuration * 1000,
+			End:     startT + bucketDuration*1000,
 			Empty:   false,
 			Samples: samples,
 			Min:     min,
@@ -276,10 +276,10 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 	}
 
 	// append missing
-	for t < (end - bucketDuration * 1000) {
+	for t < (end - bucketDuration*1000) {
 		res = append(res, StatItem{
 			Start:   t,
-			End:     t + bucketDuration * 1000,
+			End:     t + bucketDuration*1000,
 			Empty:   true,
 			Samples: 0,
 			Min:     0,
