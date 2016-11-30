@@ -9,17 +9,6 @@ type Random struct {
 	Items []Item
 }
 
-func FilterItems(vs []Item, f func(Item) bool) []Item {
-	vsf := make([]Item, 0)
-
-	for _, v := range vs {
-		if f(v) {
-			vsf = append(vsf, v)
-		}
-	}
-	return vsf
-}
-
 func (r *Random) Open() {
 	r.Items = make([]Item, 0)
 
@@ -44,7 +33,9 @@ func (r *Random) Open() {
 		}
 		r.Items = append(r.Items, Item{
 			Id:   fmt.Sprintf("hello_kitty_%3d", i),
-			Tags: tags})
+			Type: "gauge",
+			Tags: tags,
+		})
 	}
 }
 
@@ -75,7 +66,7 @@ func (r Random) GetRawData(id string, end int64, start int64, limit int64, order
 	return res
 }
 
-func (r Random) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration string) []StatItem {
+func (r Random) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem {
 	res := make([]StatItem, 0)
 
 	delta := int64(5 * 60 * 1000)
@@ -96,4 +87,12 @@ func (r Random) GetStatData(id string, end int64, start int64, limit int64, orde
 	}
 
 	return res
+}
+
+func (r Random) PostRawData(id string, t int64, v float64) bool {
+	return false
+}
+
+func (r Random) PutTags(id string, tags map[string]string) bool {
+	return false
 }
