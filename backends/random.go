@@ -79,7 +79,7 @@ func (r Random) GetStatData(id string, end int64, start int64, limit int64, orde
 		value := float64(50 + rand.Intn(50))
 		res = append(res, StatItem{
 			Start:   end - i*delta,
-			End:     end- (i - 1)*delta,
+			End:     end - (i-1)*delta,
 			Empty:   false,
 			Samples: 1,
 			Min:     value,
