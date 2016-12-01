@@ -35,11 +35,12 @@ a running metrics Hawkular server. It can use different backends for different t
 To install, get the source code, or do ``go install github.com/yaacov/mohawk`` if using go.
 To run, users will need the ``server.key`` and ``server.pem`` files.
 
-### Mock Certifications
+## Mock Certifications
 
-The server use mock sertification to serve ``https`` requests.
+The server use mock certification to serve ``https`` requests. Users can use mock 
+self signed credentials files for this. 
 
-This bash commands will create mock credentials:
+To create a self signed credentials use this bash commands:
 ```
 openssl ecparam -genkey -name secp384r1 -out server.key
 openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
@@ -63,10 +64,16 @@ Usage of mohawk:
 
 ## Example of use
 
-Running from the source directory using ``go run`` and the ``sqlite`` back end.
-[ Remmeber to set up the ``server.key`` and ``server.pem`` files in your diretory. ]
+Running from the source directory using ``go run`` and the ``sqlite`` back end
+[ Remmeber to set up the ``server.key`` and ``server.pem`` files in your diretory ].
 
 ```bash
-go run *.go -backend sqlite
+go run *.go -h
+Usage of mohawk:
+...
+```
+
+```bash
+go run *.go -backend sqlite -port 8443
 2016/12/01 14:23:48 Start server, listen on https://0.0.0.0:8443
 ```
