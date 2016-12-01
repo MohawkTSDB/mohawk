@@ -33,7 +33,7 @@ a running metrics Hawkular server. It can use different backends for different t
 ## Installation
 
 To install, get the source code, or do ``go install github.com/yaacov/mohawk`` if using go.
-To run, users will need the ``server.key`` and ``server.pem`` files.
+To run, users will need the ``server.key`` and ``server.pem`` certification files.
 
 ## Mock Certifications
 
@@ -64,14 +64,16 @@ Usage of mohawk:
 
 ## Example of use
 
-Running from the source directory using ``go run`` and the ``sqlite`` back end
-[ Remmeber to set up the ``server.key`` and ``server.pem`` files in your diretory ].
+Running from the source directory using ``go run`` and requesting the help message.
 
 ```bash
 go run *.go -h
 Usage of mohawk:
 ...
 ```
+
+Running from the source directory using ``go run`` and the ``sqlite`` back end
+[ Remmeber to set up the ``server.key`` and ``server.pem`` files in your diretory ].
 
 ```bash
 go run *.go -backend sqlite -port 8443
