@@ -5,7 +5,10 @@ MOck HAWKular is a mock Hawkular server for testing.
 ## Introduction
 
 Utility server for testing Hawkular clients, the server can mock
-A running metrics Hawkular server. It can use different backends for different test cases.
+a running metrics Hawkular server. It can use different backends for different test use cases.
+
+  - Random backend, mimics lots of metrics available only for reading.
+  - Sqlite backend, mimics persistable read and write.
 
 
 ## License and copyright
@@ -29,8 +32,12 @@ A running metrics Hawkular server. It can use different backends for different t
 
 ## Installation
 
-To install, get the source code, or ``go install github.com/yaacov/mohawk`` if using go.
+To install, get the source code, or do ``go install github.com/yaacov/mohawk`` if using go.
 To run, users will need the ``server.key`` and ``server.pem`` files.
+
+### Mock Certifications
+
+The server use mock sertification to serve ``https`` requests.
 
 This bash commands will create mock credentials:
 ```
