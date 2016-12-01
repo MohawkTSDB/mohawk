@@ -12,6 +12,10 @@ type Sqlite struct {
 	db *sql.DB
 }
 
+func (r Sqlite) Name() string {
+	return "Backend-Sqlite"
+}
+
 func (r Sqlite) IdExist(id string) bool {
 	var _id string
 	sqlStmt := fmt.Sprintf("select id from ids where id='%s'", id)

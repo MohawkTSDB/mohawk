@@ -11,7 +11,7 @@ import (
 	"github.com/yaacov/mohawk/router"
 )
 
-const VER = "0.1.0"
+const VER = "0.2.0"
 
 func main() {
 	var db backend.Backend
@@ -38,6 +38,7 @@ func main() {
 
 	r.Add("GET", "oapi", h.GetAPIVersions)
 	r.Add("GET", "hawkular/metrics/status", h.GetStatus)
+	r.Add("GET", "hawkular/alerts/status", h.GetStatus)
 
 	r.Add("GET", "hawkular/metrics/metrics", h.GetMetrics)
 	r.Add("GET", "hawkular/metrics/gauges/:id/raw", h.GetData)

@@ -51,8 +51,8 @@ func (h Handler) GetStatus(w http.ResponseWriter, r *http.Request, argv map[stri
 	res := fmt.Sprintf(`{
 		"MetricsService":"STARTED",
 		"Implementation-Version":"%s",
-		"MoHawk":"%s"
-		}`, h.version, VER)
+		"MoHawk":"%s %s"
+		}`, h.version, VER, h.backend.Name())
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)

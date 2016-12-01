@@ -9,6 +9,10 @@ type Random struct {
 	Items []Item
 }
 
+func (r Random) Name() string {
+	return "Backend-Random"
+}
+
 func (r *Random) Open() {
 	r.Items = make([]Item, 0)
 
@@ -58,7 +62,7 @@ func (r Random) GetRawData(id string, end int64, start int64, limit int64, order
 
 	for i := limit; i > 0; i-- {
 		res = append(res, DataItem{
-			Timestamp: start - i*delta,
+			Timestamp: end - i*delta,
 			Value:     float64(50 + rand.Intn(50)),
 		})
 	}
@@ -74,8 +78,8 @@ func (r Random) GetStatData(id string, end int64, start int64, limit int64, orde
 	for i := limit; i > 0; i-- {
 		value := float64(50 + rand.Intn(50))
 		res = append(res, StatItem{
-			Start:   start - i*delta,
-			End:     start,
+			Start:   end - i*delta,
+			End:     end- (i - 1)*delta,
 			Empty:   false,
 			Samples: 1,
 			Min:     value,
