@@ -1,7 +1,6 @@
 package router
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -55,9 +54,6 @@ func (r Router) match(route route, method string, segments []string) (bool, map[
 
 // ServeHTTP try to match a route to the request, and call the route handler
 func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	// log request
-	log.Printf("%s %4s %s", request.RemoteAddr, request.Method, request.URL)
-
 	// get the path
 	path := request.URL.EscapedPath()
 

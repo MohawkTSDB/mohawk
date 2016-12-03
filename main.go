@@ -15,6 +15,16 @@ import (
 // VER the server version
 const VER = "0.2.0"
 
+// Logger middleware that will log http requests
+type Logger struct {
+	Next http.Handler
+}
+
+func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("%s %4s %s", r.RemoteAddr, r.Method, r.URL)
+	l.Next.ServeHTTP(w, r)
+}
+
 // BadRequest will be called if no route found
 type BadRequest struct{}
 
@@ -87,10 +97,15 @@ func main() {
 	rMetrics.Add("POST", "gauges/raw", h.PostData)
 	rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
 
+	// logger a logging middleware
+	logger := Logger{
+		Next: rMetrics,
+	}
+
 	// Run the server
 	srv := &http.Server{
 		Addr:           fmt.Sprintf("0.0.0.0:%d", *portPtr),
-		Handler:        rMetrics,
+		Handler:        logger,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
