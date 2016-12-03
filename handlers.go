@@ -28,6 +28,9 @@ import (
 	"github.com/yaacov/mohawk/backends"
 )
 
+// validRegex regexp for validating sql variables
+var validRegex = regexp.MustCompile(`^[A-Za-z0-9_/\[\]\(\)\.-]*$`)
+
 // Handler common variables to be used by all Handler functions
 // 	version the version of the Hawkular server we are mocking
 // 	backend the backend to be used by the Handler functions
@@ -53,7 +56,6 @@ func parseTags(tags string) map[string]string {
 }
 
 func validStr(s string) bool {
-	validRegex := regexp.MustCompile(`^[A-Za-z0-9_/\[\]\(\)\.-]*$`)
 	return validRegex.MatchString(s)
 }
 
