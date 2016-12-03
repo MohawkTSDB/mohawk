@@ -12,73 +12,11 @@ type Sqlite struct {
 	db *sql.DB
 }
 
+// Backend functions
+// Required by backend interface
+
 func (r Sqlite) Name() string {
 	return "Backend-Sqlite"
-}
-
-func (r Sqlite) IdExist(id string) bool {
-	var _id string
-	sqlStmt := fmt.Sprintf("select id from ids where id='%s'", id)
-	err := r.db.QueryRow(sqlStmt).Scan(&_id)
-	return err != sql.ErrNoRows
-}
-
-func (r Sqlite) insertData(id string, t int64, v float64) {
-	sqlStmt := fmt.Sprintf("insert into %s values (%d, %f)", id, t, v)
-	_, err := r.db.Exec(sqlStmt)
-	if err != nil {
-		log.Fatal("%q: %s\n", err, sqlStmt)
-	}
-}
-
-func (r Sqlite) insertTag(id string, k string, v string) {
-	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
-	_, err := r.db.Exec(sqlStmt)
-	if err != nil {
-		log.Fatal("%q: %s\n", err, sqlStmt)
-	}
-}
-
-func (r Sqlite) createId(id string) bool {
-	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
-	_, err := r.db.Exec(sqlStmt)
-	if err != nil {
-		log.Fatal("%q: %s\n", err, sqlStmt)
-		return false
-	}
-
-	sqlStmt = fmt.Sprintf(`
-	create table if not exists %s (
-		timestamp integer,
-		value     numeric,
-		primary key (timestamp));
-	`, id)
-
-	_, err = r.db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-		return false
-	}
-
-	return true
-}
-
-func (r Sqlite) UpdateTag(items []Item, id string, tag string, value string) []Item {
-	// try to update tag if item exist
-	for i, item := range items {
-		if item.Id == id {
-			items[i].Tags[tag] = value
-			return items
-		}
-	}
-
-	// if here we did not find a matching item
-	items = append(items, Item{
-		Id:   id,
-		Tags: map[string]string{tag: value},
-	})
-
-	return items
 }
 
 func (r *Sqlite) Open() {
@@ -175,7 +113,7 @@ func (r Sqlite) GetRawData(id string, end int64, start int64, limit int64, order
 	}
 
 	// id exist, get timestamp, value pairs
-	sqlStmt := fmt.Sprintf(`select timestamp, value 
+	sqlStmt := fmt.Sprintf(`select timestamp, value
 		from %s
 		where timestamp > %d and timestamp <= %d
 		order by timestamp %s limit %d`,
@@ -216,8 +154,8 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 	}
 
 	// id exist, get timestamp, value pairs
-	sqlStmt := fmt.Sprintf(`select 
-		count(timestamp) as samples, cast((timestamp / %d) as integer) * %d as start, max(timestamp) as end, 
+	sqlStmt := fmt.Sprintf(`select
+		count(timestamp) as samples, cast((timestamp / %d) as integer) * %d as start, max(timestamp) as end,
 		min(value) as min, max(value) as max, avg(value) as avg, sum(value) as sum
 		from %s
 		where timestamp > %d and timestamp <= %d
@@ -318,4 +256,72 @@ func (r Sqlite) PutTags(id string, tags map[string]string) bool {
 		r.insertTag(id, k, v)
 	}
 	return true
+}
+
+// Helper functions
+// Not required by backend interface
+
+func (r Sqlite) IdExist(id string) bool {
+	var _id string
+	sqlStmt := fmt.Sprintf("select id from ids where id='%s'", id)
+	err := r.db.QueryRow(sqlStmt).Scan(&_id)
+	return err != sql.ErrNoRows
+}
+
+func (r Sqlite) insertData(id string, t int64, v float64) {
+	sqlStmt := fmt.Sprintf("insert into %s values (%d, %f)", id, t, v)
+	_, err := r.db.Exec(sqlStmt)
+	if err != nil {
+		log.Fatal("%q: %s\n", err, sqlStmt)
+	}
+}
+
+func (r Sqlite) insertTag(id string, k string, v string) {
+	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
+	_, err := r.db.Exec(sqlStmt)
+	if err != nil {
+		log.Fatal("%q: %s\n", err, sqlStmt)
+	}
+}
+
+func (r Sqlite) createId(id string) bool {
+	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
+	_, err := r.db.Exec(sqlStmt)
+	if err != nil {
+		log.Fatal("%q: %s\n", err, sqlStmt)
+		return false
+	}
+
+	sqlStmt = fmt.Sprintf(`
+	create table if not exists %s (
+		timestamp integer,
+		value     numeric,
+		primary key (timestamp));
+	`, id)
+
+	_, err = r.db.Exec(sqlStmt)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmt)
+		return false
+	}
+
+	return true
+}
+
+func (r Sqlite) UpdateTag(items []Item, id string, tag string, value string) []Item {
+	// try to update tag if item exist
+	for i, item := range items {
+		if item.Id == id {
+			items[i].Tags[tag] = value
+			return items
+		}
+	}
+
+	// if here we did not find a matching item
+	items = append(items, Item{
+		Id:   id,
+		Tags: map[string]string{tag: value},
+	})
+
+	return items
 }

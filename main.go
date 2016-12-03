@@ -24,7 +24,7 @@ func main() {
 	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite]")
 	flag.Parse()
 
-	// Hreate and init the backend
+	// Create and init the backend
 	if *backendPtr == "sqlite" {
 		db = &backend.Sqlite{}
 	} else {
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Create the routers
-	// Requests no handled by the routers will be forworded to BadRequest Handler
+	// Requests not handled by the routers will be forworded to BadRequest Handler
 	rRoot := router.Router{
 		Prefix: "/",
 		Next:   BadRequest{},
