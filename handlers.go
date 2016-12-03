@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -33,6 +34,21 @@ func parseTags(tags string) map[string]string {
 		}
 	}
 	return vsf
+}
+
+func validStr(s string) bool {
+	validRegex := regexp.MustCompile(`^[A-Za-z0-9_/\[\]\(\)\.-]*$`)
+	return validRegex.MatchString(s)
+}
+
+func validTags(tags map[string]string) bool {
+	for k, v := range tags {
+		if !validStr(k) || !validStr(v) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // GetStatus return a json status struct
@@ -70,8 +86,13 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	var res []backend.Item
 
 	r.ParseForm()
-	if tags, ok := r.Form["tags"]; ok && len(tags) > 0 {
-		res = h.backend.GetItemList(parseTags(tags[0]))
+	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
+		tags := parseTags(tagsStr[0])
+		if !validTags(tags) {
+			w.WriteHeader(504)
+			return
+		}
+		res = h.backend.GetItemList(tags)
 	} else {
 		res = h.backend.GetItemList(map[string]string{})
 	}
@@ -93,6 +114,10 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 
 	// use the id from the argv list
 	id = argv["id"]
+	if !validStr(id) {
+		w.WriteHeader(504)
+		return
+	}
 
 	// get data from the form arguments
 	r.ParseForm()
@@ -152,6 +177,11 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 	json.NewDecoder(r.Body).Decode(&u)
 
 	id := u[0]["id"].(string)
+	if !validStr(id) {
+		w.WriteHeader(504)
+		return
+	}
+
 	t := u[0]["data"].([]interface{})[0].(map[string]interface{})["timestamp"].(float64)
 	vStr := u[0]["data"].([]interface{})[0].(map[string]interface{})["value"].(string)
 	v, _ := strconv.ParseFloat(vStr, 64)
@@ -168,6 +198,10 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 
 	// use the id from the argv list
 	id := argv["id"]
+	if !validStr(id) || !validTags(tags) {
+		w.WriteHeader(504)
+		return
+	}
 
 	h.backend.PutTags(id, tags)
 	w.WriteHeader(200)

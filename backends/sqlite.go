@@ -24,7 +24,7 @@ func (r *Sqlite) Open() {
 
 	r.db, err = sql.Open("sqlite3", "./server.db")
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q\n", err)
 	}
 
 	sqlStmt := `
@@ -48,9 +48,10 @@ func (r Sqlite) GetItemList(tags map[string]string) []Item {
 	res := make([]Item, 0)
 
 	// create one item per id
-	rows, err := r.db.Query("select id from ids")
+	sqlStmt := "select id from ids"
+	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -58,7 +59,7 @@ func (r Sqlite) GetItemList(tags map[string]string) []Item {
 
 		err = rows.Scan(&id)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("%q\n", err)
 		}
 		res = append(res, Item{
 			Id:   id,
@@ -68,13 +69,13 @@ func (r Sqlite) GetItemList(tags map[string]string) []Item {
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q\n", err)
 	}
 
 	// update item tags
 	rows, err = r.db.Query("select id, tag, value from tags")
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q\n", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -84,13 +85,13 @@ func (r Sqlite) GetItemList(tags map[string]string) []Item {
 
 		err = rows.Scan(&id, &tag, &value)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("%q\n", err)
 		}
 		res = r.UpdateTag(res, id, tag, value)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q\n", err)
 	}
 
 	// filter using tags
@@ -120,7 +121,7 @@ func (r Sqlite) GetRawData(id string, end int64, start int64, limit int64, order
 		id, start, end, order, limit)
 	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -129,7 +130,7 @@ func (r Sqlite) GetRawData(id string, end int64, start int64, limit int64, order
 
 		err = rows.Scan(&timestamp, &value)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("%q\n", err)
 		}
 		res = append(res, DataItem{
 			Timestamp: timestamp,
@@ -138,7 +139,7 @@ func (r Sqlite) GetRawData(id string, end int64, start int64, limit int64, order
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q\n", err)
 	}
 
 	return res
@@ -164,7 +165,7 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 		bucketDuration*1000, bucketDuration*1000, id, start, end, order, limit)
 	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 	defer rows.Close()
 	t = int64(start/(bucketDuration*1000)) * (bucketDuration * 1000)
@@ -179,7 +180,7 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 
 		err = rows.Scan(&samples, &startT, &endT, &min, &max, &avg, &sum)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("%q\n", err)
 		}
 
 		// append missing
@@ -214,7 +215,7 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q\n", err)
 	}
 
 	// append missing
@@ -272,7 +273,7 @@ func (r Sqlite) insertData(id string, t int64, v float64) {
 	sqlStmt := fmt.Sprintf("insert into %s values (%d, %f)", id, t, v)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
-		log.Fatal("%q: %s\n", err, sqlStmt)
+		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 }
 
@@ -280,7 +281,7 @@ func (r Sqlite) insertTag(id string, k string, v string) {
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
-		log.Fatal("%q: %s\n", err, sqlStmt)
+		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 }
 
@@ -288,7 +289,7 @@ func (r Sqlite) createId(id string) bool {
 	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
-		log.Fatal("%q: %s\n", err, sqlStmt)
+		log.Printf("%q: %s\n", err, sqlStmt)
 		return false
 	}
 
