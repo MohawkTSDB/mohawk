@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,12 +11,18 @@ import (
 	"github.com/yaacov/mohawk/backends"
 )
 
+// Handler common variables to be used by all Handler functions
+// 	version the version of the Hawkular server we are mocking
+// 	backend the backend to be used by the Handler functions
 type Handler struct {
 	version string
 	backend backend.Backend
 }
 
-func (h Handler) parseTags(tags string) map[string]string {
+// parseTags takes a comma separeted key:value list string and returns a map[string]string
+// 	e.g.
+// 	"warm:kitty,soft:kitty" => {"warm": "kitty", "soft": "kitty"}
+func parseTags(tags string) map[string]string {
 	vsf := make(map[string]string)
 
 	tagsList := strings.Split(tags, ",")
@@ -30,52 +35,43 @@ func (h Handler) parseTags(tags string) map[string]string {
 	return vsf
 }
 
-func (h Handler) BadRequest(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	var u interface{}
-
-	json.NewDecoder(r.Body).Decode(&u)
-	r.ParseForm()
-
-	w.WriteHeader(404)
-
-	log.Printf("BadRequest:\n")
-	log.Printf("Request: %+v\n", r)
-	log.Printf("Body: %+v\n", u)
-
-	fmt.Fprintf(w, "Error:")
-	fmt.Fprintf(w, "Request: %+v\n", r)
-	fmt.Fprintf(w, "Body: %+v\n", u)
-}
-
+// GetStatus return a json status struct
 func (h Handler) GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	res := fmt.Sprintf(`{
-		"MetricsService":"STARTED",
-		"Implementation-Version":"%s",
-		"MoHawk":"%s %s"
-		}`, h.version, VER, h.backend.Name())
+	resTemplate := `{
+	"MetricsService":"STARTED",
+	"Implementation-Version":"%s",
+	"MohawkVersion":"%s",
+	"MohawkBackend":"%s"
+}`
+	res := fmt.Sprintf(resTemplate, h.version, VER, h.backend.Name())
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
 }
 
+// GetAPIVersions return a json apiVersion struct
 func (h Handler) GetAPIVersions(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	resTemplate := `{
+	"kind": "APIVersions",
+	"apiVersion": "%s",
+	"versions": [
+		"%s"
+	],
+	"serverAddressByClientCIDRs": null
+}`
+	res := fmt.Sprintf(resTemplate, "v1", "v1")
+
 	w.WriteHeader(200)
-	fmt.Fprintln(w, `{
-	  "kind": "APIVersions",
-	  "apiVersion": "v1",
-	  "versions": [
-	    "v1"
-	  ],
-	  "serverAddressByClientCIDRs": null
-	}`)
+	fmt.Fprintln(w, res)
 }
 
+// GetMetrics return a list of metrics definitions
 func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []backend.Item
 
 	r.ParseForm()
 	if tags, ok := r.Form["tags"]; ok && len(tags) > 0 {
-		res = h.backend.GetItemList(h.parseTags(tags[0]))
+		res = h.backend.GetItemList(parseTags(tags[0]))
 	} else {
 		res = h.backend.GetItemList(map[string]string{})
 	}
@@ -85,6 +81,7 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	fmt.Fprintln(w, string(resJSON))
 }
 
+// GetData return a list of metrics raw / stat data
 func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var resStr string
 	var id string
@@ -119,6 +116,10 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	}
 	if v, ok := r.Form["order"]; ok && len(v) > 0 {
 		order = v[0]
+		// do sanity check
+		if order != "ASC" || order != "DESC" {
+			order = "DESC"
+		}
 	} else {
 		order = "DESC"
 	}
@@ -145,9 +146,9 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	fmt.Fprintln(w, resStr)
 }
 
+// PostData send timestamp, value to the backend
 func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u []map[string]interface{}
-
 	json.NewDecoder(r.Body).Decode(&u)
 
 	id := u[0]["id"].(string)
@@ -156,21 +157,19 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 	v, _ := strconv.ParseFloat(vStr, 64)
 
 	h.backend.PostRawData(id, int64(t), v)
-
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }
 
+// PutTags send tag, value pairs to the backend
 func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var tags map[string]string
-
 	json.NewDecoder(r.Body).Decode(&tags)
 
 	// use the id from the argv list
 	id := argv["id"]
 
 	h.backend.PutTags(id, tags)
-
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }

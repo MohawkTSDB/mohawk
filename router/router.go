@@ -13,17 +13,23 @@ type route struct {
 	handler  func(http.ResponseWriter, *http.Request, map[string]string)
 }
 
+// Router ah http request router
 type Router struct {
-	Prefix           string
-	HandleBadRequest func(http.ResponseWriter, *http.Request, map[string]string)
-	Routes           []route
+	Prefix string
+	Next   http.Handler
+	Routes []route
 }
 
+// Add add a new route into the router routing table
 func (r *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request, map[string]string)) {
 	r.Routes = append(r.Routes, route{method, strings.Split(path, "/"), handler})
 }
 
-func (r Router) Match(route route, method string, segments []string) (bool, map[string]string) {
+// match match a request to a route, and parse the arguments embeded in the route path
+// returns
+// 	bool - true if route match
+// 	map  - a map of arguments parsed from the route path
+func (r Router) match(route route, method string, segments []string) (bool, map[string]string) {
 	argv := make(map[string]string)
 
 	// check method and segments list length
@@ -47,9 +53,8 @@ func (r Router) Match(route route, method string, segments []string) (bool, map[
 	return true, argv
 }
 
+// ServeHTTP try to match a route to the request, and call the route handler
 func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	var argv map[string]string
-
 	// log request
 	log.Printf("%s %4s %s", request.RemoteAddr, request.Method, request.URL)
 
@@ -58,20 +63,20 @@ func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	// check path prefix
 	if !strings.HasPrefix(path, r.Prefix) {
-		r.HandleBadRequest(writer, request, argv)
+		r.Next.ServeHTTP(writer, request)
 		return
 	}
 
 	// clean the path
 	path = path[len(r.Prefix):]
-	if path[len(path)-1] == '/' {
+	if len(path) > 0 && path[len(path)-1] == '/' {
 		path = path[:len(path)-1]
 	}
 
 	// try to match the path to a route
 	segments := strings.Split(path, "/")
 	for _, route := range r.Routes {
-		found, argv := r.Match(route, request.Method, segments)
+		found, argv := r.match(route, request.Method, segments)
 
 		// if found a match, run the handler for this route
 		if found {
@@ -81,5 +86,5 @@ func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// handle page not found
-	r.HandleBadRequest(writer, request, argv)
+	r.Next.ServeHTTP(writer, request)
 }

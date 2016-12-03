@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -11,15 +12,36 @@ import (
 	"github.com/yaacov/mohawk/router"
 )
 
+// VER the server version
 const VER = "0.2.0"
+
+// BadRequest will be called if no route found
+type BadRequest struct{}
+
+func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var u interface{}
+	json.NewDecoder(r.Body).Decode(&u)
+	r.ParseForm()
+
+	log.Printf("BadRequest:\n")
+	log.Printf("Request: %+v\n", r)
+	log.Printf("Body: %+v\n", u)
+
+	w.WriteHeader(404)
+	fmt.Fprintf(w, "Page not found - 404\n")
+}
 
 func main() {
 	var db backend.Backend
 
+	// Get user options
+	// 	port    - default to 8443
+	// 	backend - default to random
 	portPtr := flag.Int("port", 8443, "server port")
 	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite]")
 	flag.Parse()
 
+	// Hreate and init the backend
 	if *backendPtr == "sqlite" {
 		db = &backend.Sqlite{}
 	} else {
@@ -27,34 +49,48 @@ func main() {
 	}
 	db.Open()
 
+	// h common variables to be used by all Handler functions
+	// backend the backend to use for metrics source
+	// version the Hawkular server version we mimic
 	h := Handler{
 		backend: db,
 		version: "0.21.0",
 	}
-	r := router.Router{
-		Prefix:           "/",
-		HandleBadRequest: h.BadRequest,
+
+	// Create the routers
+	// Requests no handled by the routers will be forworded to BadRequest Handler
+	rRoot := router.Router{
+		Prefix: "/",
+		Next:   BadRequest{},
 	}
+	// Root Routing table
+	rRoot.Add("GET", "oapi", h.GetAPIVersions)
 
-	r.Add("GET", "oapi", h.GetAPIVersions)
-	r.Add("GET", "hawkular/metrics/status", h.GetStatus)
-	r.Add("GET", "hawkular/alerts/status", h.GetStatus)
+	rAlerts := router.Router{
+		Prefix: "/hawkular/alerts/",
+		Next:   rRoot,
+	}
+	// Alerts Routing table
+	rAlerts.Add("GET", "status", h.GetStatus)
 
-	r.Add("GET", "hawkular/metrics/metrics", h.GetMetrics)
-	r.Add("GET", "hawkular/metrics/gauges/:id/raw", h.GetData)
-	r.Add("GET", "hawkular/metrics/counters/:id/raw", h.GetData)
-	r.Add("GET", "hawkular/metrics/availability/:id/raw", h.GetData)
+	rMetrics := router.Router{
+		Prefix: "/hawkular/metrics/",
+		Next:   rAlerts,
+	}
+	// Metrics Routing table
+	rMetrics.Add("GET", "status", h.GetStatus)
+	rMetrics.Add("GET", "metrics", h.GetMetrics)
+	rMetrics.Add("GET", "gauges/:id/raw", h.GetData)
+	rMetrics.Add("GET", "counters/:id/raw", h.GetData)
+	rMetrics.Add("GET", "availability/:id/raw", h.GetData)
+	rMetrics.Add("GET", "gauges/:id/stats", h.GetData)
+	rMetrics.Add("POST", "gauges/raw", h.PostData)
+	rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
 
-	r.Add("GET", "hawkular/metrics/gauges/:id/stats", h.GetData)
-	r.Add("GET", "hawkular/metrics/counters/:id/stats", h.GetData)
-
-	r.Add("POST", "hawkular/metrics/gauges/raw", h.PostData)
-	r.Add("PUT", "hawkular/metrics/gauges/:id/tags", h.PutTags)
-	r.Add("PUT", "hawkular/metrics/counters/:id/tags", h.PutTags)
-
+	// Run the server
 	srv := &http.Server{
 		Addr:           fmt.Sprintf("0.0.0.0:%d", *portPtr),
-		Handler:        r,
+		Handler:        rMetrics,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
