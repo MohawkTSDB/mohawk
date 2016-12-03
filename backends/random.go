@@ -67,6 +67,12 @@ func (r Random) GetRawData(id string, end int64, start int64, limit int64, order
 		})
 	}
 
+	if order == "DESC" {
+		for i, j := 0, len(res)-1; i < j; i, j = i+1, j-1 {
+			res[i], res[j] = res[j], res[i]
+		}
+	}
+
 	return res
 }
 
@@ -88,6 +94,12 @@ func (r Random) GetStatData(id string, end int64, start int64, limit int64, orde
 			Median:  value,
 			Sum:     value,
 		})
+	}
+
+	if order == "DESC" {
+		for i, j := 0, len(res)-1; i < j; i, j = i+1, j-1 {
+			res[i], res[j] = res[j], res[i]
+		}
 	}
 
 	return res
