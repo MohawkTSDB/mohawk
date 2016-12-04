@@ -58,7 +58,7 @@ func parseTags(tags string) map[string]string {
 
 func validStr(s string) bool {
 	valid := validRegex.MatchString(s)
-	if !valid{
+	if !valid {
 		log.Printf("Valid string fail: %s\n", s)
 	}
 	return valid
