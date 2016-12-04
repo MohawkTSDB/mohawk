@@ -131,7 +131,7 @@ func (r Sqlite) GetRawData(id string, end int64, start int64, limit int64, order
 
 	// id exist, get timestamp, value pairs
 	sqlStmt := fmt.Sprintf(`select timestamp, value
-		from %s
+		from '%s'
 		where timestamp > %d and timestamp <= %d
 		order by timestamp %s limit %d`,
 		id, start, end, order, limit)
@@ -174,7 +174,7 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 	sqlStmt := fmt.Sprintf(`select
 		count(timestamp) as samples, cast((timestamp / %d) as integer) * %d as start, max(timestamp) as end,
 		min(value) as min, max(value) as max, avg(value) as avg, sum(value) as sum
-		from %s
+		from '%s'
 		where timestamp > %d and timestamp <= %d
 		group by start
 		order by start %s limit %d`,
@@ -286,7 +286,7 @@ func (r Sqlite) IdExist(id string) bool {
 }
 
 func (r Sqlite) insertData(id string, t int64, v float64) {
-	sqlStmt := fmt.Sprintf("insert into %s values (%d, %f)", id, t, v)
+	sqlStmt := fmt.Sprintf("insert into '%s' values (%d, %f)", id, t, v)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
@@ -310,7 +310,7 @@ func (r Sqlite) createId(id string) bool {
 	}
 
 	sqlStmt = fmt.Sprintf(`
-	create table if not exists %s (
+	create table if not exists '%s' (
 		timestamp integer,
 		value     numeric,
 		primary key (timestamp));

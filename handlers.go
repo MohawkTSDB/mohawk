@@ -19,6 +19,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -56,7 +57,11 @@ func parseTags(tags string) map[string]string {
 }
 
 func validStr(s string) bool {
-	return validRegex.MatchString(s)
+	valid := validRegex.MatchString(s)
+	if !valid{
+		log.Printf("Valid string fail: %s\n", s)
+	}
+	return valid
 }
 
 func validTags(tags map[string]string) bool {
