@@ -30,7 +30,7 @@ import (
 )
 
 // validRegex regexp for validating sql variables
-var validRegex = regexp.MustCompile(`^[A-Za-z0-9_/\[\]\(\)\.-]*$`)
+var validRegex = regexp.MustCompile(`^[ A-Za-z0-9_/\[\]\(\)\.-]*$`)
 
 // Handler common variables to be used by all Handler functions
 // 	version the version of the Hawkular server we are mocking
