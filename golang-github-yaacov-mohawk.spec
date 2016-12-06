@@ -9,12 +9,12 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           golang-%{provider}-%{project}-%{repo}
-Version:        0.4.1
+Version:        0.4.2
 Release:        13%{?dist}
 Summary:        Mock Hawkular server
 License:        MIT
 URL:            https://%{import_path}
-Source0:        https://github.com/yaacov/mohawk/archive/master.tar.gz
+Source0:        https://github.com/yaacov/mohawk/archive/%{version}.tar.gz
 
 BuildRequires:  gcc
 
@@ -27,7 +27,7 @@ BuildRequires:  golang(github.com/mattn/go-sqlite3) >= 0-0.1
 Mock Hawkular server
 
 %prep
-%setup -q -n mohawk-master
+%setup -q -n mohawk-%{version}
 
 # many golang binaries are "vendoring" (bundling) sources, so remove them. Those dependencies need to be packaged independently.
 rm -rf vendor
