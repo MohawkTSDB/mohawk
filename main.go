@@ -28,7 +28,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.2.0"
+const VER = "0.3.0"
 
 func main() {
 	var db backend.Backend
@@ -38,6 +38,7 @@ func main() {
 	// 	backend - default to random
 	portPtr := flag.Int("port", 8443, "server port")
 	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite]")
+	apiPtr := flag.String("api", "0.21.0", "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
 	flag.Parse()
 
 	// Create and init the backend
@@ -53,7 +54,7 @@ func main() {
 	// version the Hawkular server version we mimic
 	h := Handler{
 		backend: db,
-		version: "0.21.0",
+		version: *apiPtr,
 	}
 
 	// Create the routers
@@ -79,13 +80,23 @@ func main() {
 	// Metrics Routing table
 	rMetrics.Add("GET", "status", h.GetStatus)
 	rMetrics.Add("GET", "metrics", h.GetMetrics)
+
+	// api version >= 0.16.0
 	rMetrics.Add("GET", "gauges/:id/raw", h.GetData)
 	rMetrics.Add("GET", "counters/:id/raw", h.GetData)
 	rMetrics.Add("GET", "availability/:id/raw", h.GetData)
 	rMetrics.Add("GET", "gauges/:id/stats", h.GetData)
+
 	rMetrics.Add("POST", "gauges/raw", h.PostData)
 	rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
 
+	// api version < 0.16.0
+	rMetrics.Add("GET", "gauges/:id/data", h.GetData)
+	rMetrics.Add("GET", "counters/:id/data", h.GetData)
+	rMetrics.Add("GET", "availability/:id/data", h.GetData)
+	
+	rMetrics.Add("POST", "gauges/data", h.PostData)
+	
 	// logger a logging middleware
 	logger := Logger{
 		Next: rMetrics,
