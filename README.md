@@ -55,7 +55,10 @@ The `-h` flag will print out a help text, that list the command line arguments.
 ```bash
 # run `go run *.go` from the source directory, or if installed use:
 mohawk -h
+
 Usage of mohawk:
+  -api string
+    	the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final] (default "0.21.0")
   -backend string
     	the backend to use [random, sqlite] (default "random")
   -port int
