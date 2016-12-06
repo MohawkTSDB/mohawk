@@ -28,7 +28,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.3.0"
+const VER = "0.4.1"
 
 func main() {
 	var db backend.Backend
@@ -39,6 +39,7 @@ func main() {
 	portPtr := flag.Int("port", 8443, "server port")
 	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite]")
 	apiPtr := flag.String("api", "0.21.0", "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
+	apiTLS := flag.String("tls", "true", "use TLS server")
 	flag.Parse()
 
 	// Create and init the backend
@@ -85,10 +86,16 @@ func main() {
 	rMetrics.Add("GET", "gauges/:id/raw", h.GetData)
 	rMetrics.Add("GET", "counters/:id/raw", h.GetData)
 	rMetrics.Add("GET", "availability/:id/raw", h.GetData)
+
 	rMetrics.Add("GET", "gauges/:id/stats", h.GetData)
+	rMetrics.Add("GET", "counters/:id/stats", h.GetData)
+	rMetrics.Add("GET", "availability/:id/stats", h.GetData)
 
 	rMetrics.Add("POST", "gauges/raw", h.PostData)
+	rMetrics.Add("POST", "counters/raw", h.PostData)
+	
 	rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
+	rMetrics.Add("PUT", "counters/:id/tags", h.PutTags)
 
 	// api version < 0.16.0
 	rMetrics.Add("GET", "gauges/:id/data", h.GetData)
@@ -96,6 +103,7 @@ func main() {
 	rMetrics.Add("GET", "availability/:id/data", h.GetData)
 	
 	rMetrics.Add("POST", "gauges/data", h.PostData)
+	rMetrics.Add("POST", "counters/data", h.PostData)
 	
 	// logger a logging middleware
 	logger := Logger{
@@ -110,6 +118,11 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	log.Printf("Start server, listen on https://%+v", srv.Addr)
-	log.Fatal(srv.ListenAndServeTLS("server.pem", "server.key"))
+	if *apiTLS == "true" {
+		log.Printf("Start server, listen on https://%+v", srv.Addr)
+		log.Fatal(srv.ListenAndServeTLS("server.pem", "server.key"))
+	} else {
+		log.Printf("Start server, listen on http://%+v", srv.Addr)
+		log.Fatal(srv.ListenAndServe())
+	}
 }

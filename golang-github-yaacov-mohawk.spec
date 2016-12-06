@@ -9,7 +9,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           golang-%{provider}-%{project}-%{repo}
-Version:        0.3.0
+Version:        0.4.1
 Release:        13%{?dist}
 Summary:        Mock Hawkular server
 License:        MIT
