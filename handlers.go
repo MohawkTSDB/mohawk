@@ -159,6 +159,9 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	if v, ok := r.Form["limit"]; ok && len(v) > 0 {
 		i, _ := strconv.Atoi(v[0])
 		limit = int64(i)
+		if limit < 1 {
+			limit = int64(100)
+		}
 	} else {
 		limit = int64(100)
 	}

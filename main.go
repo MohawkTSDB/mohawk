@@ -93,7 +93,7 @@ func main() {
 
 	rMetrics.Add("POST", "gauges/raw", h.PostData)
 	rMetrics.Add("POST", "counters/raw", h.PostData)
-	
+
 	rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
 	rMetrics.Add("PUT", "counters/:id/tags", h.PutTags)
 
@@ -101,10 +101,10 @@ func main() {
 	rMetrics.Add("GET", "gauges/:id/data", h.GetData)
 	rMetrics.Add("GET", "counters/:id/data", h.GetData)
 	rMetrics.Add("GET", "availability/:id/data", h.GetData)
-	
+
 	rMetrics.Add("POST", "gauges/data", h.PostData)
 	rMetrics.Add("POST", "counters/data", h.PostData)
-	
+
 	// logger a logging middleware
 	logger := Logger{
 		Next: rMetrics,
