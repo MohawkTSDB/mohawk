@@ -62,21 +62,18 @@ func main() {
 	// Requests not handled by the routers will be forworded to BadRequest Handler
 	rRoot := router.Router{
 		Prefix: "/",
-		Next:   BadRequest{},
 	}
 	// Root Routing table
 	rRoot.Add("GET", "oapi", h.GetAPIVersions)
 
 	rAlerts := router.Router{
 		Prefix: "/hawkular/alerts/",
-		Next:   rRoot,
 	}
 	// Alerts Routing table
 	rAlerts.Add("GET", "status", h.GetStatus)
 
 	rMetrics := router.Router{
 		Prefix: "/hawkular/metrics/",
-		Next:   rAlerts,
 	}
 	// Metrics Routing table
 	rMetrics.Add("GET", "status", h.GetStatus)
@@ -106,9 +103,10 @@ func main() {
 	rMetrics.Add("POST", "counters/data", h.PostData)
 
 	// logger a logging middleware
-	logger := Logger{
-		Next: rMetrics,
-	}
+	logger := Logger{}
+
+	// prepend middlewars and routes to the rRoot route then fallback to BadRequest
+	router.ConcatMiddleWares([]router.MiddleWare{&logger, &rMetrics, &rAlerts, &rRoot}, BadRequest{})
 
 	// Run the server
 	srv := &http.Server{

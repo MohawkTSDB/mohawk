@@ -25,12 +25,16 @@ import (
 
 // Logger middleware that will log http requests
 type Logger struct {
-	Next http.Handler
+	next http.Handler
+}
+
+func (l *Logger) SetNext(h http.Handler) {
+	l.next = h
 }
 
 func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %4s %s", r.RemoteAddr, r.Method, r.URL)
-	l.Next.ServeHTTP(w, r)
+	l.next.ServeHTTP(w, r)
 }
 
 // BadRequest will be called if no route found

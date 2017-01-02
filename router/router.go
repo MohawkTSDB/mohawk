@@ -31,8 +31,12 @@ type route struct {
 // Router ah http request router
 type Router struct {
 	Prefix string
-	Next   http.Handler
 	Routes []route
+	next   http.Handler
+}
+
+func (r *Router) SetNext(h http.Handler) {
+	r.next = h
 }
 
 // Add add a new route into the router routing table
@@ -75,7 +79,7 @@ func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	// check path prefix
 	if !strings.HasPrefix(path, r.Prefix) {
-		r.Next.ServeHTTP(writer, request)
+		r.next.ServeHTTP(writer, request)
 		return
 	}
 
@@ -98,5 +102,5 @@ func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// handle page not found
-	r.Next.ServeHTTP(writer, request)
+	r.next.ServeHTTP(writer, request)
 }
