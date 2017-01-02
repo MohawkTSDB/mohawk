@@ -197,6 +197,78 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	fmt.Fprintln(w, resStr)
 }
 
+// PostQuery send timestamp, value to the backend
+func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	var resStr string
+	var id string
+	var end int64
+	var start int64
+	var limit int64
+	var bucketDuration int64
+	var order string
+	var u map[string]interface{}
+	json.NewDecoder(r.Body).Decode(&u)
+
+	if v, ok := u["ids"]; ok {
+		id = v.([]interface{})[0].(string)
+	}
+
+	if !validStr(id) {
+		w.WriteHeader(504)
+		return
+	}
+
+	if v, ok := u["end"]; ok {
+		end = int64(v.(float64))
+	} else {
+		end = int64(time.Now().Unix() * 1000)
+	}
+	if v, ok := u["start"]; ok {
+		start = int64(v.(float64))
+	} else {
+		start = end - int64(8*60*60*1000)
+	}
+	if v, ok := u["limit"]; ok {
+		limit = int64(v.(float64))
+		if limit < 1 {
+			limit = int64(100)
+		}
+	} else {
+		limit = int64(100)
+	}
+	if v, ok := u["order"]; ok {
+		order = v.(string)
+		// do sanity check
+		if order != "ASC" || order != "DESC" {
+			order = "DESC"
+		}
+	} else {
+		order = "DESC"
+	}
+	if vi, ok := u["bucketDuration"]; ok {
+		v := vi.(string)
+		i, _ := strconv.Atoi(v[:len(v)-1])
+		bucketDuration = int64(i)
+	} else {
+		bucketDuration = int64(0)
+	}
+
+	// call backend for data
+	if bucketDuration == 0 {
+		res := h.backend.GetRawData(id, end, start, limit, order)
+		resJSON, _ := json.Marshal(res)
+		resStr = string(resJSON)
+	} else {
+		res := h.backend.GetStatData(id, end, start, limit, order, bucketDuration)
+		resJSON, _ := json.Marshal(res)
+		resStr = string(resJSON)
+	}
+
+	// output to client
+	w.WriteHeader(200)
+	fmt.Fprintf(w, "[{\"id\": \"%s\", \"data\": %s}]", id, resStr)
+}
+
 // PostData send timestamp, value to the backend
 func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u []map[string]interface{}

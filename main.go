@@ -89,7 +89,9 @@ func main() {
 	rMetrics.Add("GET", "availability/:id/stats", h.GetData)
 
 	rMetrics.Add("POST", "gauges/raw", h.PostData)
+	rMetrics.Add("POST", "gauges/raw/query", h.PostQuery)
 	rMetrics.Add("POST", "counters/raw", h.PostData)
+	rMetrics.Add("POST", "counters/raw/query", h.PostQuery)
 
 	rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
 	rMetrics.Add("PUT", "counters/:id/tags", h.PutTags)
@@ -105,7 +107,7 @@ func main() {
 	// logger a logging middleware
 	logger := Logger{}
 
-	// prepend middlewars and routes to the rRoot route then fallback to BadRequest
+	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
 	router.ConcatMiddleWares([]router.MiddleWare{&logger, &rMetrics, &rAlerts, &rRoot}, BadRequest{})
 
 	// Run the server
