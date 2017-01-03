@@ -36,9 +36,11 @@ To install, get the source code, or do ``go install github.com/yaacov/mohawk`` i
 To run, users will need the ``server.key`` and ``server.pem`` certification files.
 
 Using a Copr repository for Fedora:
-``dnf copr enable yaacov/golang-github-yaacov-mohawk`` 
 
-``sudo dnf install mohawk``
+```
+dnf copr enable yaacov/golang-github-yaacov-mohawk
+sudo dnf install mohawk
+```
 
 ## Mock Certifications
 
