@@ -63,6 +63,8 @@ Usage of mohawk:
     	the backend to use [random, sqlite] (default "random")
   -port int
     	server port (default 8443)
+  -tls string
+    	use TLS server (default "true")
 ```
 
 ## Example of use
@@ -73,6 +75,12 @@ Running from the source directory using ``go run`` and requesting the help messa
 go run *.go -h
 Usage of mohawk:
 ...
+```
+Running from system install using ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
+
+```bash
+mohawk -tls false -port 8080 -backend sqlite
+2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
 ```
 
 Running from the source directory using ``go run`` and the ``sqlite`` back end
