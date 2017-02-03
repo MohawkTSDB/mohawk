@@ -160,10 +160,10 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 		i, _ := strconv.Atoi(v[0])
 		limit = int64(i)
 		if limit < 1 {
-			limit = int64(100)
+			limit = int64(20000)
 		}
 	} else {
-		limit = int64(100)
+		limit = int64(20000)
 	}
 	if v, ok := r.Form["order"]; ok && len(v) > 0 {
 		order = v[0]
@@ -231,10 +231,10 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	if v, ok := u["limit"]; ok {
 		limit = int64(v.(float64))
 		if limit < 1 {
-			limit = int64(100)
+			limit = int64(20000)
 		}
 	} else {
-		limit = int64(100)
+		limit = int64(20000)
 	}
 	if v, ok := u["order"]; ok {
 		order = v.(string)
