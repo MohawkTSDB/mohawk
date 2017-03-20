@@ -65,18 +65,12 @@ func main() {
 	}
 	// Root Routing table
 	rRoot.Add("GET", "oapi", h.GetAPIVersions)
-
-	rAlerts := router.Router{
-		Prefix: "/hawkular/alerts/",
-	}
-	// Alerts Routing table
-	rAlerts.Add("GET", "status", h.GetStatus)
+	rRoot.Add("GET", "hawkular/metrics/status", h.GetStatus)
 
 	rMetrics := router.Router{
 		Prefix: "/hawkular/metrics/",
 	}
 	// Metrics Routing table
-	rMetrics.Add("GET", "status", h.GetStatus)
 	rMetrics.Add("GET", "metrics", h.GetMetrics)
 
 	// api version >= 0.16.0
@@ -108,7 +102,11 @@ func main() {
 	logger := Logger{}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	router.ConcatMiddleWares([]router.MiddleWare{&logger, &rMetrics, &rAlerts, &rRoot}, BadRequest{})
+	if (*backendPtr == "error") {
+		router.ConcatMiddleWares([]router.MiddleWare{&logger, &rRoot}, BadRequest{})
+	} else {
+		router.ConcatMiddleWares([]router.MiddleWare{&logger, &rMetrics, &rRoot}, BadRequest{})
+	}
 
 	// Run the server
 	srv := &http.Server{
