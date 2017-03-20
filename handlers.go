@@ -109,6 +109,16 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	var res []backend.Item
 
 	r.ParseForm()
+
+	// we only use gauges
+	if typeStr, ok := r.Form["type"]; ok && len(typeStr) > 0 && typeStr[0] != "gauge" {
+		w.WriteHeader(200)
+		fmt.Fprintln(w, "[]")
+
+		return
+	}
+
+	// get a list of gauges
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
 		tags := parseTags(tagsStr[0])
 		if !validTags(tags) {
@@ -118,6 +128,18 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 		res = h.backend.GetItemList(tags)
 	} else {
 		res = h.backend.GetItemList(map[string]string{})
+	}
+	resJSON, _ := json.Marshal(res)
+
+	w.WriteHeader(200)
+	fmt.Fprintln(w, string(resJSON))
+}
+
+func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	res := []backend.Tenant{
+		backend.Tenant{
+			Id: "_ops",
+		},
 	}
 	resJSON, _ := json.Marshal(res)
 

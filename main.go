@@ -72,6 +72,7 @@ func main() {
 	}
 	// Metrics Routing table
 	rMetrics.Add("GET", "metrics", h.GetMetrics)
+	rMetrics.Add("GET", "tenants", h.GetTenants)
 
 	// api version >= 0.16.0
 	rMetrics.Add("GET", "gauges/:id/raw", h.GetData)
@@ -102,7 +103,7 @@ func main() {
 	logger := Logger{}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	if (*backendPtr == "error") {
+	if *backendPtr == "error" {
 		router.ConcatMiddleWares([]router.MiddleWare{&logger, &rRoot}, BadRequest{})
 	} else {
 		router.ConcatMiddleWares([]router.MiddleWare{&logger, &rMetrics, &rRoot}, BadRequest{})

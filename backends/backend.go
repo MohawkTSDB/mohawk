@@ -16,6 +16,10 @@
 // Package backend
 package backend
 
+type Tenant struct {
+	Id string `json:"id"`
+}
+
 type Item struct {
 	Id   string            `json:"id"`
 	Type string            `json:"type"`
