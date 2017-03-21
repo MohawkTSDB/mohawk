@@ -191,10 +191,10 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 		order = v[0]
 		// do sanity check
 		if order != "ASC" || order != "DESC" {
-			order = "DESC"
+			order = "ASC"
 		}
 	} else {
-		order = "DESC"
+		order = "ASC"
 	}
 	if v, ok := r.Form["bucketDuration"]; ok && len(v) > 0 {
 		i, _ := strconv.Atoi(v[0][:len(v[0])-1])
@@ -262,10 +262,10 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 		order = v.(string)
 		// do sanity check
 		if order != "ASC" || order != "DESC" {
-			order = "DESC"
+			order = "ASC"
 		}
 	} else {
-		order = "DESC"
+		order = "ASC"
 	}
 	if vi, ok := u["bucketDuration"]; ok {
 		v := vi.(string)
