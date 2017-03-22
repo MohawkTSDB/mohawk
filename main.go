@@ -28,7 +28,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.6.0"
+const VER = "0.6.1"
 
 func main() {
 	var db backend.Backend
