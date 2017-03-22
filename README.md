@@ -38,7 +38,7 @@ To run, users will need the ``server.key`` and ``server.pem`` certification file
 Or if using a Copr repository for Fedora:
 
 ```
-sudo dnf copr enable yaacov/golang-github-yaacov-mohawk
+sudo dnf copr enable yaacov/mohawk 
 sudo dnf install mohawk
 ```
 
