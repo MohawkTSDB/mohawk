@@ -250,29 +250,32 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	} else {
 		start = end - int64(8*60*60*1000)
 	}
+
+	limit = int64(20000)
 	if v, ok := u["limit"]; ok {
-		limit = int64(v.(float64))
-		if limit < 1 {
-			limit = int64(20000)
+		if li, ok := v.(float64); ok {
+			if limit < 1 {
+				limit = int64(20000)
+			} else {
+				limit = int64(li)
+			}
 		}
-	} else {
-		limit = int64(20000)
 	}
+	order = "ASC"
 	if v, ok := u["order"]; ok {
-		order = v.(string)
-		// do sanity check
-		if order != "ASC" || order != "DESC" {
-			order = "ASC"
+		if order, ok := v.(string); ok {
+			// do sanity check
+			if order != "ASC" || order != "DESC" {
+				order = "ASC"
+			}
 		}
-	} else {
-		order = "ASC"
 	}
+	bucketDuration = int64(0)
 	if vi, ok := u["bucketDuration"]; ok {
-		v := vi.(string)
-		i, _ := strconv.Atoi(v[:len(v)-1])
-		bucketDuration = int64(i)
-	} else {
-		bucketDuration = int64(0)
+		if v, ok := vi.(string); ok {
+			i, _ := strconv.Atoi(v[:len(v)-1])
+			bucketDuration = int64(i)
+		}
 	}
 
 	// call backend for data
