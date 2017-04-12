@@ -28,7 +28,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.7.1"
+const VER = "0.8.2"
 
 func main() {
 	var db backend.Backend
@@ -70,7 +70,7 @@ func main() {
 	rTimeout := router.Router{
 		Prefix: "/hawkular/metrics/",
 	}
-	// Metrics Routing table
+	// Timeout Error Routing table
 	rTimeout.Add("GET", "metrics", h.Timeout)
 	rTimeout.Add("GET", "tenants", h.GetTenants)
 
