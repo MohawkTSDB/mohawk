@@ -40,7 +40,14 @@ func main() {
 	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite, error]")
 	apiPtr := flag.String("api", "0.21.0", "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
 	apiTLS := flag.String("tls", "true", "use TLS server")
+	versionPtr := flag.Bool("version", false, "version number")
 	flag.Parse()
+
+	// return version number and exit
+	if *versionPtr {
+		fmt.Printf("MoHawk version: %s\n\n", VER)
+		return
+	}
 
 	// Create and init the backend
 	if *backendPtr == "sqlite" {
