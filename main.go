@@ -28,7 +28,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.8.2"
+const VER = "0.8.3"
 
 func main() {
 	var db backend.Backend
@@ -37,7 +37,7 @@ func main() {
 	// 	port    - default to 8443
 	// 	backend - default to random
 	portPtr := flag.Int("port", 8443, "server port")
-	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite]")
+	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite, error]")
 	apiPtr := flag.String("api", "0.21.0", "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
 	apiTLS := flag.String("tls", "true", "use TLS server")
 	flag.Parse()
@@ -45,6 +45,8 @@ func main() {
 	// Create and init the backend
 	if *backendPtr == "sqlite" {
 		db = &backend.Sqlite{}
+	} else if *backendPtr == "error" {
+		db = &backend.Timeout{}
 	} else {
 		db = &backend.Random{}
 	}
