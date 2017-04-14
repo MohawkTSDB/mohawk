@@ -117,11 +117,13 @@ func main() {
 
 	// logger a logging middleware
 	logger := Logger{}
+
+	// gzipper a gzip encoding middleware
 	gzipper := GZipper{}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
 	if *backendPtr == "error" {
-		router.ConcatMiddleWares([]router.MiddleWare{&gzipper, &logger, &rTimeout, &rRoot}, BadRequest{})
+		router.ConcatMiddleWares([]router.MiddleWare{&logger, &gzipper, &rTimeout, &rRoot}, BadRequest{})
 	} else {
 		router.ConcatMiddleWares([]router.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot}, BadRequest{})
 	}
