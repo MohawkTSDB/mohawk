@@ -37,7 +37,7 @@ func (gzr *gzipResponseWriter) WriteHeader(statusCode int) {
 	if gzr.statusCode != http.StatusNotModified && gzr.statusCode != http.StatusNoContent {
 		gzr.ResponseWriter.Header().Del("Content-Length")
 		gzr.ResponseWriter.Header().Set("Content-Encoding", "gzip")
-		gzr.ResponseWriter.Header().Set("Vary", "Content-Encoding")
+		gzr.ResponseWriter.Header().Set("Vary", "Accept-Encoding")
 	}
 
 	gzr.ResponseWriter.WriteHeader(statusCode)
