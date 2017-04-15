@@ -76,14 +76,16 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 
 	end := int64(time.Now().Unix() * 1000)
 	if v, ok := r.Form["end"]; ok && len(v) > 0 {
-		i, _ := strconv.Atoi(v[0])
-		end = int64(i)
+		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
+			end = int64(i)
+		}
 	}
 
 	start := end - int64(8*60*60*1000)
 	if v, ok := r.Form["start"]; ok && len(v) > 0 {
-		i, _ := strconv.Atoi(v[0])
-		start = int64(i)
+		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
+			start = int64(i)
+		}
 	}
 
 	limit := int64(20000)
@@ -100,8 +102,9 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 
 	bucketDuration := int64(0)
 	if v, ok := r.Form["bucketDuration"]; ok && len(v) > 0 {
-		i, _ := strconv.Atoi(v[0][:len(v[0])-1])
-		bucketDuration = int64(i)
+		if i, err := strconv.Atoi(v[0][:len(v[0])-1]); err == nil && i > 1 {
+			bucketDuration = int64(i)
+		}
 	}
 
 	// call backend for data
@@ -115,6 +118,10 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 // PostQuery send timestamp, value to the backend
 func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u dataQuery
+	var end int64
+	var start int64
+	var limit int64
+	var err error
 
 	decoder := json.NewDecoder(r.Body)
 	decoder.UseNumber()
@@ -127,18 +134,15 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 		return
 	}
 
-	end, _ := u.End.Int64()
-	if end < 1 {
+	if end, err = u.End.Int64(); err != nil || end < 1 {
 		end = int64(time.Now().Unix() * 1000)
 	}
 
-	start, _ := u.Start.Int64()
-	if start < 1 {
+	if start, err = u.Start.Int64(); err != nil || start < 1 {
 		start = end - int64(8*60*60*1000)
 	}
 
-	limit, _ := u.Start.Int64()
-	if limit < 1 {
+	if limit, err = u.Start.Int64(); err != nil || limit < 1 {
 		limit = int64(20000)
 	}
 
