@@ -36,6 +36,24 @@ type dataQuery struct {
 	BucketDuration string      `json:"bucketDuration"`
 }
 
+// getData querys data from the backend, and return a json string
+func getData(h Handler, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
+	var resStr string
+
+	// call backend for data
+	if bucketDuration == 0 {
+		res := h.Backend.GetRawData(id, end, start, limit, order)
+		resJSON, _ := json.Marshal(res)
+		resStr = string(resJSON)
+	} else {
+		res := h.Backend.GetStatData(id, end, start, limit, order, bucketDuration)
+		resJSON, _ := json.Marshal(res)
+		resStr = string(resJSON)
+	}
+
+	return resStr
+}
+
 // parseTags takes a comma separeted key:value list string and returns a map[string]string
 // 	e.g.
 // 	"warm:kitty,soft:kitty" => {"warm": "kitty", "soft": "kitty"}
