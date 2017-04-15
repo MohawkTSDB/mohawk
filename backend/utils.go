@@ -28,12 +28,12 @@ var validRegex = regexp.MustCompile(`^[ A-Za-z0-9_/\[\]\(\)\.-]*$`)
 
 // json struct used to query data by the POST http request
 type dataQuery struct {
-	IDs []string `json:"ids"`
-	Start json.Number `json:"start"`
-	End json.Number `json:"end"`
-	Limit json.Number `json:"limit"`
-	Order string `json:"order"`
-	BucketDuration string `json:"bucketDuration"`
+	IDs            []string    `json:"ids"`
+	Start          json.Number `json:"start"`
+	End            json.Number `json:"end"`
+	Limit          json.Number `json:"limit"`
+	Order          string      `json:"order"`
+	BucketDuration string      `json:"bucketDuration"`
 }
 
 // parseTags takes a comma separeted key:value list string and returns a map[string]string
