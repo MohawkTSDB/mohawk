@@ -44,14 +44,14 @@ func (r *Backend) Open() {
 		map[string]string{"type": "node", "group_id": "filesystem/usage_rate", "units": "byte"},
 	}
 
-	for i := 0; i < 120; i++ {
+	for i := 0; i < 2020; i++ {
 		seed := seeds[rand.Intn(len(seeds))]
 		tags := map[string]string{
 			"type":     seed["type"],
 			"group_id": seed["group_id"],
 			"units":    seed["units"],
 			"issue":    seed["issue"],
-			"hostname": fmt.Sprintf("example.%03d.com", i/4),
+			"hostname": fmt.Sprintf("example.%04d.com", i/4),
 		}
 		id := fmt.Sprintf("machine/%s/%s", tags["hostname"], tags["group_id"])
 
