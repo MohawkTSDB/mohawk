@@ -24,6 +24,9 @@ import (
 	"time"
 
 	"github.com/yaacov/mohawk/backend"
+	"github.com/yaacov/mohawk/backend/random"
+	"github.com/yaacov/mohawk/backend/sqlite"
+	"github.com/yaacov/mohawk/backend/timeout"
 	"github.com/yaacov/mohawk/middleware"
 	"github.com/yaacov/mohawk/router"
 )
@@ -57,13 +60,14 @@ func main() {
 	}
 
 	// Create and init the backend
-	if *backendPtr == "sqlite" {
-		db = &backend.Sqlite{}
-	} else if *backendPtr == "error" {
-		db = &backend.Timeout{}
-	} else if *backendPtr == "random" {
-		db = &backend.Random{}
-	} else {
+	switch *backendPtr {
+	case "sqlite":
+		db = &sqlite.Backend{}
+	case "error":
+		db = &timeout.Backend{}
+	case "random":
+		db = &random.Backend{}
+	default:
 		log.Fatal("Can't find backend:", *backendPtr)
 	}
 	db.Open()

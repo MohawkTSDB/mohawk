@@ -14,41 +14,45 @@
 // limitations under the License.
 
 // Package backend
-package backend
+package timeout
 
-type Timeout struct {
+import (
+	"github.com/yaacov/mohawk/backend"
+)
+
+type Backend struct {
 }
 
-func (r Timeout) Name() string {
-	return "Backend-Error"
+func (r Backend) Name() string {
+	return "Backend-TimeoutError"
 }
 
-func (r *Timeout) Open() {
+func (r *Backend) Open() {
 
 }
 
-func (r Timeout) GetItemList(tags map[string]string) []Item {
-	res := make([]Item, 0)
+func (r Backend) GetItemList(tags map[string]string) []backend.Item {
+	res := make([]backend.Item, 0)
 
 	return res
 }
 
-func (r Timeout) GetRawData(id string, end int64, start int64, limit int64, order string) []DataItem {
-	res := make([]DataItem, 0)
+func (r Backend) GetRawData(id string, end int64, start int64, limit int64, order string) []backend.DataItem {
+	res := make([]backend.DataItem, 0)
 
 	return res
 }
 
-func (r Timeout) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem {
-	res := make([]StatItem, 0)
+func (r Backend) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
+	res := make([]backend.StatItem, 0)
 
 	return res
 }
 
-func (r Timeout) PostRawData(id string, t int64, v float64) bool {
+func (r Backend) PostRawData(id string, t int64, v float64) bool {
 	return false
 }
 
-func (r Timeout) PutTags(id string, tags map[string]string) bool {
+func (r Backend) PutTags(id string, tags map[string]string) bool {
 	return false
 }

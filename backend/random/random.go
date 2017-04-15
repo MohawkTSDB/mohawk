@@ -14,23 +14,25 @@
 // limitations under the License.
 
 // Package backend
-package backend
+package random
 
 import (
 	"fmt"
 	"math/rand"
+
+	"github.com/yaacov/mohawk/backend"
 )
 
-type Random struct {
-	Items []Item
+type Backend struct {
+	Items []backend.Item
 }
 
-func (r Random) Name() string {
+func (r Backend) Name() string {
 	return "Backend-Random"
 }
 
-func (r *Random) Open() {
-	r.Items = make([]Item, 0)
+func (r *Backend) Open() {
+	r.Items = make([]backend.Item, 0)
 
 	seeds := []map[string]string{
 		map[string]string{"type": "node", "group_id": "cpu/usage_rate", "units": "cpu", "issue": "42"},
@@ -51,7 +53,7 @@ func (r *Random) Open() {
 			"issue":    seed["issue"],
 			"hostname": fmt.Sprintf("example.%03d.com", i/4),
 		}
-		r.Items = append(r.Items, Item{
+		r.Items = append(r.Items, backend.Item{
 			Id:   fmt.Sprintf("hello_kitty_%03d", i),
 			Type: "gauge",
 			Tags: tags,
@@ -59,25 +61,25 @@ func (r *Random) Open() {
 	}
 }
 
-func (r Random) GetItemList(tags map[string]string) []Item {
+func (r Backend) GetItemList(tags map[string]string) []backend.Item {
 	res := r.Items
 
 	if len(tags) > 0 {
 		for key, value := range tags {
-			res = FilterItems(res, func(i Item) bool { return i.Tags[key] == value })
+			res = backend.FilterItems(res, func(i backend.Item) bool { return i.Tags[key] == value })
 		}
 	}
 
 	return res
 }
 
-func (r Random) GetRawData(id string, end int64, start int64, limit int64, order string) []DataItem {
-	res := make([]DataItem, 0)
+func (r Backend) GetRawData(id string, end int64, start int64, limit int64, order string) []backend.DataItem {
+	res := make([]backend.DataItem, 0)
 
 	delta := int64(5 * 60 * 1000)
 
 	for i := limit; i > 0; i-- {
-		res = append(res, DataItem{
+		res = append(res, backend.DataItem{
 			Timestamp: end - i*delta,
 			Value:     float64(50 + rand.Intn(50)),
 		})
@@ -92,14 +94,14 @@ func (r Random) GetRawData(id string, end int64, start int64, limit int64, order
 	return res
 }
 
-func (r Random) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem {
-	res := make([]StatItem, 0)
+func (r Backend) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
+	res := make([]backend.StatItem, 0)
 
 	delta := int64(5 * 60 * 1000)
 
 	for i := limit; i > 0; i-- {
 		value := float64(50 + rand.Intn(50))
-		res = append(res, StatItem{
+		res = append(res, backend.StatItem{
 			Start:   end - i*delta,
 			End:     end - (i-1)*delta,
 			Empty:   false,
@@ -121,10 +123,10 @@ func (r Random) GetStatData(id string, end int64, start int64, limit int64, orde
 	return res
 }
 
-func (r Random) PostRawData(id string, t int64, v float64) bool {
+func (r Backend) PostRawData(id string, t int64, v float64) bool {
 	return false
 }
 
-func (r Random) PutTags(id string, tags map[string]string) bool {
+func (r Backend) PutTags(id string, tags map[string]string) bool {
 	return false
 }

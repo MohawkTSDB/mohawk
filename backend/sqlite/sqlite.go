@@ -14,7 +14,7 @@
 // limitations under the License.
 
 // Package backend
-package backend
+package sqlite
 
 import (
 	"database/sql"
@@ -22,20 +22,21 @@ import (
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/yaacov/mohawk/backend"
 )
 
-type Sqlite struct {
+type Backend struct {
 	db *sql.DB
 }
 
 // Backend functions
 // Required by backend interface
 
-func (r Sqlite) Name() string {
-	return "Backend-Sqlite"
+func (r Backend) Name() string {
+	return "Backend-Sqlite3"
 }
 
-func (r *Sqlite) Open() {
+func (r *Backend) Open() {
 	var err error
 
 	r.db, err = sql.Open("sqlite3", "./server.db")
@@ -60,8 +61,8 @@ func (r *Sqlite) Open() {
 	}
 }
 
-func (r Sqlite) GetItemList(tags map[string]string) []Item {
-	res := make([]Item, 0)
+func (r Backend) GetItemList(tags map[string]string) []backend.Item {
+	res := make([]backend.Item, 0)
 
 	// create one item per id
 	sqlStmt := "select id from ids"
@@ -77,7 +78,7 @@ func (r Sqlite) GetItemList(tags map[string]string) []Item {
 		if err != nil {
 			log.Printf("%q\n", err)
 		}
-		res = append(res, Item{
+		res = append(res, backend.Item{
 			Id:   id,
 			Type: "gauge",
 			Tags: map[string]string{},
@@ -114,15 +115,15 @@ func (r Sqlite) GetItemList(tags map[string]string) []Item {
 	// FIXME: we should do this in the sql
 	if len(tags) > 0 {
 		for key, value := range tags {
-			res = FilterItems(res, func(i Item) bool { return i.Tags[key] == value })
+			res = backend.FilterItems(res, func(i backend.Item) bool { return i.Tags[key] == value })
 		}
 	}
 
 	return res
 }
 
-func (r Sqlite) GetRawData(id string, end int64, start int64, limit int64, order string) []DataItem {
-	res := make([]DataItem, 0)
+func (r Backend) GetRawData(id string, end int64, start int64, limit int64, order string) []backend.DataItem {
+	res := make([]backend.DataItem, 0)
 
 	// check if id exist
 	if !r.IdExist(id) {
@@ -148,7 +149,7 @@ func (r Sqlite) GetRawData(id string, end int64, start int64, limit int64, order
 		if err != nil {
 			log.Printf("%q\n", err)
 		}
-		res = append(res, DataItem{
+		res = append(res, backend.DataItem{
 			Timestamp: timestamp,
 			Value:     value,
 		})
@@ -161,9 +162,9 @@ func (r Sqlite) GetRawData(id string, end int64, start int64, limit int64, order
 	return res
 }
 
-func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem {
+func (r Backend) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var t int64
-	res := make([]StatItem, 0)
+	res := make([]backend.StatItem, 0)
 
 	// check if id exist
 	if !r.IdExist(id) {
@@ -201,7 +202,7 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 
 		// append missing
 		for t < (startT - bucketDuration*1000) {
-			res = append(res, StatItem{
+			res = append(res, backend.StatItem{
 				Start:   t,
 				End:     t + bucketDuration*1000,
 				Empty:   true,
@@ -216,7 +217,7 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 		}
 
 		// add data
-		res = append(res, StatItem{
+		res = append(res, backend.StatItem{
 			Start:   startT,
 			End:     startT + bucketDuration*1000,
 			Empty:   false,
@@ -236,7 +237,7 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 
 	// append missing
 	for t < (end - bucketDuration*1000) {
-		res = append(res, StatItem{
+		res = append(res, backend.StatItem{
 			Start:   t,
 			End:     t + bucketDuration*1000,
 			Empty:   true,
@@ -253,7 +254,7 @@ func (r Sqlite) GetStatData(id string, end int64, start int64, limit int64, orde
 	return res
 }
 
-func (r Sqlite) PostRawData(id string, t int64, v float64) bool {
+func (r Backend) PostRawData(id string, t int64, v float64) bool {
 	// check if id exist
 	if !r.IdExist(id) {
 		r.createId(id)
@@ -263,7 +264,7 @@ func (r Sqlite) PostRawData(id string, t int64, v float64) bool {
 	return true
 }
 
-func (r Sqlite) PutTags(id string, tags map[string]string) bool {
+func (r Backend) PutTags(id string, tags map[string]string) bool {
 	// check if id exist
 	if !r.IdExist(id) {
 		r.createId(id)
@@ -278,14 +279,14 @@ func (r Sqlite) PutTags(id string, tags map[string]string) bool {
 // Helper functions
 // Not required by backend interface
 
-func (r Sqlite) IdExist(id string) bool {
+func (r Backend) IdExist(id string) bool {
 	var _id string
 	sqlStmt := fmt.Sprintf("select id from ids where id='%s'", id)
 	err := r.db.QueryRow(sqlStmt).Scan(&_id)
 	return err != sql.ErrNoRows
 }
 
-func (r Sqlite) insertData(id string, t int64, v float64) {
+func (r Backend) insertData(id string, t int64, v float64) {
 	sqlStmt := fmt.Sprintf("insert into '%s' values (%d, %f)", id, t, v)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
@@ -293,7 +294,7 @@ func (r Sqlite) insertData(id string, t int64, v float64) {
 	}
 }
 
-func (r Sqlite) insertTag(id string, k string, v string) {
+func (r Backend) insertTag(id string, k string, v string) {
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
@@ -301,7 +302,7 @@ func (r Sqlite) insertTag(id string, k string, v string) {
 	}
 }
 
-func (r Sqlite) createId(id string) bool {
+func (r Backend) createId(id string) bool {
 	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
@@ -325,7 +326,7 @@ func (r Sqlite) createId(id string) bool {
 	return true
 }
 
-func (r Sqlite) UpdateTag(items []Item, id string, tag string, value string) []Item {
+func (r Backend) UpdateTag(items []backend.Item, id string, tag string, value string) []backend.Item {
 	// try to update tag if item exist
 	for i, item := range items {
 		if item.Id == id {
@@ -335,7 +336,7 @@ func (r Sqlite) UpdateTag(items []Item, id string, tag string, value string) []I
 	}
 
 	// if here we did not find a matching item
-	items = append(items, Item{
+	items = append(items, backend.Item{
 		Id:   id,
 		Tags: map[string]string{tag: value},
 	})
