@@ -54,7 +54,7 @@ func (r *Backend) Open() {
 			"hostname": fmt.Sprintf("example.%03d.com", i/4),
 		}
 		r.Items = append(r.Items, backend.Item{
-			Id:   fmt.Sprintf("hello_kitty_%03d", i),
+			Id:   fmt.Sprintf("machine/example.%03d.com/%s", i/4, seed["group_id"]),
 			Type: "gauge",
 			Tags: tags,
 		})
@@ -74,14 +74,17 @@ func (r Backend) GetItemList(tags map[string]string) []backend.Item {
 }
 
 func (r Backend) GetRawData(id string, end int64, start int64, limit int64, order string) []backend.DataItem {
-	res := make([]backend.DataItem, 0)
+	var i int64
+	var res []backend.DataItem
 
 	delta := int64(5 * 60 * 1000)
+	base := 10 + rand.Intn(250)
+	variant := 20 + rand.Intn(50)
 
-	for i := limit; i > 0; i-- {
+	for i = 0; i < limit && (end-i*delta) > start; i++ {
 		res = append(res, backend.DataItem{
 			Timestamp: end - i*delta,
-			Value:     float64(50 + rand.Intn(50)),
+			Value:     float64(base + rand.Intn(variant)),
 		})
 	}
 
@@ -95,15 +98,18 @@ func (r Backend) GetRawData(id string, end int64, start int64, limit int64, orde
 }
 
 func (r Backend) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
-	res := make([]backend.StatItem, 0)
+	var i int64
+	var res []backend.StatItem
 
-	delta := int64(5 * 60 * 1000)
+	delta := bucketDuration * 1000
+	base := 10 + rand.Intn(250)
+	variant := 20 + rand.Intn(50)
 
-	for i := limit; i > 0; i-- {
-		value := float64(50 + rand.Intn(50))
+	for i = 0; i < limit && (end-(i-1)*delta) > start; i++ {
+		value := float64(base + rand.Intn(variant))
 		res = append(res, backend.StatItem{
-			Start:   end - i*delta,
-			End:     end - (i-1)*delta,
+			Start:   end - (i-1)*delta,
+			End:     end - i*delta,
 			Empty:   false,
 			Samples: 1,
 			Min:     value,

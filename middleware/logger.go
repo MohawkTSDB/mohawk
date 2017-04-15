@@ -17,13 +17,15 @@
 package middleware
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 )
 
 // Logger middleware that will log http requests
 type Logger struct {
-	next http.Handler
+	Verbose bool
+	next    http.Handler
 }
 
 // SetNext set next http serve func
@@ -34,5 +36,6 @@ func (l *Logger) SetNext(h http.Handler) {
 // ServeHTTP http serve func
 func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %4s  Accept-Encoding: %s, %s", r.RemoteAddr, r.Method, r.Header.Get("Accept-Encoding"), r.URL)
+
 	l.next.ServeHTTP(w, r)
 }

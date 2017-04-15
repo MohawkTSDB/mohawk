@@ -54,6 +54,7 @@ func main() {
 	backendPtr := flag.String("backend", defaultBackend, "the backend to use [random, sqlite, timeout]")
 	apiPtr := flag.String("api", defaultAPI, "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
 	tlsPtr := flag.String("tls", defaultTLS, "use TLS server")
+	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	versionPtr := flag.Bool("version", false, "version number")
 	flag.Parse()
 
@@ -83,6 +84,7 @@ func main() {
 	// h common variables to be used for the backend Handler functions
 	// backend the backend to use for metrics source
 	h := backend.Handler{
+		Verbose: *verbosePtr,
 		Backend: db,
 	}
 
@@ -132,7 +134,9 @@ func main() {
 	}
 
 	// logger a logging middleware
-	logger := middleware.Logger{}
+	logger := middleware.Logger{
+		Verbose: *verbosePtr,
+	}
 
 	// gzipper a gzip encoding middleware
 	gzipper := middleware.GZipper{}

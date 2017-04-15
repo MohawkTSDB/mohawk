@@ -28,6 +28,7 @@ import (
 // 	version the version of the Hawkular server we are mocking
 // 	backend the backend to be used by the Handler functions
 type Handler struct {
+	Verbose bool
 	Backend Backend
 }
 
@@ -127,12 +128,14 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	decoder.UseNumber()
 	decoder.Decode(&u)
 
-	id := u.IDs[0]
-
-	if !validStr(id) {
-		w.WriteHeader(504)
-		return
+	for _, id := range u.IDs {
+		if !validStr(id) {
+			w.WriteHeader(504)
+			fmt.Fprintf(w, "<p>Error 504, Bad metrics ID</p>")
+			return
+		}
 	}
+	numOfItems := len(u.IDs) - 1
 
 	if end, err = u.End.Int64(); err != nil || end < 1 {
 		end = int64(time.Now().Unix() * 1000)
@@ -142,7 +145,7 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 		start = end - int64(8*60*60*1000)
 	}
 
-	if limit, err = u.Start.Int64(); err != nil || limit < 1 {
+	if limit, err = u.Limit.Int64(); err != nil || limit < 1 {
 		limit = int64(20000)
 	}
 
@@ -158,12 +161,21 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 		}
 	}
 
-	// call backend for data
-	resStr := getData(h, id, end, start, limit, order, bucketDuration)
-
-	// output to client
 	w.WriteHeader(200)
-	fmt.Fprintf(w, "[{\"id\": \"%s\", \"data\": %s}]", id, resStr)
+	fmt.Fprintf(w, "[")
+
+	for i, id := range u.IDs {
+		// call backend for data
+		resStr := getData(h, id, end, start, limit, order, bucketDuration)
+
+		// write data
+		fmt.Fprintf(w, "{\"id\": \"%s\", \"data\": %s}", id, resStr)
+		if i < numOfItems {
+			fmt.Fprintf(w, ",")
+		}
+	}
+
+	fmt.Fprintf(w, "]")
 }
 
 // PostData send timestamp, value to the backend
