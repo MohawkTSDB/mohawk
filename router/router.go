@@ -35,10 +35,6 @@ type Router struct {
 	next   http.Handler
 }
 
-func (r *Router) SetNext(h http.Handler) {
-	r.next = h
-}
-
 // Add add a new route into the router routing table
 func (r *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request, map[string]string)) {
 	r.Routes = append(r.Routes, route{method, strings.Split(path, "/"), handler})
@@ -70,6 +66,10 @@ func (r Router) match(route route, method string, segments []string) (bool, map[
 
 	// found matching route
 	return true, argv
+}
+
+func (r *Router) SetNext(h http.Handler) {
+	r.next = h
 }
 
 // ServeHTTP try to match a route to the request, and call the route handler

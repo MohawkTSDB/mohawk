@@ -13,27 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package router
-package router
+// Package middleware middlewares for MoHawk
+package middleware
 
 import (
+	"log"
 	"net/http"
 )
 
-type MiddleWare interface {
-	SetNext(http.Handler)
-	ServeHTTP(http.ResponseWriter, *http.Request)
+// Logger middleware that will log http requests
+type Logger struct {
+	next http.Handler
 }
 
-// ConcatMiddleWares concat a list of MiddleWares into the router routing table
-func ConcatMiddleWares(handlers []MiddleWare, fallBack http.Handler) {
-	switch len(handlers) {
-	case 0:
-		return
-	case 1:
-		handlers[0].SetNext(fallBack)
-	default:
-		handlers[0].SetNext(handlers[1])
-		ConcatMiddleWares(handlers[1:], fallBack)
-	}
+// SetNext set next http serve func
+func (l *Logger) SetNext(h http.Handler) {
+	l.next = h
+}
+
+// ServeHTTP http serve func
+func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("%s %4s  Accept-Encoding: %s, %s", r.RemoteAddr, r.Method, r.Header.Get("Accept-Encoding"), r.URL)
+	l.next.ServeHTTP(w, r)
 }

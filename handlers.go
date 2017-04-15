@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yaacov/mohawk/backends"
+	"github.com/yaacov/mohawk/backend"
 )
 
 // validRegex regexp for validating sql variables

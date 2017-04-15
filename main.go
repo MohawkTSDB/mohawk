@@ -23,7 +23,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yaacov/mohawk/backends"
+	"github.com/yaacov/mohawk/backend"
+	"github.com/yaacov/mohawk/middleware"
 	"github.com/yaacov/mohawk/router"
 )
 
@@ -39,7 +40,7 @@ func main() {
 	portPtr := flag.Int("port", 8443, "server port")
 	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite, error]")
 	apiPtr := flag.String("api", "0.21.0", "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
-	apiTLS := flag.String("tls", "true", "use TLS server")
+	tlsPtr := flag.String("tls", "true", "use TLS server")
 	versionPtr := flag.Bool("version", false, "version number")
 	flag.Parse()
 
@@ -54,8 +55,10 @@ func main() {
 		db = &backend.Sqlite{}
 	} else if *backendPtr == "error" {
 		db = &backend.Timeout{}
-	} else {
+	} else if *backendPtr == "random" {
 		db = &backend.Random{}
+	} else {
+		log.Fatal("Can't find backend:", *backendPtr)
 	}
 	db.Open()
 
@@ -116,16 +119,19 @@ func main() {
 	rMetrics.Add("POST", "counters/data", h.PostData)
 
 	// logger a logging middleware
-	logger := Logger{}
+	logger := middleware.Logger{}
 
 	// gzipper a gzip encoding middleware
-	gzipper := GZipper{}
+	gzipper := middleware.GZipper{}
+
+	// fallback a BadRequest middleware
+	fallback := middleware.BadRequest{}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
 	if *backendPtr == "error" {
-		router.ConcatMiddleWares([]router.MiddleWare{&logger, &gzipper, &rTimeout, &rRoot}, BadRequest{})
+		middleware.ConcatMiddleWares([]middleware.MiddleWare{&logger, &gzipper, &rTimeout, &rRoot, &fallback})
 	} else {
-		router.ConcatMiddleWares([]router.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot}, BadRequest{})
+		middleware.ConcatMiddleWares([]middleware.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot, &fallback})
 	}
 
 	// Run the server
@@ -136,7 +142,7 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	if *apiTLS == "true" {
+	if *tlsPtr == "true" {
 		log.Printf("Start server, listen on https://%+v", srv.Addr)
 		log.Fatal(srv.ListenAndServeTLS("server.pem", "server.key"))
 	} else {

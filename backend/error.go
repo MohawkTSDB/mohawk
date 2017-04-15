@@ -17,7 +17,6 @@
 package backend
 
 type Timeout struct {
-	Items []Item
 }
 
 func (r Timeout) Name() string {
@@ -29,7 +28,7 @@ func (r *Timeout) Open() {
 }
 
 func (r Timeout) GetItemList(tags map[string]string) []Item {
-	res := r.Items
+	res := make([]Item, 0)
 
 	return res
 }

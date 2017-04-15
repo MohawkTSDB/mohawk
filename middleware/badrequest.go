@@ -13,55 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package main
-package main
+// Package middleware middlewares for MoHawk
+package middleware
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/yaacov/mohawk/gziphandler"
 )
 
-// GZipper middleware that will gzip http requests
-type GZipper struct {
-	next http.Handler
-}
-
-// SetNext set next http serve func
-func (g *GZipper) SetNext(h http.Handler) {
-	g.next = h
-}
-
-// ServeHTTP http serve func
-func (g *GZipper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	gziphandler.New(g.next.ServeHTTP)(w, r)
-}
-
-// Logger middleware that will log http requests
-type Logger struct {
-	next http.Handler
-}
-
-// SetNext set next http serve func
-func (l *Logger) SetNext(h http.Handler) {
-	l.next = h
-}
-
-// ServeHTTP http serve func
-func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("%s %4s  Accept-Encoding: %s, %s", r.RemoteAddr, r.Method, r.Header.Get("Accept-Encoding"), r.URL)
-	l.next.ServeHTTP(w, r)
-}
-
 // BadRequest will be called if no route found
-type BadRequest struct{}
+type BadRequest struct {
+}
+
+// SetNext set next http serve func
+func (b *BadRequest) SetNext(_h http.Handler) {
+}
 
 // ServeHTTP http serve func
 func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var u interface{}
+
 	json.NewDecoder(r.Body).Decode(&u)
 	r.ParseForm()
 
