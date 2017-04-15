@@ -101,35 +101,35 @@ func main() {
 	}
 	// Metrics Routing table
 	if *backendPtr == "timeout" {
-		rMetrics.Add("GET", "metrics", Timeout)
+		rMetrics.Add("GET", "metrics", GetTimeout)
 	} else {
 		rMetrics.Add("GET", "metrics", h.GetMetrics)
+
+		// api version >= 0.16.0
+		rMetrics.Add("GET", "gauges/:id/raw", h.GetData)
+		rMetrics.Add("GET", "counters/:id/raw", h.GetData)
+		rMetrics.Add("GET", "availability/:id/raw", h.GetData)
+
+		rMetrics.Add("GET", "gauges/:id/stats", h.GetData)
+		rMetrics.Add("GET", "counters/:id/stats", h.GetData)
+		rMetrics.Add("GET", "availability/:id/stats", h.GetData)
+
+		rMetrics.Add("POST", "gauges/raw", h.PostData)
+		rMetrics.Add("POST", "gauges/raw/query", h.PostQuery)
+		rMetrics.Add("POST", "counters/raw", h.PostData)
+		rMetrics.Add("POST", "counters/raw/query", h.PostQuery)
+
+		rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
+		rMetrics.Add("PUT", "counters/:id/tags", h.PutTags)
+
+		// api version < 0.16.0
+		rMetrics.Add("GET", "gauges/:id/data", h.GetData)
+		rMetrics.Add("GET", "counters/:id/data", h.GetData)
+		rMetrics.Add("GET", "availability/:id/data", h.GetData)
+
+		rMetrics.Add("POST", "gauges/data", h.PostData)
+		rMetrics.Add("POST", "counters/data", h.PostData)
 	}
-
-	// api version >= 0.16.0
-	rMetrics.Add("GET", "gauges/:id/raw", h.GetData)
-	rMetrics.Add("GET", "counters/:id/raw", h.GetData)
-	rMetrics.Add("GET", "availability/:id/raw", h.GetData)
-
-	rMetrics.Add("GET", "gauges/:id/stats", h.GetData)
-	rMetrics.Add("GET", "counters/:id/stats", h.GetData)
-	rMetrics.Add("GET", "availability/:id/stats", h.GetData)
-
-	rMetrics.Add("POST", "gauges/raw", h.PostData)
-	rMetrics.Add("POST", "gauges/raw/query", h.PostQuery)
-	rMetrics.Add("POST", "counters/raw", h.PostData)
-	rMetrics.Add("POST", "counters/raw/query", h.PostQuery)
-
-	rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
-	rMetrics.Add("PUT", "counters/:id/tags", h.PutTags)
-
-	// api version < 0.16.0
-	rMetrics.Add("GET", "gauges/:id/data", h.GetData)
-	rMetrics.Add("GET", "counters/:id/data", h.GetData)
-	rMetrics.Add("GET", "availability/:id/data", h.GetData)
-
-	rMetrics.Add("POST", "gauges/data", h.PostData)
-	rMetrics.Add("POST", "counters/data", h.PostData)
 
 	// logger a logging middleware
 	logger := middleware.Logger{}
