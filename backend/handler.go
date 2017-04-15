@@ -103,11 +103,7 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 }
 
 func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	res := []Tenant{
-		Tenant{
-			Id: "_ops",
-		},
-	}
+	res := []Tenant{Tenant{Id: "_ops"}}
 	resJSON, _ := json.Marshal(res)
 
 	w.WriteHeader(200)
