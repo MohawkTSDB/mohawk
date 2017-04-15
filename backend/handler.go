@@ -19,11 +19,8 @@ package backend
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"regexp"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -32,43 +29,6 @@ import (
 // 	backend the backend to be used by the Handler functions
 type Handler struct {
 	Backend Backend
-}
-
-// validRegex regexp for validating sql variables
-var validRegex = regexp.MustCompile(`^[ A-Za-z0-9_/\[\]\(\)\.-]*$`)
-
-// parseTags takes a comma separeted key:value list string and returns a map[string]string
-// 	e.g.
-// 	"warm:kitty,soft:kitty" => {"warm": "kitty", "soft": "kitty"}
-func parseTags(tags string) map[string]string {
-	vsf := make(map[string]string)
-
-	tagsList := strings.Split(tags, ",")
-	for _, tag := range tagsList {
-		t := strings.Split(tag, ":")
-		if len(t) == 2 {
-			vsf[t[0]] = t[1]
-		}
-	}
-	return vsf
-}
-
-func validStr(s string) bool {
-	valid := validRegex.MatchString(s)
-	if !valid {
-		log.Printf("Valid string fail: %s\n", s)
-	}
-	return valid
-}
-
-func validTags(tags map[string]string) bool {
-	for k, v := range tags {
-		if !validStr(k) || !validStr(v) {
-			return false
-		}
-	}
-
-	return true
 }
 
 // GetMetrics return a list of metrics definitions
@@ -177,58 +137,42 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 // PostQuery send timestamp, value to the backend
 func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var resStr string
-	var id string
-	var end int64
-	var start int64
-	var limit int64
-	var bucketDuration int64
-	var order string
-	var u map[string]interface{}
-	json.NewDecoder(r.Body).Decode(&u)
+	var u dataQuery
 
-	if v, ok := u["ids"]; ok {
-		id = v.([]interface{})[0].(string)
-	}
+	decoder := json.NewDecoder(r.Body)
+	decoder.UseNumber()
+	decoder.Decode(&u)
+
+	id := u.IDs[0]
 
 	if !validStr(id) {
 		w.WriteHeader(504)
 		return
 	}
 
-	if v, ok := u["end"]; ok {
-		end = int64(v.(float64))
-	} else {
+	end, _ := u.End.Int64()
+	if end < 1 {
 		end = int64(time.Now().Unix() * 1000)
 	}
-	if v, ok := u["start"]; ok {
-		start = int64(v.(float64))
-	} else {
+
+	start, _ := u.Start.Int64()
+	if start < 1 {
 		start = end - int64(8*60*60*1000)
 	}
 
-	limit = int64(20000)
-	if v, ok := u["limit"]; ok {
-		if li, ok := v.(float64); ok {
-			if limit < 1 {
-				limit = int64(20000)
-			} else {
-				limit = int64(li)
-			}
-		}
+	limit, _ := u.Start.Int64()
+	if limit < 1 {
+		limit = int64(20000)
 	}
-	order = "ASC"
-	if v, ok := u["order"]; ok {
-		if order, ok := v.(string); ok {
-			// do sanity check
-			if order != "ASC" || order != "DESC" {
-				order = "ASC"
-			}
-		}
+
+	order := "ASC"
+	if u.Order == "DESC" {
+		order = "DESC"
 	}
-	bucketDuration = int64(0)
-	if vi, ok := u["bucketDuration"]; ok {
-		if v, ok := vi.(string); ok {
-			i, _ := strconv.Atoi(v[:len(v)-1])
+
+	bucketDuration := int64(0)
+	if v := u.BucketDuration; len(v) > 1 {
+		if i, err := strconv.Atoi(v[:len(v)-1]); err == nil {
 			bucketDuration = int64(i)
 		}
 	}
