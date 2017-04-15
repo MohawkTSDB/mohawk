@@ -129,9 +129,11 @@ func main() {
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
 	if *backendPtr == "error" {
-		middleware.ConcatMiddleWares([]middleware.MiddleWare{&logger, &gzipper, &rTimeout, &rRoot, &fallback})
+		middlewareList := []middleware.MiddleWare{&logger, &gzipper, &rTimeout, &rRoot, &fallback}
+		middleware.Append(middlewareList)
 	} else {
-		middleware.ConcatMiddleWares([]middleware.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot, &fallback})
+		middlewareList := []middleware.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot, &fallback}
+		middleware.Append(middlewareList)
 	}
 
 	// Run the server

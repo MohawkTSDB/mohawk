@@ -104,7 +104,7 @@ func (h Handler) GetAPIVersions(w http.ResponseWriter, r *http.Request, argv map
 	fmt.Fprintln(w, res)
 }
 
-// Return a timeout 504 Error
+// Timeout a timeout 504 Error
 func (h Handler) Timeout(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	res := "<html><body><h1>504 Gateway Time-out</h1>The server didn't respond in time.</body></html>"
 

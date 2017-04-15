@@ -25,8 +25,8 @@ type MiddleWare interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 }
 
-// ConcatMiddleWares concat a list of MiddleWares into the router routing table
-func ConcatMiddleWares(handlers []MiddleWare) {
+// append concat a list of MiddleWares into the router routing table
+func Append(handlers []MiddleWare) {
 	switch len(handlers) {
 	case 0:
 		fallthrough
@@ -34,6 +34,6 @@ func ConcatMiddleWares(handlers []MiddleWare) {
 		return
 	default:
 		handlers[0].SetNext(handlers[1])
-		ConcatMiddleWares(handlers[1:])
+		Append(handlers[1:])
 	}
 }
