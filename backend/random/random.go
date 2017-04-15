@@ -53,11 +53,22 @@ func (r *Backend) Open() {
 			"issue":    seed["issue"],
 			"hostname": fmt.Sprintf("example.%03d.com", i/4),
 		}
-		r.Items = append(r.Items, backend.Item{
-			Id:   fmt.Sprintf("machine/example.%03d.com/%s", i/4, seed["group_id"]),
-			Type: "gauge",
-			Tags: tags,
-		})
+		id := fmt.Sprintf("machine/%s/%s", tags["hostname"], tags["group_id"])
+
+		validID := true
+		for _, o := range r.Items {
+			if id == o.Id {
+				validID = false
+			}
+		}
+
+		if validID {
+			r.Items = append(r.Items, backend.Item{
+				Id:   id,
+				Type: "gauge",
+				Tags: tags,
+			})
+		}
 	}
 }
 
