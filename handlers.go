@@ -46,3 +46,11 @@ func Timeout(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	w.WriteHeader(504)
 	fmt.Fprintln(w, res)
 }
+
+// GetTenants return a list of metrics tenants
+func GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	res := `[{"id":"_ops"}]`
+
+	w.WriteHeader(200)
+	fmt.Fprintln(w, string(res))
+}

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package backend
+// Package backend define the Backend interface
 package backend
 
 import (
@@ -96,14 +96,6 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	} else {
 		res = h.Backend.GetItemList(map[string]string{})
 	}
-	resJSON, _ := json.Marshal(res)
-
-	w.WriteHeader(200)
-	fmt.Fprintln(w, string(resJSON))
-}
-
-func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	res := []Tenant{Tenant{Id: "_ops"}}
 	resJSON, _ := json.Marshal(res)
 
 	w.WriteHeader(200)

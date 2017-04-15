@@ -34,6 +34,12 @@ import (
 // VER the server version
 const VER = "0.8.3"
 
+// defaults
+const defaultPort = 8080
+const defaultBackend = "sqlite"
+const defaultAPI = "0.21.0"
+const defaultTLS = "false"
+
 // ImplementationVersion Hakular server api implementation version
 var ImplementationVersion string
 
@@ -44,12 +50,10 @@ func main() {
 	var db backend.Backend
 
 	// Get user options
-	// 	port    - default to 8443
-	// 	backend - default to random
-	portPtr := flag.Int("port", 8443, "server port")
-	backendPtr := flag.String("backend", "random", "the backend to use [random, sqlite, error]")
-	apiPtr := flag.String("api", "0.21.0", "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
-	tlsPtr := flag.String("tls", "true", "use TLS server")
+	portPtr := flag.Int("port", defaultPort, "server port")
+	backendPtr := flag.String("backend", defaultBackend, "the backend to use [random, sqlite, timeout]")
+	apiPtr := flag.String("api", defaultAPI, "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
+	tlsPtr := flag.String("tls", defaultTLS, "use TLS server")
 	versionPtr := flag.Bool("version", false, "version number")
 	flag.Parse()
 
@@ -63,7 +67,7 @@ func main() {
 	switch *backendPtr {
 	case "sqlite":
 		db = &sqlite.Backend{}
-	case "error":
+	case "timeout":
 		db = &timeout.Backend{}
 	case "random":
 		db = &random.Backend{}
@@ -90,20 +94,17 @@ func main() {
 	// Root Routing table
 	rRoot.Add("GET", "oapi", GetAPIVersions)
 	rRoot.Add("GET", "hawkular/metrics/status", GetStatus)
-
-	rTimeout := router.Router{
-		Prefix: "/hawkular/metrics/",
-	}
-	// Timeout Error Routing table
-	rTimeout.Add("GET", "metrics", Timeout)
-	rTimeout.Add("GET", "tenants", h.GetTenants)
+	rRoot.Add("GET", "hawkular/metrics/tenants", GetTenants)
 
 	rMetrics := router.Router{
 		Prefix: "/hawkular/metrics/",
 	}
 	// Metrics Routing table
-	rMetrics.Add("GET", "metrics", h.GetMetrics)
-	rMetrics.Add("GET", "tenants", h.GetTenants)
+	if *backendPtr == "timeout" {
+		rMetrics.Add("GET", "metrics", Timeout)
+	} else{
+		rMetrics.Add("GET", "metrics", h.GetMetrics)
+	}
 
 	// api version >= 0.16.0
 	rMetrics.Add("GET", "gauges/:id/raw", h.GetData)
@@ -140,13 +141,8 @@ func main() {
 	fallback := middleware.BadRequest{}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	if *backendPtr == "error" {
-		middlewareList := []middleware.MiddleWare{&logger, &gzipper, &rTimeout, &rRoot, &fallback}
-		middleware.Append(middlewareList)
-	} else {
-		middlewareList := []middleware.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot, &fallback}
-		middleware.Append(middlewareList)
-	}
+	middlewareList := []middleware.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot, &fallback}
+	middleware.Append(middlewareList)
 
 	// Run the server
 	srv := &http.Server{
