@@ -35,11 +35,11 @@ func (r *Backend) Open() {
 	r.Items = make([]backend.Item, 0)
 
 	seeds := []map[string]string{
-		map[string]string{"type": "node", "group_id": "cpu/usage_rate", "units": "cpu", "issue": "42"},
+		map[string]string{"type": "node", "group_id": "cpu/usage_rate", "units": "ns", "issue": "42"},
 		map[string]string{"type": "node", "group_id": "memory/usage_rate", "units": "byte"},
-		map[string]string{"type": "node", "group_id": "cpu/usage_rate", "units": "cpu", "issue": "42"},
+		map[string]string{"type": "node", "group_id": "cpu/usage_rate", "units": "ns", "issue": "42"},
 		map[string]string{"type": "node", "group_id": "memory/usage_rate", "units": "byte"},
-		map[string]string{"type": "node", "group_id": "cpu/limit", "units": "cpu", "issue": "442"},
+		map[string]string{"type": "node", "group_id": "cpu/limit", "units": "ns", "issue": "442"},
 		map[string]string{"type": "node", "group_id": "memory/limit", "units": "byte", "issue": "442"},
 		map[string]string{"type": "node", "group_id": "filesystem/usage_rate", "units": "byte"},
 	}
