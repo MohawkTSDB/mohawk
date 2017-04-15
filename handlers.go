@@ -23,12 +23,7 @@ import (
 
 // GetStatus return a json status struct
 func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	resTemplate := `{
-	"MetricsService":"STARTED",
-	"Implementation-Version":"%s",
-	"MohawkVersion":"%s",
-	"MohawkBackend":"%s"
-}`
+	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkBackend":"%s"}`
 	res := fmt.Sprintf(resTemplate, ImplementationVersion, VER, BackendName)
 
 	w.WriteHeader(200)
@@ -37,14 +32,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 
 // GetAPIVersions return a json apiVersion struct
 func GetAPIVersions(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	resTemplate := `{
-	"kind": "APIVersions",
-	"apiVersion": "%s",
-	"versions": [
-		"%s"
-	],
-	"serverAddressByClientCIDRs": null
-}`
+	resTemplate := `{"kind":"APIVersions","apiVersion":"%s","versions":["%s"],"serverAddressByClientCIDRs":null}`
 	res := fmt.Sprintf(resTemplate, "v1", "v1")
 
 	w.WriteHeader(200)
