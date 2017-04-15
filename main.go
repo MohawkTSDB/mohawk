@@ -102,7 +102,7 @@ func main() {
 	// Metrics Routing table
 	if *backendPtr == "timeout" {
 		rMetrics.Add("GET", "metrics", Timeout)
-	} else{
+	} else {
 		rMetrics.Add("GET", "metrics", h.GetMetrics)
 	}
 
