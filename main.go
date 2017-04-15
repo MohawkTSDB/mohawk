@@ -31,6 +31,12 @@ import (
 // VER the server version
 const VER = "0.8.3"
 
+// ImplementationVersion Hakular server api implementation version
+var ImplementationVersion string
+
+// BackendName MoHawk active backend
+var BackendName string
+
 func main() {
 	var db backend.Backend
 
@@ -62,12 +68,14 @@ func main() {
 	}
 	db.Open()
 
+	// set global variables
+	ImplementationVersion = *apiPtr
+	BackendName = db.Name()
+
 	// h common variables to be used by all Handler functions
 	// backend the backend to use for metrics source
-	// version the Hawkular server version we mimic
-	h := Handler{
-		backend: db,
-		version: *apiPtr,
+	h := backend.Handler{
+		Backend: db,
 	}
 
 	// Create the routers
@@ -76,14 +84,14 @@ func main() {
 		Prefix: "/",
 	}
 	// Root Routing table
-	rRoot.Add("GET", "oapi", h.GetAPIVersions)
-	rRoot.Add("GET", "hawkular/metrics/status", h.GetStatus)
+	rRoot.Add("GET", "oapi", GetAPIVersions)
+	rRoot.Add("GET", "hawkular/metrics/status", GetStatus)
 
 	rTimeout := router.Router{
 		Prefix: "/hawkular/metrics/",
 	}
 	// Timeout Error Routing table
-	rTimeout.Add("GET", "metrics", h.Timeout)
+	rTimeout.Add("GET", "metrics", Timeout)
 	rTimeout.Add("GET", "tenants", h.GetTenants)
 
 	rMetrics := router.Router{
