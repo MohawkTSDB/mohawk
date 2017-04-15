@@ -17,7 +17,6 @@
 package middleware
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 )
