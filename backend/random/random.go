@@ -99,7 +99,7 @@ func (r Backend) GetRawData(id string, end int64, start int64, limit int64, orde
 		})
 	}
 
-	if order == "DESC" {
+	if order == "ASC" {
 		for i, j := 0, len(res)-1; i < j; i, j = i+1, j-1 {
 			res[i], res[j] = res[j], res[i]
 		}
@@ -131,7 +131,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 		})
 	}
 
-	if order == "DESC" {
+	if order == "ASC" {
 		for i, j := 0, len(res)-1; i < j; i, j = i+1, j-1 {
 			res[i], res[j] = res[j], res[i]
 		}
