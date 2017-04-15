@@ -72,7 +72,7 @@ func main() {
 	ImplementationVersion = *apiPtr
 	BackendName = db.Name()
 
-	// h common variables to be used by all Handler functions
+	// h common variables to be used for the backend Handler functions
 	// backend the backend to use for metrics source
 	h := backend.Handler{
 		Backend: db,
