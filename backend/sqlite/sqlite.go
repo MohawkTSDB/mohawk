@@ -121,7 +121,6 @@ func (r Backend) GetItemList(tags map[string]string) []backend.Item {
 	}
 
 	// filter using tags
-	// FIXME: we should do this in the sql
 	if len(tags) > 0 {
 		for key, value := range tags {
 			res = backend.FilterItems(res, func(i backend.Item) bool {
@@ -190,8 +189,8 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 		from '%s'
 		where timestamp > %d and timestamp <= %d
 		group by start
-		order by start %s limit %d`,
-		bucketDuration*1000, bucketDuration*1000, id, start, end, order, limit)
+		order by start ASC`,
+		bucketDuration*1000, bucketDuration*1000, id, start, end)
 	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
@@ -213,7 +212,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 		}
 
 		// append missing
-		for t < (startT - bucketDuration*1000) {
+		for t < startT {
 			res = append(res, backend.StatItem{
 				Start:   t,
 				End:     t + bucketDuration*1000,
@@ -248,7 +247,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 	}
 
 	// append missing
-	for t < (end - bucketDuration*1000) {
+	for t < end {
 		res = append(res, backend.StatItem{
 			Start:   t,
 			End:     t + bucketDuration*1000,
