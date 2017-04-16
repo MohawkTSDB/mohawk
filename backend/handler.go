@@ -180,20 +180,28 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 
 // PostData send timestamp, value to the backend
 func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	var u []map[string]interface{}
+	var u []postDataItems
 	json.NewDecoder(r.Body).Decode(&u)
 
-	id := u[0]["id"].(string)
-	if !validStr(id) {
-		w.WriteHeader(504)
-		return
+	for _, item := range u {
+		if !validStr(item.ID) {
+			w.WriteHeader(504)
+			fmt.Fprintf(w, "<p>Error 504, Bad metrics ID</p>")
+			return
+		}
 	}
 
-	t := u[0]["data"].([]interface{})[0].(map[string]interface{})["timestamp"].(float64)
-	vStr := u[0]["data"].([]interface{})[0].(map[string]interface{})["value"].(string)
-	v, _ := strconv.ParseFloat(vStr, 64)
+	for _, item := range u {
+		id := item.ID
 
-	h.Backend.PostRawData(id, int64(t), v)
+		for _, data := range item.Data {
+			timestamp, _ := data.Timestamp.Int64()
+			value, _ := data.Value.Float64()
+
+			h.Backend.PostRawData(id, timestamp, value)
+		}
+	}
+
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }

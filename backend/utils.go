@@ -36,6 +36,16 @@ type dataQuery struct {
 	BucketDuration string      `json:"bucketDuration"`
 }
 
+// json struct used to parse post data http request
+type postDataItem struct {
+	Timestamp json.Number `json:"timestamp"`
+	Value     json.Number `json:"value"`
+}
+type postDataItems struct {
+	ID   string         `json:"id"`
+	Data []postDataItem `json:"data"`
+}
+
 // getData querys data from the backend, and return a json string
 func getData(h Handler, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
 	var resStr string
