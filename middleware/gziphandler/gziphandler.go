@@ -7,7 +7,6 @@ import (
 	"compress/gzip"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 )
 
@@ -69,11 +68,6 @@ func (gzr *gzipResponseWriter) Flush() {
 
 func New(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
-			fn(w, r)
-			return
-		}
-
 		gzr := pool.Get().(*gzipResponseWriter)
 		gzr.statusCode = 0
 		gzr.headerWritten = false

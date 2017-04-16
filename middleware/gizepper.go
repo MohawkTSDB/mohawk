@@ -17,7 +17,9 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
+	"strings"
 
 	"github.com/yaacov/mohawk/middleware/gziphandler"
 )
@@ -25,7 +27,7 @@ import (
 // GZipper middleware that will gzip http requests
 type GZipper struct {
 	Verbose bool
-	next http.Handler
+	next    http.Handler
 }
 
 // SetNext set next http serve func
@@ -35,5 +37,14 @@ func (g *GZipper) SetNext(h http.Handler) {
 
 // ServeHTTP http serve func
 func (g *GZipper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		g.next.ServeHTTP(w, r)
+		return
+	}
+
+	if g.Verbose {
+		log.Printf("Using gzip encoding")
+	}
+
 	gziphandler.New(g.next.ServeHTTP)(w, r)
 }

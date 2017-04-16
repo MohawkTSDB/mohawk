@@ -19,6 +19,7 @@ package backend
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -37,6 +38,10 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	var res []Item
 
 	r.ParseForm()
+
+	if h.Verbose {
+		log.Printf("Metrics type: %s", r.Form.Get("type"))
+	}
 
 	// we only use gauges
 	if typeStr, ok := r.Form["type"]; ok && len(typeStr) > 0 && typeStr[0] != "gauge" {
@@ -108,6 +113,10 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 		}
 	}
 
+	if h.Verbose {
+		log.Printf("ID: %s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", id, end, start, limit, order, bucketDuration)
+	}
+
 	// call backend for data
 	resStr := getData(h, id, end, start, limit, order, bucketDuration)
 
@@ -165,6 +174,10 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	fmt.Fprintf(w, "[")
 
 	for i, id := range u.IDs {
+		if h.Verbose {
+			log.Printf("ID: %s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", id, end, start, limit, order, bucketDuration)
+		}
+
 		// call backend for data
 		resStr := getData(h, id, end, start, limit, order, bucketDuration)
 
