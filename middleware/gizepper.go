@@ -24,6 +24,7 @@ import (
 
 // GZipper middleware that will gzip http requests
 type GZipper struct {
+	Verbose bool
 	next http.Handler
 }
 

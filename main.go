@@ -139,7 +139,9 @@ func main() {
 	}
 
 	// gzipper a gzip encoding middleware
-	gzipper := middleware.GZipper{}
+	gzipper := middleware.GZipper{
+		Verbose: *verbosePtr,
+	}
 
 	// fallback a BadRequest middleware
 	fallback := middleware.BadRequest{}

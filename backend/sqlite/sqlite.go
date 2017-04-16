@@ -20,6 +20,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"regexp"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/yaacov/mohawk/backend"
@@ -115,7 +116,10 @@ func (r Backend) GetItemList(tags map[string]string) []backend.Item {
 	// FIXME: we should do this in the sql
 	if len(tags) > 0 {
 		for key, value := range tags {
-			res = backend.FilterItems(res, func(i backend.Item) bool { return i.Tags[key] == value })
+			res = backend.FilterItems(res, func(i backend.Item) bool {
+				r, _ := regexp.Compile("^" + value + "$")
+				return r.MatchString(i.Tags[key])
+			})
 		}
 	}
 
