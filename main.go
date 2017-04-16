@@ -39,7 +39,7 @@ const VER = "0.8.3"
 const defaultPort = 8080
 const defaultBackend = "sqlite"
 const defaultAPI = "0.21.0"
-const defaultTLS = "false"
+const defaultTLS = false
 
 // ImplementationVersion Hakular server api implementation version
 var ImplementationVersion string
@@ -54,7 +54,7 @@ func main() {
 	portPtr := flag.Int("port", defaultPort, "server port")
 	backendPtr := flag.String("backend", defaultBackend, "the backend to use [random, sqlite, timeout]")
 	apiPtr := flag.String("api", defaultAPI, "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
-	tlsPtr := flag.String("tls", defaultTLS, "use TLS server")
+	tlsPtr := flag.Bool("tls", defaultTLS, "use TLS server")
 	optionsPtr := flag.String("options", "", "specific backend options")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	versionPtr := flag.Bool("version", false, "version number")
@@ -166,7 +166,7 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	if *tlsPtr == "true" {
+	if *tlsPtr {
 		log.Printf("Start server, listen on https://%+v", srv.Addr)
 		log.Fatal(srv.ListenAndServeTLS("server.pem", "server.key"))
 	} else {
