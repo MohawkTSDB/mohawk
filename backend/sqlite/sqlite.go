@@ -175,6 +175,7 @@ func (r Backend) GetRawData(id string, end int64, start int64, limit int64, orde
 
 func (r Backend) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var t int64
+	timeStep := bucketDuration * 1000
 	res := make([]backend.StatItem, 0)
 
 	// check if id exist
@@ -190,13 +191,13 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 		where timestamp > %d and timestamp <= %d
 		group by start
 		order by start ASC`,
-		bucketDuration*1000, bucketDuration*1000, id, start, end)
+		timeStep, timeStep, id, start, end)
 	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 	defer rows.Close()
-	t = int64(start/(bucketDuration*1000)+1) * (bucketDuration * 1000)
+	t = int64(start/timeStep) * timeStep
 	for rows.Next() {
 		var samples int64
 		var startT int64
@@ -215,7 +216,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 		for t < startT {
 			res = append(res, backend.StatItem{
 				Start:   t,
-				End:     t + bucketDuration*1000,
+				End:     t + timeStep,
 				Empty:   true,
 				Samples: 0,
 				Min:     0,
@@ -224,13 +225,13 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 				Median:  0,
 				Sum:     0,
 			})
-			t += bucketDuration * 1000
+			t += timeStep
 		}
 
 		// add data
 		res = append(res, backend.StatItem{
 			Start:   startT,
-			End:     startT + bucketDuration*1000,
+			End:     startT + timeStep,
 			Empty:   false,
 			Samples: samples,
 			Min:     min,
@@ -239,7 +240,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 			Median:  0,
 			Sum:     sum,
 		})
-		t += bucketDuration * 1000
+		t += timeStep
 	}
 	err = rows.Err()
 	if err != nil {
@@ -250,7 +251,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 	for t < end {
 		res = append(res, backend.StatItem{
 			Start:   t,
-			End:     t + bucketDuration*1000,
+			End:     t + timeStep,
 			Empty:   true,
 			Samples: 0,
 			Min:     0,
@@ -259,7 +260,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 			Median:  0,
 			Sum:     0,
 		})
-		t += bucketDuration * 1000
+		t += timeStep
 	}
 
 	return res
