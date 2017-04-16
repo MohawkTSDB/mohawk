@@ -176,6 +176,9 @@ func (r Backend) GetRawData(id string, end int64, start int64, limit int64, orde
 func (r Backend) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var t int64
 	timeStep := bucketDuration * 1000
+	startTime := int64(start/timeStep) * timeStep
+	endTime := int64(end/timeStep) * timeStep
+
 	res := make([]backend.StatItem, 0)
 
 	// check if id exist
@@ -188,16 +191,16 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 		count(timestamp) as samples, cast((timestamp / %d) as integer) * %d as start, max(timestamp) as end,
 		min(value) as min, max(value) as max, avg(value) as avg, sum(value) as sum
 		from '%s'
-		where timestamp > %d and timestamp <= %d
+		where timestamp >= %d and timestamp < %d
 		group by start
 		order by start ASC`,
-		timeStep, timeStep, id, start, end)
+		timeStep, timeStep, id, startTime, endTime)
 	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 	defer rows.Close()
-	t = int64(start/timeStep) * timeStep
+	t = startTime
 	for rows.Next() {
 		var samples int64
 		var startT int64
@@ -248,7 +251,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 	}
 
 	// append missing
-	for t < end {
+	for t < endTime {
 		res = append(res, backend.StatItem{
 			Start:   t,
 			End:     t + timeStep,
