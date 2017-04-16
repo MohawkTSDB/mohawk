@@ -20,6 +20,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/url"
 	"regexp"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -37,10 +38,17 @@ func (r Backend) Name() string {
 	return "Backend-Sqlite3"
 }
 
-func (r *Backend) Open() {
+func (r *Backend) Open(options url.Values) {
 	var err error
+	var filename string
 
-	r.db, err = sql.Open("sqlite3", "./server.db")
+	// get backend options
+	filename = options.Get("db-filename")
+	if filename == "" {
+		filename = "./server.db"
+	}
+
+	r.db, err = sql.Open("sqlite3", filename)
 	if err != nil {
 		log.Printf("%q\n", err)
 	}

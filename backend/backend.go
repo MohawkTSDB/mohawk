@@ -16,6 +16,10 @@
 // Package backend
 package backend
 
+import (
+	"net/url"
+)
+
 type Tenant struct {
 	Id string `json:"id"`
 }
@@ -45,7 +49,7 @@ type StatItem struct {
 
 type Backend interface {
 	Name() string
-	Open()
+	Open(options url.Values)
 	GetItemList(tags map[string]string) []Item
 	GetRawData(id string, end int64, start int64, limit int64, order string) []DataItem
 	GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem

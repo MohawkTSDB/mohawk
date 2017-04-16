@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/yaacov/mohawk/backend"
@@ -54,6 +55,7 @@ func main() {
 	backendPtr := flag.String("backend", defaultBackend, "the backend to use [random, sqlite, timeout]")
 	apiPtr := flag.String("api", defaultAPI, "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
 	tlsPtr := flag.String("tls", defaultTLS, "use TLS server")
+	optionsPtr := flag.String("options", "", "specific backend options")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	versionPtr := flag.Bool("version", false, "version number")
 	flag.Parse()
@@ -75,7 +77,13 @@ func main() {
 	default:
 		log.Fatal("Can't find backend:", *backendPtr)
 	}
-	db.Open()
+
+	// parse options
+	if options, err := url.ParseQuery(*optionsPtr); err == nil {
+		db.Open(options)
+	} else {
+		log.Fatal("Can't parse opetions:", *optionsPtr)
+	}
 
 	// set global variables
 	ImplementationVersion = *apiPtr

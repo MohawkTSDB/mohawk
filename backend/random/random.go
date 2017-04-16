@@ -19,7 +19,9 @@ package random
 import (
 	"fmt"
 	"math/rand"
+	"net/url"
 	"regexp"
+	"strconv"
 
 	"github.com/yaacov/mohawk/backend"
 )
@@ -32,7 +34,16 @@ func (r Backend) Name() string {
 	return "Backend-Random"
 }
 
-func (r *Backend) Open() {
+func (r *Backend) Open(options url.Values) {
+	var maxSize int
+
+	// get backend options
+	maxSizeStr := options.Get("max-size")
+	if maxSizeStr == "" {
+		maxSizeStr = "1000"
+	}
+	maxSize, _ = strconv.Atoi(maxSizeStr)
+
 	r.Items = make([]backend.Item, 0)
 
 	seeds := []map[string]string{
@@ -45,7 +56,7 @@ func (r *Backend) Open() {
 		map[string]string{"type": "node", "group_id": "filesystem/usage_rate", "units": "byte"},
 	}
 
-	for i := 0; i < 2020; i++ {
+	for i := 0; i < maxSize; i++ {
 		seed := seeds[rand.Intn(len(seeds))]
 		tags := map[string]string{
 			"type":     seed["type"],

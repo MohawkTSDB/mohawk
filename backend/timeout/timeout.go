@@ -17,6 +17,8 @@
 package timeout
 
 import (
+	"net/url"
+
 	"github.com/yaacov/mohawk/backend"
 )
 
@@ -27,8 +29,7 @@ func (r Backend) Name() string {
 	return "Backend-TimeoutError"
 }
 
-func (r *Backend) Open() {
-
+func (r *Backend) Open(options url.Values) {
 }
 
 func (r Backend) GetItemList(tags map[string]string) []backend.Item {
