@@ -196,7 +196,7 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 	defer rows.Close()
-	t = int64(start/(bucketDuration*1000)) * (bucketDuration * 1000)
+	t = int64(start/(bucketDuration*1000)+1) * (bucketDuration * 1000)
 	for rows.Next() {
 		var samples int64
 		var startT int64
