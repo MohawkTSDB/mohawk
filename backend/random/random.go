@@ -36,6 +36,8 @@ func (r Backend) Name() string {
 
 func (r *Backend) Open(options url.Values) {
 	var maxSize int
+	var keys map[string]bool
+	var validID bool
 
 	// get backend options
 	maxSizeStr := options.Get("max-size")
@@ -44,6 +46,7 @@ func (r *Backend) Open(options url.Values) {
 	}
 	maxSize, _ = strconv.Atoi(maxSizeStr)
 
+	keys = make(map[string]bool)
 	r.Items = make([]backend.Item, 0)
 
 	seeds := []map[string]string{
@@ -67,14 +70,9 @@ func (r *Backend) Open(options url.Values) {
 		}
 		id := fmt.Sprintf("machine/%s/%s", tags["hostname"], tags["group_id"])
 
-		validID := true
-		for _, o := range r.Items {
-			if id == o.Id {
-				validID = false
-			}
-		}
+		if _, validID = keys[id]; !validID {
+			keys[id] = true
 
-		if validID {
 			r.Items = append(r.Items, backend.Item{
 				Id:   id,
 				Type: "gauge",
