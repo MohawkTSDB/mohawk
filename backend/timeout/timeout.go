@@ -58,6 +58,10 @@ func (r Backend) PutTags(id string, tags map[string]string) bool {
 	return false
 }
 
+func (r Backend) DeleteData(id string, end int64, start int64) bool {
+	return false
+}
+
 func (r Backend) DeleteTags(id string, tags []string) bool {
 	return false
 }

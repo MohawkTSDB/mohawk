@@ -126,6 +126,50 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	fmt.Fprintf(w, resStr)
 }
 
+// DeleteData delete a list of metrics raw  data
+func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	// use the id from the argv list
+	id := argv["id"]
+	if !validStr(id) {
+		w.WriteHeader(504)
+		return
+	}
+
+	// get data from the form arguments
+	r.ParseForm()
+
+	end := int64(0)
+	if v, ok := r.Form["end"]; ok && len(v) > 0 {
+		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
+			end = int64(i)
+		}
+	}
+
+	start := int64(0)
+	if v, ok := r.Form["start"]; ok && len(v) > 0 {
+		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
+			start = int64(i)
+		}
+	}
+
+	if h.Verbose {
+		log.Printf("ID: %s, End: %d, Start: %d", id, end, start)
+	}
+
+	// call backend for data
+	if start < end {
+		h.Backend.DeleteData(id, end, start)
+
+		// output to client
+		w.WriteHeader(200)
+		fmt.Fprintf(w, "{}")
+		return
+	}
+
+	w.WriteHeader(504)
+	fmt.Fprintf(w, "504 - Can't delete time rage")
+}
+
 // PostQuery send timestamp, value to the backend
 func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u dataQuery

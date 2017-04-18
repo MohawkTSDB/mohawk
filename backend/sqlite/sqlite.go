@@ -291,16 +291,26 @@ func (r Backend) PutTags(id string, tags map[string]string) bool {
 	return true
 }
 
-func (r Backend) DeleteTags(id string, tags []string) bool {
+func (r Backend) DeleteData(id string, end int64, start int64) bool {
 	// check if id exist
-	if !r.IdExist(id) {
-		r.createId(id)
+	if r.IdExist(id) {
+		r.deleteData(id, end, start)
+		return true
 	}
 
-	for _, k := range tags {
-		r.deleteTag(id, k)
+	return false
+}
+
+func (r Backend) DeleteTags(id string, tags []string) bool {
+	// check if id exist
+	if r.IdExist(id) {
+		for _, k := range tags {
+			r.deleteTag(id, k)
+		}
+		return true
 	}
-	return true
+
+	return false
 }
 
 // Helper functions
@@ -323,6 +333,14 @@ func (r Backend) insertData(id string, t int64, v float64) {
 
 func (r Backend) insertTag(id string, k string, v string) {
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
+	_, err := r.db.Exec(sqlStmt)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmt)
+	}
+}
+
+func (r Backend) deleteData(id string, end int64, start int64) {
+	sqlStmt := fmt.Sprintf("delete from '%s' where timestamp >= %d and timestamp < %d", id, start, end)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
