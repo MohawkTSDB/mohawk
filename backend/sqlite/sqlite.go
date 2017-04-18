@@ -291,6 +291,18 @@ func (r Backend) PutTags(id string, tags map[string]string) bool {
 	return true
 }
 
+func (r Backend) DeleteTags(id string, tags []string) bool {
+	// check if id exist
+	if !r.IdExist(id) {
+		r.createId(id)
+	}
+
+	for _, k := range tags {
+		r.deleteTag(id, k)
+	}
+	return true
+}
+
 // Helper functions
 // Not required by backend interface
 
@@ -311,6 +323,14 @@ func (r Backend) insertData(id string, t int64, v float64) {
 
 func (r Backend) insertTag(id string, k string, v string) {
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
+	_, err := r.db.Exec(sqlStmt)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmt)
+	}
+}
+
+func (r Backend) deleteTag(id string, k string) {
+	sqlStmt := fmt.Sprintf("delete from tags where id='%s' and tag='%s'", id, k)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)

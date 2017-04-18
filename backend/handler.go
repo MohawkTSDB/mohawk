@@ -22,6 +22,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -232,6 +233,22 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 	}
 
 	h.Backend.PutTags(id, tags)
+	w.WriteHeader(200)
+	fmt.Fprintln(w, "{}")
+}
+
+// PutTags send tag, value pairs to the backend
+func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	// use the id from the argv list
+	id := argv["id"]
+	tagsStr := argv["tags"]
+	if !validStr(id) || !validStr(tagsStr) {
+		w.WriteHeader(504)
+		return
+	}
+	tags := strings.Split(tagsStr, ",")
+
+	h.Backend.DeleteTags(id, tags)
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }

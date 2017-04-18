@@ -24,7 +24,7 @@ import (
 )
 
 // validRegex regexp for validating sql variables
-var validRegex = regexp.MustCompile(`^[ A-Za-z0-9_/\[\]\(\)\.\+\*-]*$`)
+var validRegex = regexp.MustCompile(`^[ A-Za-z0-9_,/\[\]\(\)\.\+\*-]*$`)
 
 // json struct used to query data by the POST http request
 type dataQuery struct {

@@ -132,6 +132,9 @@ func main() {
 		rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
 		rMetrics.Add("PUT", "counters/:id/tags", h.PutTags)
 
+		rMetrics.Add("DELETE", "gauges/:id/tags/:tags", h.DeleteTags)
+		rMetrics.Add("DELETE", "counters/:id/tags/:tags", h.DeleteTags)
+
 		// api version < 0.16.0
 		rMetrics.Add("GET", "gauges/:id/data", h.GetData)
 		rMetrics.Add("GET", "counters/:id/data", h.GetData)

@@ -57,3 +57,7 @@ func (r Backend) PostRawData(id string, t int64, v float64) bool {
 func (r Backend) PutTags(id string, tags map[string]string) bool {
 	return false
 }
+
+func (r Backend) DeleteTags(id string, tags []string) bool {
+	return false
+}
