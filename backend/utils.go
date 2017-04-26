@@ -47,16 +47,16 @@ type postDataItems struct {
 }
 
 // getData querys data from the backend, and return a json string
-func getData(h Handler, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
+func getData(h Handler, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
 	var resStr string
 
 	// call backend for data
 	if bucketDuration == 0 {
-		res := h.Backend.GetRawData(id, end, start, limit, order)
+		res := h.Backend.GetRawData(tenant, id, end, start, limit, order)
 		resJSON, _ := json.Marshal(res)
 		resStr = string(resJSON)
 	} else {
-		res := h.Backend.GetStatData(id, end, start, limit, order, bucketDuration)
+		res := h.Backend.GetStatData(tenant, id, end, start, limit, order, bucketDuration)
 		resJSON, _ := json.Marshal(res)
 		resStr = string(resJSON)
 	}

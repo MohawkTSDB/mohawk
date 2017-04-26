@@ -34,6 +34,17 @@ type Handler struct {
 	Backend Backend
 }
 
+// GetTenants return a list of metrics tenants
+func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	var res []Tenant
+
+	res = h.Backend.GetTenants()
+	resJSON, _ := json.Marshal(res)
+
+	w.WriteHeader(200)
+	fmt.Fprintln(w, string(resJSON))
+}
+
 // GetMetrics return a list of metrics definitions
 func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []Item
@@ -52,6 +63,9 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 		return
 	}
 
+	// get tenant
+	tenant := "_ops"
+
 	// get a list of gauges
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
 		tags := parseTags(tagsStr[0])
@@ -59,9 +73,9 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 			w.WriteHeader(504)
 			return
 		}
-		res = h.Backend.GetItemList(tags)
+		res = h.Backend.GetItemList(tenant, tags)
 	} else {
-		res = h.Backend.GetItemList(map[string]string{})
+		res = h.Backend.GetItemList(tenant, map[string]string{})
 	}
 	resJSON, _ := json.Marshal(res)
 
@@ -80,6 +94,9 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 
 	// get data from the form arguments
 	r.ParseForm()
+
+	// get tenant
+	tenant := "_ops"
 
 	end := int64(time.Now().Unix() * 1000)
 	if v, ok := r.Form["end"]; ok && len(v) > 0 {
@@ -115,11 +132,11 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	}
 
 	if h.Verbose {
-		log.Printf("ID: %s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", id, end, start, limit, order, bucketDuration)
+		log.Printf("ID: %s@%s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", tenant, id, end, start, limit, order, bucketDuration)
 	}
 
 	// call backend for data
-	resStr := getData(h, id, end, start, limit, order, bucketDuration)
+	resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
 
 	// output to client
 	w.WriteHeader(200)
@@ -152,13 +169,16 @@ func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[str
 		}
 	}
 
+	// get tenant
+	tenant := "_ops"
+
 	if h.Verbose {
-		log.Printf("ID: %s, End: %d, Start: %d", id, end, start)
+		log.Printf("ID: %s@%s, End: %d, Start: %d", tenant, id, end, start)
 	}
 
 	// call backend for data
 	if start < end {
-		h.Backend.DeleteData(id, end, start)
+		h.Backend.DeleteData(tenant, id, end, start)
 
 		// output to client
 		w.WriteHeader(200)
@@ -181,6 +201,9 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	decoder := json.NewDecoder(r.Body)
 	decoder.UseNumber()
 	decoder.Decode(&u)
+
+	// get tenant
+	tenant := "_ops"
 
 	for _, id := range u.IDs {
 		if !validStr(id) {
@@ -220,11 +243,11 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 
 	for i, id := range u.IDs {
 		if h.Verbose {
-			log.Printf("ID: %s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", id, end, start, limit, order, bucketDuration)
+			log.Printf("ID: %s@%s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", tenant, id, end, start, limit, order, bucketDuration)
 		}
 
 		// call backend for data
-		resStr := getData(h, id, end, start, limit, order, bucketDuration)
+		resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
 
 		// write data
 		fmt.Fprintf(w, "{\"id\": \"%s\", \"data\": %s}", id, resStr)
@@ -249,6 +272,9 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 		}
 	}
 
+	// get tenant
+	tenant := "_ops"
+
 	for _, item := range u {
 		id := item.ID
 
@@ -256,7 +282,7 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 			timestamp, _ := data.Timestamp.Int64()
 			value, _ := data.Value.Float64()
 
-			h.Backend.PostRawData(id, timestamp, value)
+			h.Backend.PostRawData(tenant, id, timestamp, value)
 		}
 	}
 
@@ -276,7 +302,10 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 		return
 	}
 
-	h.Backend.PutTags(id, tags)
+	// get tenant
+	tenant := "_ops"
+
+	h.Backend.PutTags(tenant, id, tags)
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }
@@ -292,7 +321,10 @@ func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[str
 	}
 	tags := strings.Split(tagsStr, ",")
 
-	h.Backend.DeleteTags(id, tags)
+	// get tenant
+	tenant := "_ops"
+
+	h.Backend.DeleteTags(tenant, id, tags)
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }

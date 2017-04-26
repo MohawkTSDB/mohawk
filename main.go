@@ -104,7 +104,7 @@ func main() {
 	// Root Routing table
 	rRoot.Add("GET", "oapi", GetAPIVersions)
 	rRoot.Add("GET", "hawkular/metrics/status", GetStatus)
-	rRoot.Add("GET", "hawkular/metrics/tenants", GetTenants)
+	rRoot.Add("GET", "hawkular/metrics/tenants", h.GetTenants)
 
 	rMetrics := router.Router{
 		Prefix: "/hawkular/metrics/",

@@ -50,13 +50,14 @@ type StatItem struct {
 type Backend interface {
 	Name() string
 	Open(options url.Values)
-	GetItemList(tags map[string]string) []Item
-	GetRawData(id string, end int64, start int64, limit int64, order string) []DataItem
-	GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem
-	PostRawData(id string, t int64, v float64) bool
-	PutTags(id string, tags map[string]string) bool
-	DeleteData(id string, end int64, start int64) bool
-	DeleteTags(id string, tags []string) bool
+	GetTenants() []Tenant
+	GetItemList(tenant string, tags map[string]string) []Item
+	GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []DataItem
+	GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem
+	PostRawData(tenant string, id string, t int64, v float64) bool
+	PutTags(tenant string, id string, tags map[string]string) bool
+	DeleteData(tenant string, id string, end int64, start int64) bool
+	DeleteTags(tenant string, id string, tags []string) bool
 }
 
 func FilterItems(vs []Item, f func(Item) bool) []Item {
