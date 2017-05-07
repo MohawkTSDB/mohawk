@@ -66,19 +66,23 @@ mohawk -h
 
 Usage of mohawk:
   -api string
-    	the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final] (default "0.21.0")
+      the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final] (default "0.21.0")
   -backend string
-    	the backend to use [random, sqlite, timeout] (default "sqlite")
+      the backend to use [random, sqlite, timeout] (default "sqlite")
+  -cert string
+      path to TLS cert file (default "server.pem")
+  -key string
+      path to TLS key file (default "server.key")
   -options string
-    	specific backend options
+      specific backend options [e.g. db-dirname (sqlite), max-size (random)]
   -port int
-    	server port (default 8080)
+      server port (default 8080)
   -tls
-    	use TLS server
+      use TLS server
   -verbose
-    	more debug output
+      more debug output
   -version
-    	version number
+      version number
 ```
 
 ## Example of use
