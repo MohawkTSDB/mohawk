@@ -66,7 +66,6 @@ $> mohawk --version
 MoHawk version: 0.10.1
 
 $> mohawk -h
-
 Usage of mohawk:
   -api string
       the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final] (default "0.21.0")
