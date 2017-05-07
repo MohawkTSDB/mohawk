@@ -40,6 +40,8 @@ const defaultPort = 8080
 const defaultBackend = "sqlite"
 const defaultAPI = "0.21.0"
 const defaultTLS = false
+const defaultTLSKey = "server.key"
+const defaultTLSCert = "server.pem"
 
 // ImplementationVersion Hakular server api implementation version
 var ImplementationVersion string
@@ -58,6 +60,8 @@ func main() {
 	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname (sqlite), max-size (random)]")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	versionPtr := flag.Bool("version", false, "version number")
+	keyPtr := flag.String("key", defaultTLSKey, "path to TLS key file")
+	certPtr := flag.String("cert", defaultTLSCert, "path to TLS cert file")
 	flag.Parse()
 
 	// return version number and exit
@@ -174,7 +178,7 @@ func main() {
 	}
 	if *tlsPtr {
 		log.Printf("Start server, listen on https://%+v", srv.Addr)
-		log.Fatal(srv.ListenAndServeTLS("server.pem", "server.key"))
+		log.Fatal(srv.ListenAndServeTLS(*certPtr, *keyPtr))
 	} else {
 		log.Printf("Start server, listen on http://%+v", srv.Addr)
 		log.Fatal(srv.ListenAndServe())
