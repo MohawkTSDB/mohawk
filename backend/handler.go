@@ -64,7 +64,10 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	}
 
 	// get tenant
-	tenant := "_ops"
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = "_ops"
+	}
 
 	// get a list of gauges
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
@@ -96,7 +99,10 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	r.ParseForm()
 
 	// get tenant
-	tenant := "_ops"
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = "_ops"
+	}
 
 	end := int64(time.Now().Unix() * 1000)
 	if v, ok := r.Form["end"]; ok && len(v) > 0 {
@@ -170,7 +176,10 @@ func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[str
 	}
 
 	// get tenant
-	tenant := "_ops"
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = "_ops"
+	}
 
 	if h.Verbose {
 		log.Printf("ID: %s@%s, End: %d, Start: %d", tenant, id, end, start)
@@ -203,7 +212,10 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	decoder.Decode(&u)
 
 	// get tenant
-	tenant := "_ops"
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = "_ops"
+	}
 
 	for _, id := range u.IDs {
 		if !validStr(id) {
@@ -273,7 +285,10 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 	}
 
 	// get tenant
-	tenant := "_ops"
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = "_ops"
+	}
 
 	for _, item := range u {
 		id := item.ID
@@ -303,7 +318,10 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 	}
 
 	// get tenant
-	tenant := "_ops"
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = "_ops"
+	}
 
 	h.Backend.PutTags(tenant, id, tags)
 	w.WriteHeader(200)
@@ -322,7 +340,10 @@ func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[str
 	tags := strings.Split(tagsStr, ",")
 
 	// get tenant
-	tenant := "_ops"
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = "_ops"
+	}
 
 	h.Backend.DeleteTags(tenant, id, tags)
 	w.WriteHeader(200)

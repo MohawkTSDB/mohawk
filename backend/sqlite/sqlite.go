@@ -28,7 +28,8 @@ import (
 )
 
 type Backend struct {
-	db *sql.DB
+	dbDirName string
+	tenant    map[string]*sql.DB
 }
 
 // Backend functions
@@ -38,51 +39,66 @@ func (r Backend) Name() string {
 	return "Backend-Sqlite3"
 }
 
-func (r *Backend) Open(options url.Values) {
-	var err error
+func (r *Backend) GetTenant(name string) (*sql.DB, error) {
 	var filename string
 
-	// get backend options
-	filename = options.Get("db-filename")
-	if filename == "" {
-		filename = "./server.db"
+	if tenant, ok := r.tenant[name]; ok {
+		return tenant, nil
 	}
 
-	r.db, err = sql.Open("sqlite3", filename)
+	filename = fmt.Sprintf("%s/%s.db", r.dbDirName, name)
+
+	db, err := sql.Open("sqlite3", filename)
 	if err != nil {
 		log.Printf("%q\n", err)
+		return nil, err
 	}
 
 	sqlStmt := `
-	create table if not exists ids (
-		id    text,
-		primary key (id));
-	create table if not exists tags (
-		id    text,
-		tag   text,
-		value text,
-		primary key (id, tag));
-	`
-	_, err = r.db.Exec(sqlStmt)
+		create table if not exists ids (
+			id    text,
+			primary key (id));
+		create table if not exists tags (
+			id    text,
+			tag   text,
+			value text,
+			primary key (id, tag));
+		`
+
+	_, err = db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
-		return
+		return db, err
 	}
+
+	r.tenant[name] = db
+	return db, nil
+}
+
+func (r *Backend) Open(options url.Values) {
+	// get backend options
+	r.dbDirName = options.Get("db-dirname")
+	if r.dbDirName == "" {
+		r.dbDirName = "./server"
+	}
+
+	r.tenant = make(map[string]*sql.DB)
 }
 
 func (r Backend) GetTenants() []backend.Tenant {
-	var res []backend.Tenant
+	res := make([]backend.Tenant, 0)
 
 	res = append(res, backend.Tenant{Id: "_ops"})
 	return res
 }
 
 func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
-	var res []backend.Item
+	res := make([]backend.Item, 0)
+	db, _ := r.GetTenant(tenant)
 
 	// create one item per id
 	sqlStmt := "select id from ids"
-	rows, err := r.db.Query(sqlStmt)
+	rows, err := db.Query(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
@@ -106,7 +122,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 	}
 
 	// update item tags
-	rows, err = r.db.Query("select id, tag, value from tags")
+	rows, err = db.Query("select id, tag, value from tags")
 	if err != nil {
 		log.Printf("%q\n", err)
 	}
@@ -141,7 +157,8 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 }
 
 func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
-	var res []backend.DataItem
+	res := make([]backend.DataItem, 0)
+	db, _ := r.GetTenant(tenant)
 
 	// check if id exist
 	if !r.IdExist(tenant, id) {
@@ -154,7 +171,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 		where timestamp > %d and timestamp <= %d
 		order by timestamp %s limit %d`,
 		id, start, end, order, limit)
-	rows, err := r.db.Query(sqlStmt)
+	rows, err := db.Query(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
@@ -182,7 +199,8 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var t int64
-	var res []backend.StatItem
+	res := make([]backend.StatItem, 0)
+	db, _ := r.GetTenant(tenant)
 
 	timeStep := bucketDuration * 1000
 	startTime := int64(start/timeStep) * timeStep
@@ -202,7 +220,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 		group by start
 		order by start ASC`,
 		timeStep, timeStep, id, startTime, endTime)
-	rows, err := r.db.Query(sqlStmt)
+	rows, err := db.Query(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
@@ -325,46 +343,58 @@ func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 
 func (r Backend) IdExist(tenant string, id string) bool {
 	var _id string
+	db, _ := r.GetTenant(tenant)
+
 	sqlStmt := fmt.Sprintf("select id from ids where id='%s'", id)
-	err := r.db.QueryRow(sqlStmt).Scan(&_id)
+	err := db.QueryRow(sqlStmt).Scan(&_id)
 	return err != sql.ErrNoRows
 }
 
 func (r Backend) insertData(tenant string, id string, t int64, v float64) {
+	db, _ := r.GetTenant(tenant)
+
 	sqlStmt := fmt.Sprintf("insert into '%s' values (%d, %f)", id, t, v)
-	_, err := r.db.Exec(sqlStmt)
+	_, err := db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 }
 
 func (r Backend) insertTag(tenant string, id string, k string, v string) {
+	db, _ := r.GetTenant(tenant)
+
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
-	_, err := r.db.Exec(sqlStmt)
+	_, err := db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 }
 
 func (r Backend) deleteData(tenant string, id string, end int64, start int64) {
+	db, _ := r.GetTenant(tenant)
+
 	sqlStmt := fmt.Sprintf("delete from '%s' where timestamp >= %d and timestamp < %d", id, start, end)
-	_, err := r.db.Exec(sqlStmt)
+	_, err := db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 }
 
 func (r Backend) deleteTag(tenant string, id string, k string) {
+	db, _ := r.GetTenant(tenant)
+
 	sqlStmt := fmt.Sprintf("delete from tags where id='%s' and tag='%s'", id, k)
-	_, err := r.db.Exec(sqlStmt)
+	_, err := db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 }
 
 func (r Backend) createId(tenant string, id string) bool {
+	db, _ := r.GetTenant(tenant)
+
 	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
-	_, err := r.db.Exec(sqlStmt)
+	_, err := db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return false
@@ -377,7 +407,7 @@ func (r Backend) createId(tenant string, id string) bool {
 		primary key (timestamp));
 	`, id)
 
-	_, err = r.db.Exec(sqlStmt)
+	_, err = db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return false
