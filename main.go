@@ -55,7 +55,7 @@ func main() {
 	backendPtr := flag.String("backend", defaultBackend, "the backend to use [random, sqlite, timeout]")
 	apiPtr := flag.String("api", defaultAPI, "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
 	tlsPtr := flag.Bool("tls", defaultTLS, "use TLS server")
-	optionsPtr := flag.String("options", "", "specific backend options")
+	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname (sqlite), max-size (random)]")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	versionPtr := flag.Bool("version", false, "version number")
 	flag.Parse()

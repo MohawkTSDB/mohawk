@@ -79,7 +79,7 @@ func (r *Backend) Open(options url.Values) {
 	// get backend options
 	r.dbDirName = options.Get("db-dirname")
 	if r.dbDirName == "" {
-		r.dbDirName = "./server"
+		r.dbDirName = "./"
 	}
 
 	r.tenant = make(map[string]*sql.DB)
