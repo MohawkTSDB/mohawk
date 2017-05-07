@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/yaacov/mohawk/middleware/gziphandler"
+	"github.com/yaacov/mohawk/middleware/gzip"
 )
 
 // GZipper middleware that will gzip http requests
@@ -46,5 +46,5 @@ func (g *GZipper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Using gzip encoding")
 	}
 
-	gziphandler.New(g.next.ServeHTTP)(w, r)
+	gzip.Decorator(g.next.ServeHTTP)(w, r)
 }

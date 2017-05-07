@@ -82,7 +82,14 @@ func (r *Backend) Open(options url.Values) {
 	}
 }
 
-func (r Backend) GetItemList(tags map[string]string) []backend.Item {
+func (r Backend) GetTenants() []backend.Tenant {
+	var res []backend.Tenant
+
+	res = append(res, backend.Tenant{Id: "_ops"})
+	return res
+}
+
+func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
 	res := r.Items
 
 	if len(tags) > 0 {
@@ -97,7 +104,7 @@ func (r Backend) GetItemList(tags map[string]string) []backend.Item {
 	return res
 }
 
-func (r Backend) GetRawData(id string, end int64, start int64, limit int64, order string) []backend.DataItem {
+func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
 	var i int64
 	var res []backend.DataItem
 
@@ -121,7 +128,7 @@ func (r Backend) GetRawData(id string, end int64, start int64, limit int64, orde
 	return res
 }
 
-func (r Backend) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
+func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var i int64
 	var res []backend.StatItem
 
@@ -153,18 +160,18 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 	return res
 }
 
-func (r Backend) PostRawData(id string, t int64, v float64) bool {
+func (r Backend) PostRawData(tenant string, id string, t int64, v float64) bool {
 	return false
 }
 
-func (r Backend) PutTags(id string, tags map[string]string) bool {
+func (r Backend) PutTags(tenant string, id string, tags map[string]string) bool {
 	return false
 }
 
-func (r Backend) DeleteData(id string, end int64, start int64) bool {
+func (r Backend) DeleteData(tenant string, id string, end int64, start int64) bool {
 	return false
 }
 
-func (r Backend) DeleteTags(id string, tags []string) bool {
+func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 	return false
 }

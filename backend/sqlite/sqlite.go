@@ -70,8 +70,15 @@ func (r *Backend) Open(options url.Values) {
 	}
 }
 
-func (r Backend) GetItemList(tags map[string]string) []backend.Item {
-	res := make([]backend.Item, 0)
+func (r Backend) GetTenants() []backend.Tenant {
+	var res []backend.Tenant
+
+	res = append(res, backend.Tenant{Id: "_ops"})
+	return res
+}
+
+func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
+	var res []backend.Item
 
 	// create one item per id
 	sqlStmt := "select id from ids"
@@ -113,7 +120,7 @@ func (r Backend) GetItemList(tags map[string]string) []backend.Item {
 		if err != nil {
 			log.Printf("%q\n", err)
 		}
-		res = r.UpdateTag(res, id, tag, value)
+		res = r.UpdateTag(res, tenant, id, tag, value)
 	}
 	err = rows.Err()
 	if err != nil {
@@ -133,11 +140,11 @@ func (r Backend) GetItemList(tags map[string]string) []backend.Item {
 	return res
 }
 
-func (r Backend) GetRawData(id string, end int64, start int64, limit int64, order string) []backend.DataItem {
-	res := make([]backend.DataItem, 0)
+func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
+	var res []backend.DataItem
 
 	// check if id exist
-	if !r.IdExist(id) {
+	if !r.IdExist(tenant, id) {
 		return res
 	}
 
@@ -173,16 +180,16 @@ func (r Backend) GetRawData(id string, end int64, start int64, limit int64, orde
 	return res
 }
 
-func (r Backend) GetStatData(id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
+func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var t int64
+	var res []backend.StatItem
+
 	timeStep := bucketDuration * 1000
 	startTime := int64(start/timeStep) * timeStep
 	endTime := int64(end/timeStep) * timeStep
 
-	res := make([]backend.StatItem, 0)
-
 	// check if id exist
-	if !r.IdExist(id) {
+	if !r.IdExist(tenant, id) {
 		return res
 	}
 
@@ -269,43 +276,43 @@ func (r Backend) GetStatData(id string, end int64, start int64, limit int64, ord
 	return res
 }
 
-func (r Backend) PostRawData(id string, t int64, v float64) bool {
+func (r Backend) PostRawData(tenant string, id string, t int64, v float64) bool {
 	// check if id exist
-	if !r.IdExist(id) {
-		r.createId(id)
+	if !r.IdExist(tenant, id) {
+		r.createId(tenant, id)
 	}
 
-	r.insertData(id, t, v)
+	r.insertData(tenant, id, t, v)
 	return true
 }
 
-func (r Backend) PutTags(id string, tags map[string]string) bool {
+func (r Backend) PutTags(tenant string, id string, tags map[string]string) bool {
 	// check if id exist
-	if !r.IdExist(id) {
-		r.createId(id)
+	if !r.IdExist(tenant, id) {
+		r.createId(tenant, id)
 	}
 
 	for k, v := range tags {
-		r.insertTag(id, k, v)
+		r.insertTag(tenant, id, k, v)
 	}
 	return true
 }
 
-func (r Backend) DeleteData(id string, end int64, start int64) bool {
+func (r Backend) DeleteData(tenant string, id string, end int64, start int64) bool {
 	// check if id exist
-	if r.IdExist(id) {
-		r.deleteData(id, end, start)
+	if r.IdExist(tenant, id) {
+		r.deleteData(tenant, id, end, start)
 		return true
 	}
 
 	return false
 }
 
-func (r Backend) DeleteTags(id string, tags []string) bool {
+func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 	// check if id exist
-	if r.IdExist(id) {
+	if r.IdExist(tenant, id) {
 		for _, k := range tags {
-			r.deleteTag(id, k)
+			r.deleteTag(tenant, id, k)
 		}
 		return true
 	}
@@ -316,14 +323,14 @@ func (r Backend) DeleteTags(id string, tags []string) bool {
 // Helper functions
 // Not required by backend interface
 
-func (r Backend) IdExist(id string) bool {
+func (r Backend) IdExist(tenant string, id string) bool {
 	var _id string
 	sqlStmt := fmt.Sprintf("select id from ids where id='%s'", id)
 	err := r.db.QueryRow(sqlStmt).Scan(&_id)
 	return err != sql.ErrNoRows
 }
 
-func (r Backend) insertData(id string, t int64, v float64) {
+func (r Backend) insertData(tenant string, id string, t int64, v float64) {
 	sqlStmt := fmt.Sprintf("insert into '%s' values (%d, %f)", id, t, v)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
@@ -331,7 +338,7 @@ func (r Backend) insertData(id string, t int64, v float64) {
 	}
 }
 
-func (r Backend) insertTag(id string, k string, v string) {
+func (r Backend) insertTag(tenant string, id string, k string, v string) {
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
@@ -339,7 +346,7 @@ func (r Backend) insertTag(id string, k string, v string) {
 	}
 }
 
-func (r Backend) deleteData(id string, end int64, start int64) {
+func (r Backend) deleteData(tenant string, id string, end int64, start int64) {
 	sqlStmt := fmt.Sprintf("delete from '%s' where timestamp >= %d and timestamp < %d", id, start, end)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
@@ -347,7 +354,7 @@ func (r Backend) deleteData(id string, end int64, start int64) {
 	}
 }
 
-func (r Backend) deleteTag(id string, k string) {
+func (r Backend) deleteTag(tenant string, id string, k string) {
 	sqlStmt := fmt.Sprintf("delete from tags where id='%s' and tag='%s'", id, k)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
@@ -355,7 +362,7 @@ func (r Backend) deleteTag(id string, k string) {
 	}
 }
 
-func (r Backend) createId(id string) bool {
+func (r Backend) createId(tenant string, id string) bool {
 	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
 	_, err := r.db.Exec(sqlStmt)
 	if err != nil {
@@ -379,7 +386,7 @@ func (r Backend) createId(id string) bool {
 	return true
 }
 
-func (r Backend) UpdateTag(items []backend.Item, id string, tag string, value string) []backend.Item {
+func (r Backend) UpdateTag(items []backend.Item, tenant string, id string, tag string, value string) []backend.Item {
 	// try to update tag if item exist
 	for i, item := range items {
 		if item.Id == id {
