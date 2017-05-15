@@ -51,12 +51,14 @@ var BackendName string
 
 func main() {
 	var db backend.Backend
+	var middlewareList []middleware.MiddleWare
 
 	// Get user options
 	portPtr := flag.Int("port", defaultPort, "server port")
 	backendPtr := flag.String("backend", defaultBackend, "the backend to use [random, sqlite, timeout]")
 	apiPtr := flag.String("api", defaultAPI, "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
 	tlsPtr := flag.Bool("tls", defaultTLS, "use TLS server")
+	gzipPtr := flag.Bool("gzip", false, "accept gzip encoding")
 	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname (sqlite), max-size (random)]")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	versionPtr := flag.Bool("version", false, "version number")
@@ -165,7 +167,12 @@ func main() {
 	fallback := middleware.BadRequest{}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	middlewareList := []middleware.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot, &fallback}
+	if *gzipPtr {
+		middlewareList = []middleware.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot, &fallback}
+	} else {
+		middlewareList = []middleware.MiddleWare{&logger, &rMetrics, &rRoot, &fallback}
+	}
+
 	middleware.Append(middlewareList)
 
 	// Run the server

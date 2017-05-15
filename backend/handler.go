@@ -308,6 +308,7 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) || !validTags(tags) {
+		log.Printf("error put tags: %+v", tags)
 		w.WriteHeader(504)
 		return
 	}
