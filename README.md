@@ -1,10 +1,10 @@
 # mohawk
 
-MOck HAWKular (Mohawk) is a metrics storage engine that uses a plugin architecture for data storage and Hawkular based RESTful API as the primary interface.
+MOck HAWKular (Mohawk) is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based RESTful API as the primary interface.
 
 ## Introduction
 
-Mohawk can use different backends for different use cases. Different backends may vary in speed, persistance and scalability. Mohawk use a RESTful API identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different backends for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a RESTful API identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
 
   - Sqlite backend, persistable read and write, mimics regular behavior of a Hawkular metrics server.
 
