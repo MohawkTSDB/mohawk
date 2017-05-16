@@ -39,8 +39,7 @@ sudo dnf install mohawk
 
 ## Mock Certifications
 
-The server use mock certification to serve ``https`` requests. Users can use mock
-self signed credentials files for this.
+The server requires certification to serve ``https`` requests. Users can use self signed credentials files for testing.
 
 To create a self signed credentials use this bash commands:
 ```
