@@ -26,6 +26,7 @@ import (
 
 // GZipper middleware that will gzip http requests
 type GZipper struct {
+	UseGzip bool
 	Verbose bool
 	next    http.Handler
 }
@@ -37,7 +38,7 @@ func (g *GZipper) SetNext(h http.Handler) {
 
 // ServeHTTP http serve func
 func (g *GZipper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+	if !g.UseGzip || !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
 		g.next.ServeHTTP(w, r)
 		return
 	}

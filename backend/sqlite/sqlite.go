@@ -19,9 +19,11 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"regexp"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/yaacov/mohawk/backend"
@@ -53,6 +55,7 @@ func (r *Backend) GetTenant(name string) (*sql.DB, error) {
 		log.Printf("%q\n", err)
 		return nil, err
 	}
+	db.SetMaxOpenConns(1)
 
 	sqlStmt := `
 		create table if not exists ids (
@@ -88,7 +91,14 @@ func (r *Backend) Open(options url.Values) {
 func (r Backend) GetTenants() []backend.Tenant {
 	res := make([]backend.Tenant, 0)
 
-	res = append(res, backend.Tenant{Id: "_ops"})
+	files, _ := ioutil.ReadDir(r.dbDirName)
+	for _, f := range files {
+		// take only sqlite db files as tenant names
+		if p := strings.Split(f.Name(), "."); len(p) == 2 && p[1] == "db" {
+			res = append(res, backend.Tenant{Id: p[0]})
+		}
+	}
+
 	return res
 }
 

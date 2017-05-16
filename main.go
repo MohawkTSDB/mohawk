@@ -25,9 +25,7 @@ import (
 	"time"
 
 	"github.com/yaacov/mohawk/backend"
-	"github.com/yaacov/mohawk/backend/random"
 	"github.com/yaacov/mohawk/backend/sqlite"
-	"github.com/yaacov/mohawk/backend/timeout"
 	"github.com/yaacov/mohawk/middleware"
 	"github.com/yaacov/mohawk/router"
 )
@@ -43,11 +41,17 @@ const defaultTLS = false
 const defaultTLSKey = "server.key"
 const defaultTLSCert = "server.pem"
 
-// ImplementationVersion Hakular server api implementation version
-var ImplementationVersion string
-
 // BackendName MoHawk active backend
 var BackendName string
+
+// GetStatus return a json status struct
+func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkBackend":"%s"}`
+	res := fmt.Sprintf(resTemplate, defaultAPI, VER, BackendName)
+
+	w.WriteHeader(200)
+	fmt.Fprintln(w, res)
+}
 
 func main() {
 	var db backend.Backend
@@ -55,12 +59,12 @@ func main() {
 
 	// Get user options
 	portPtr := flag.Int("port", defaultPort, "server port")
-	backendPtr := flag.String("backend", defaultBackend, "the backend to use [random, sqlite, timeout]")
-	apiPtr := flag.String("api", defaultAPI, "the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final]")
+	backendPtr := flag.String("backend", defaultBackend, "the backend to use [sqlite]")
 	tlsPtr := flag.Bool("tls", defaultTLS, "use TLS server")
 	gzipPtr := flag.Bool("gzip", false, "accept gzip encoding")
 	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname (sqlite), max-size (random)]")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
+	quietPtr := flag.Bool("quiet", false, "less debug output")
 	versionPtr := flag.Bool("version", false, "version number")
 	keyPtr := flag.String("key", defaultTLSKey, "path to TLS key file")
 	certPtr := flag.String("cert", defaultTLSCert, "path to TLS cert file")
@@ -76,10 +80,6 @@ func main() {
 	switch *backendPtr {
 	case "sqlite":
 		db = &sqlite.Backend{}
-	case "timeout":
-		db = &timeout.Backend{}
-	case "random":
-		db = &random.Backend{}
 	default:
 		log.Fatal("Can't find backend:", *backendPtr)
 	}
@@ -92,7 +92,6 @@ func main() {
 	}
 
 	// set global variables
-	ImplementationVersion = *apiPtr
 	BackendName = db.Name()
 
 	// h common variables to be used for the backend Handler functions
@@ -105,61 +104,49 @@ func main() {
 	// Create the routers
 	// Requests not handled by the routers will be forworded to BadRequest Handler
 	rRoot := router.Router{
-		Prefix: "/",
-	}
-	// Root Routing table
-	rRoot.Add("GET", "oapi", GetAPIVersions)
-	rRoot.Add("GET", "hawkular/metrics/status", GetStatus)
-	rRoot.Add("GET", "hawkular/metrics/tenants", h.GetTenants)
-
-	rMetrics := router.Router{
 		Prefix: "/hawkular/metrics/",
 	}
-	// Metrics Routing table
-	if *backendPtr == "timeout" {
-		rMetrics.Add("GET", "metrics", GetTimeout)
-	} else {
-		rMetrics.Add("GET", "metrics", h.GetMetrics)
+	// Root Routing table
+	rRoot.Add("GET", "status", GetStatus)
+	rRoot.Add("GET", "tenants", h.GetTenants)
+	rRoot.Add("GET", "metrics", h.GetMetrics)
 
-		// api version >= 0.16.0
-		rMetrics.Add("GET", "gauges/:id/raw", h.GetData)
-		rMetrics.Add("GET", "counters/:id/raw", h.GetData)
-		rMetrics.Add("GET", "availability/:id/raw", h.GetData)
-
-		rMetrics.Add("GET", "gauges/:id/stats", h.GetData)
-		rMetrics.Add("GET", "counters/:id/stats", h.GetData)
-		rMetrics.Add("GET", "availability/:id/stats", h.GetData)
-
-		rMetrics.Add("POST", "gauges/raw", h.PostData)
-		rMetrics.Add("POST", "gauges/raw/query", h.PostQuery)
-		rMetrics.Add("POST", "counters/raw", h.PostData)
-		rMetrics.Add("POST", "counters/raw/query", h.PostQuery)
-
-		rMetrics.Add("PUT", "gauges/:id/tags", h.PutTags)
-		rMetrics.Add("PUT", "counters/:id/tags", h.PutTags)
-
-		rMetrics.Add("DELETE", "gauges/:id/raw", h.DeleteData)
-		rMetrics.Add("DELETE", "counters/:id/raw", h.DeleteData)
-
-		rMetrics.Add("DELETE", "gauges/:id/tags/:tags", h.DeleteTags)
-		rMetrics.Add("DELETE", "counters/:id/tags/:tags", h.DeleteTags)
-
-		// api version < 0.16.0
-		rMetrics.Add("GET", "gauges/:id/data", h.GetData)
-		rMetrics.Add("GET", "counters/:id/data", h.GetData)
-		rMetrics.Add("GET", "availability/:id/data", h.GetData)
-
-		rMetrics.Add("POST", "gauges/data", h.PostData)
-		rMetrics.Add("POST", "counters/data", h.PostData)
+	// Metrics Routing tables
+	rGauges := router.Router{
+		Prefix: "/hawkular/metrics/gauges/",
 	}
+	rGauges.Add("GET", ":id/raw", h.GetData)
+	rGauges.Add("GET", ":id/stats", h.GetData)
+	rGauges.Add("POST", "raw", h.PostData)
+	rGauges.Add("POST", "raw/query", h.PostQuery)
+	rGauges.Add("PUT", ":id/tags", h.PutTags)
+	rGauges.Add("DELETE", ":id/raw", h.DeleteData)
+	rGauges.Add("DELETE", ":id/tags/:tags", h.DeleteTags)
+
+	rCounters := router.Router{
+		Prefix: "/hawkular/metrics/counters/",
+	}
+	rCounters.Add("GET", ":id/raw", h.GetData)
+	rCounters.Add("GET", ":id/stats", h.GetData)
+	rCounters.Add("POST", "raw", h.PostData)
+	rCounters.Add("POST", "raw/query", h.PostQuery)
+	rCounters.Add("PUT", ":id/tags", h.PutTags)
+
+	rAvailability := router.Router{
+		Prefix: "/hawkular/metrics/availability/",
+	}
+	rAvailability.Add("GET", ":id/raw", h.GetData)
+	rAvailability.Add("GET", ":id/stats", h.GetData)
 
 	// logger a logging middleware
 	logger := middleware.Logger{
+		Quiet:   *quietPtr,
 		Verbose: *verbosePtr,
 	}
 
 	// gzipper a gzip encoding middleware
 	gzipper := middleware.GZipper{
+		UseGzip: *gzipPtr,
 		Verbose: *verbosePtr,
 	}
 
@@ -167,12 +154,7 @@ func main() {
 	fallback := middleware.BadRequest{}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	if *gzipPtr {
-		middlewareList = []middleware.MiddleWare{&logger, &gzipper, &rMetrics, &rRoot, &fallback}
-	} else {
-		middlewareList = []middleware.MiddleWare{&logger, &rMetrics, &rRoot, &fallback}
-	}
-
+	middlewareList = []middleware.MiddleWare{&logger, &gzipper, &rGauges, &rCounters, &rAvailability, &rRoot, &fallback}
 	middleware.Append(middlewareList)
 
 	// Run the server
