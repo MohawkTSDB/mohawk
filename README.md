@@ -94,11 +94,11 @@ mohawk
 2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
 ```
 
-Running from system install using  ``mohawk`` and the ``random`` back end
+Running from system install using  ``mohawk`` and the ``sqlite`` back end
 [ Remmeber to set up the ``server.key`` and ``server.pem`` files in your path ].
 
 ```bash
-mohawk -backend random -tls -port 8443
+mohawk -backend sqlite -tls -port 8443
 2016/12/01 14:23:48 Start server, listen on https://0.0.0.0:8443
 ```
 
@@ -110,7 +110,7 @@ openssl ecparam -genkey -name secp384r1 -out server.key
 openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 ```
 
-### Running the tls server on port 8443
+### Running the tls server on port 8443 supporting gzip encoding
 ```bash
 mohawk -tls -gzip -port 8443
 ```
