@@ -123,6 +123,10 @@ func main() {
 	rGauges.Add("DELETE", ":id/raw", h.DeleteData)
 	rGauges.Add("DELETE", ":id/tags/:tags", h.DeleteTags)
 
+	// deprecated
+	rGauges.Add("GET", ":id/data", h.GetData)
+	rGauges.Add("POST", "data", h.PostData)
+
 	rCounters := router.Router{
 		Prefix: "/hawkular/metrics/counters/",
 	}
@@ -132,12 +136,17 @@ func main() {
 	rCounters.Add("POST", "raw/query", h.PostQuery)
 	rCounters.Add("PUT", ":id/tags", h.PutTags)
 
+	// deprecated
+	rCounters.Add("GET", ":id/data", h.GetData)
+	rCounters.Add("POST", "data", h.PostData)
+
 	rAvailability := router.Router{
 		Prefix: "/hawkular/metrics/availability/",
 	}
 	rAvailability.Add("GET", ":id/raw", h.GetData)
 	rAvailability.Add("GET", ":id/stats", h.GetData)
 
+	// Create the middlewares
 	// logger a logging middleware
 	logger := middleware.Logger{
 		Quiet:   *quietPtr,
@@ -150,11 +159,14 @@ func main() {
 		Verbose: *verbosePtr,
 	}
 
-	// fallback a BadRequest middleware
-	fallback := middleware.BadRequest{}
+	// badrequest a BadRequest middleware
+	badrequest := middleware.BadRequest{
+		Quiet:   *quietPtr,
+		Verbose: *verbosePtr,
+	}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	middlewareList = []middleware.MiddleWare{&logger, &gzipper, &rGauges, &rCounters, &rAvailability, &rRoot, &fallback}
+	middlewareList = []middleware.MiddleWare{&logger, &gzipper, &rGauges, &rCounters, &rAvailability, &rRoot, &badrequest}
 	middleware.Append(middlewareList)
 
 	// Run the server
