@@ -1,15 +1,12 @@
 # mohawk
 
-MOck HAWKular is a mock Hawkular server for testing.
+MOck HAWKular (Mohawk) is a metrics storage engine that uses a plugin architecture for data storage and Hawkular based RESTful API as the primary interface.
 
 ## Introduction
 
-Utility server for testing Hawkular clients, the server can mock
-a running metrics Hawkular server. It can use different backends for different test use cases.
+Mohawk can use different backends for different use cases. Different backends may vary in speed, persistance and scalability. Mohawk use a RESTful API identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
 
   - Sqlite backend, persistable read and write, mimics regular behavior of a Hawkular metrics server.
-  - Random backend, mimics lots of metrics available only for reading.
-  - Timeout backend, mimics errors while query data.
 
 
 ## License and copyright
@@ -33,10 +30,7 @@ a running metrics Hawkular server. It can use different backends for different t
 
 ## Installation
 
-To install, get the source code, or do ``go install github.com/yaacov/mohawk`` if using go.
-To run, users will need the ``server.key`` and ``server.pem`` certification files.
-
-Or if using a Copr repository for Fedora:
+Using a Copr repository for Fedora:
 
 ```
 sudo dnf copr enable yaacov/mohawk
@@ -56,7 +50,7 @@ openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 
 ## Usage
 
-When installed, run using the command line ``mohawk``, when run from code, use ``go run *.go``
+When installed, run using the command line ``mohawk``
 
 The `-h` flag will print out a help text, that list the command line arguments.
 
@@ -67,16 +61,14 @@ MoHawk version: 0.10.1
 
 $> mohawk -h
 Usage of mohawk:
-  -api string
-      the hawkulr api to mimic [e.g. 0.8.9.Testing, 0.21.2.Final] (default "0.21.0")
   -backend string
-      the backend to use [random, sqlite, timeout] (default "sqlite")
+      the backend to use [sqlite,] (default "sqlite")
   -cert string
       path to TLS cert file (default "server.pem")
   -key string
       path to TLS key file (default "server.key")
   -options string
-      specific backend options [e.g. db-dirname (sqlite), max-size (random)]
+      specific backend options [e.g. db-dirname (sqlite)]
   -port int
       server port (default 8080)
   -tls
@@ -89,10 +81,10 @@ Usage of mohawk:
 
 ## Example of use
 
-Running from the source path using ``go run`` and requesting the help message.
+Running ffrom system install using ``mohawk`` and requesting the help message.
 
 ```bash
-go run *.go -h
+mohawk -h
 Usage of mohawk:
 ...
 ```
@@ -121,7 +113,7 @@ openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 
 ### Running the tls server on port 8443
 ```bash
-mohawk -tls -port 8443
+mohawk -tls -gzip -port 8443
 ```
 
 ### Reading and writing data
