@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/yaacov/mohawk/backend"
+	"github.com/yaacov/mohawk/backend/example"
 	"github.com/yaacov/mohawk/backend/sqlite"
 	"github.com/yaacov/mohawk/middleware"
 	"github.com/yaacov/mohawk/router"
@@ -49,6 +50,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkBackend":"%s"}`
 	res := fmt.Sprintf(resTemplate, defaultAPI, VER, BackendName)
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
 }
@@ -80,6 +82,8 @@ func main() {
 	switch *backendPtr {
 	case "sqlite":
 		db = &sqlite.Backend{}
+	case "example":
+		db = &example.Backend{}
 	default:
 		log.Fatal("Can't find backend:", *backendPtr)
 	}

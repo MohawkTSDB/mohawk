@@ -51,6 +51,7 @@ func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[str
 	res = h.Backend.GetTenants()
 	resJSON, _ := json.Marshal(res)
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, string(resJSON))
 }
@@ -67,6 +68,7 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 
 	// we only use gauges
 	if typeStr, ok := r.Form["type"]; ok && len(typeStr) > 0 && typeStr[0] != "gauge" {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		fmt.Fprintln(w, "[]")
 
@@ -89,6 +91,7 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	}
 	resJSON, _ := json.Marshal(res)
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, string(resJSON))
 }
@@ -108,7 +111,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	// get tenant
 	tenant := parseTenant(r)
 
-	end := int64(time.Now().Unix() * 1000)
+	end := int64(time.Now().UTC().Unix() * 1000)
 	if v, ok := r.Form["end"]; ok && len(v) > 0 {
 		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
 			end = int64(i)
@@ -149,6 +152,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
 
 	// output to client
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, resStr)
 }
@@ -191,6 +195,7 @@ func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[str
 		h.Backend.DeleteData(tenant, id, end, start)
 
 		// output to client
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		fmt.Fprintf(w, "{}")
 		return
@@ -225,7 +230,7 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	numOfItems := len(u.IDs) - 1
 
 	if end, err = u.End.Int64(); err != nil || end < 1 {
-		end = int64(time.Now().Unix() * 1000)
+		end = int64(time.Now().UTC().Unix() * 1000)
 	}
 
 	if start, err = u.Start.Int64(); err != nil || start < 1 {
@@ -248,6 +253,7 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 		}
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, "[")
 
@@ -296,6 +302,7 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 		}
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }
@@ -316,11 +323,12 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 	tenant := parseTenant(r)
 
 	h.Backend.PutTags(tenant, id, tags)
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }
 
-// PutTags send tag, value pairs to the backend
+// DeleteTags delete a tag
 func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	// use the id from the argv list
 	id := argv["id"]
@@ -335,6 +343,7 @@ func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[str
 	tenant := parseTenant(r)
 
 	h.Backend.DeleteTags(tenant, id, tags)
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
 }

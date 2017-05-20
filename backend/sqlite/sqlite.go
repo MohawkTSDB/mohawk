@@ -41,43 +41,6 @@ func (r Backend) Name() string {
 	return "Backend-Sqlite3"
 }
 
-func (r *Backend) GetTenant(name string) (*sql.DB, error) {
-	var filename string
-
-	if tenant, ok := r.tenant[name]; ok {
-		return tenant, nil
-	}
-
-	filename = fmt.Sprintf("%s/%s.db", r.dbDirName, name)
-
-	db, err := sql.Open("sqlite3", filename)
-	if err != nil {
-		log.Printf("%q\n", err)
-		return nil, err
-	}
-	db.SetMaxOpenConns(1)
-
-	sqlStmt := `
-		create table if not exists ids (
-			id    text,
-			primary key (id));
-		create table if not exists tags (
-			id    text,
-			tag   text,
-			value text,
-			primary key (id, tag));
-		`
-
-	_, err = db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-		return db, err
-	}
-
-	r.tenant[name] = db
-	return db, nil
-}
-
 func (r *Backend) Open(options url.Values) {
 	// get backend options
 	r.dbDirName = options.Get("db-dirname")
@@ -350,6 +313,43 @@ func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 
 // Helper functions
 // Not required by backend interface
+
+func (r *Backend) GetTenant(name string) (*sql.DB, error) {
+	var filename string
+
+	if tenant, ok := r.tenant[name]; ok {
+		return tenant, nil
+	}
+
+	filename = fmt.Sprintf("%s/%s.db", r.dbDirName, name)
+
+	db, err := sql.Open("sqlite3", filename)
+	if err != nil {
+		log.Printf("%q\n", err)
+		return nil, err
+	}
+	db.SetMaxOpenConns(1)
+
+	sqlStmt := `
+		create table if not exists ids (
+			id    text,
+			primary key (id));
+		create table if not exists tags (
+			id    text,
+			tag   text,
+			value text,
+			primary key (id, tag));
+		`
+
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmt)
+		return db, err
+	}
+
+	r.tenant[name] = db
+	return db, nil
+}
 
 func (r Backend) IdExist(tenant string, id string) bool {
 	var _id string
