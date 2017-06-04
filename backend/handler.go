@@ -132,9 +132,9 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 		}
 	}
 
-	order := "ASC"
-	if v, ok := r.Form["order"]; ok && len(v) > 0 && v[0] == "DESC" {
-		order = "DESC"
+	order := "DESC"
+	if v, ok := r.Form["order"]; ok && len(v) > 0 && v[0] == "ASC" {
+		order = "ASC"
 	}
 
 	bucketDuration := int64(0)
