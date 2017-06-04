@@ -3,6 +3,7 @@
 *.a
 *.so
 
+server/*
 server.pem
 server.key
 server.db
