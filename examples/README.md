@@ -181,7 +181,7 @@ Response with gauge data points
 Every query is bounded by a start and an end time. The end time defaults to now, and the start time defaults to 8 hours ago. These can be overridden with the start and end parameters respectively. The expected format of their values is a unix timestamp. The start of the range is inclusive while the end is exclusive.
 
 ```
-curl -X GET http://server/hawkular/metrics/gauges/request_size/raw?start=1235,end=6789
+curl http://server/hawkular/metrics/gauges/request_size/raw?start=1235,end=6789
 ```
 
 ### Limiting Results
@@ -189,13 +189,13 @@ curl -X GET http://server/hawkular/metrics/gauges/request_size/raw?start=1235,en
 By default there is no limit on the number of data points returned. The limit parameter will limit the number of data points returned.
 
 ```
-curl -X GET http://server/hawkular/metrics/gauges/request_size/raw?limit=100
+curl http://server/hawkular/metrics/gauges/request_size/raw?limit=100
 ```
 
 ### Fetch gauge stats using bucketDuration parameter
 
 ```
-curl -X GET http://server/hawkular/metrics/gauges/request_size/raw?start=1235&end=6789&bucketDuration=60s
+curl http://server/hawkular/metrics/gauges/request_size/raw?start=1235&end=6789&bucketDuration=60s
 ```
 
 Response with gauge data points
