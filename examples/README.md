@@ -21,10 +21,7 @@ MoHawk Metrics offers a rich set of features around querying that are ideal for 
 
 ## Tenants
 
-All data is partitioned by tenant. Data is not physically partitioned on disk. The partitioning happens at the API level. This means that a metric cannot exist on its own outside of a tenant. Let’s first look at how tenants are created.
-Creating Tenants
-
-Tenants are created in one of two ways. First, a tenant can be created implicitly by simply inserting metric data. Clients can immediately start storing data without first creating a tenant.
+All data is partitioned by tenant. The partitioning happens at the API level. This means that a metric cannot exist on its own outside of a tenant.
 
 ### Implicit tenant creation
 
