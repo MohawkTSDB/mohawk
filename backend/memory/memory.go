@@ -41,6 +41,7 @@ type Tenant struct {
 type Backend struct {
 	firstPosTimestamp  int64
 	timeGranularitySec int64
+	timeRetentionSec   int64
 
 	tenant map[string]*Tenant
 }
@@ -53,8 +54,11 @@ func (r Backend) Name() string {
 }
 
 func (r *Backend) Open(options url.Values) {
-	// set time granularity to 5 sec
-	r.timeGranularitySec = 5
+	// set time granularity to 30 sec
+	r.timeGranularitySec = 30
+	// set time retention to 7 days
+	r.timeRetentionSec = 7 * 24 * 60 * 60
+	// set first time stamp to now
 	r.firstPosTimestamp = int64(time.Now().UTC().Unix() / r.timeGranularitySec)
 
 	// open db connection
@@ -107,14 +111,31 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
 	res := make([]backend.DataItem, 0)
 
+	arraySize := r.timeRetentionSec / r.timeGranularitySec
+	pStart := r.getPosForTimestamp(start)
+	pEnd := r.getPosForTimestamp(end)
+
+	// sanity check pEnd
+	if pEnd < pStart {
+		pEnd += arraySize
+	}
+
 	// check if tenant and id exists, create them if necessary
 	r.checkID(tenant, id)
 
-	for _, v := range r.tenant[tenant].ts[id].data {
-		res = append(res, backend.DataItem{
-			Timestamp: v.timeStamp * 1000,
-			Value:     v.value,
-		})
+	// fill data out array
+	count := int64(0)
+	for i := pStart; count < limit && i <= pEnd; i++ {
+		d := r.tenant[tenant].ts[id].data[i%arraySize]
+
+		// if this is a valid point
+		if d.timeStamp <= end && d.timeStamp > start {
+			count++
+			res = append(res, backend.DataItem{
+				Timestamp: d.timeStamp,
+				Value:     d.value,
+			})
+		}
 	}
 
 	return res
@@ -123,17 +144,79 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var res []backend.StatItem
 
-	res = append(res, backend.StatItem{
-		Start:   start,
-		End:     end,
-		Empty:   true,
-		Samples: 0,
-		Min:     0,
-		Max:     0,
-		Avg:     0,
-		Median:  0,
-		Sum:     0,
-	})
+	arraySize := r.timeRetentionSec / r.timeGranularitySec
+	pStep := bucketDuration / r.timeGranularitySec
+	pStart := r.getPosForTimestamp(start)
+	pEnd := r.getPosForTimestamp(end)
+
+	// sanity check pEnd
+	if pEnd < pStart {
+		pEnd += arraySize
+	}
+
+	// sanity check step
+	if pStep < 1 {
+		pStep = 1
+	}
+	if pStep > (pEnd - pStart) {
+		pStep = pEnd - pStart
+	}
+
+	startTimestamp := end
+	stepMillisec := pStep * r.timeGranularitySec * 1000
+
+	// check if tenant and id exists, create them if necessary
+	r.checkID(tenant, id)
+
+	// fill data out array
+	count := int64(0)
+	for b := pEnd; count < limit && b > pStart && startTimestamp > stepMillisec; b -= pStep {
+		samples := int64(0)
+		sum := float64(0)
+		last := float64(0)
+
+		// loop on all points in bucket
+		for i := (b - pStep); i < b; i++ {
+			d := r.tenant[tenant].ts[id].data[i%arraySize]
+			if d.timeStamp <= end && d.timeStamp > start {
+				samples++
+				last = d.value
+				sum += d.value
+			}
+		}
+
+		// all points are valid
+		startTimestamp -= stepMillisec
+		count++
+
+		// all points are valid
+		if samples > 0 {
+			res = append(res, backend.StatItem{
+				Start:   startTimestamp,
+				End:     startTimestamp + stepMillisec,
+				Empty:   false,
+				Samples: samples,
+				Min:     0,
+				Max:     last,
+				Avg:     sum / float64(samples),
+				Median:  0,
+				Sum:     sum,
+			})
+		} else {
+			count++
+			res = append(res, backend.StatItem{
+				Start:   startTimestamp,
+				End:     startTimestamp + stepMillisec,
+				Empty:   true,
+				Samples: 0,
+				Min:     0,
+				Max:     0,
+				Avg:     0,
+				Median:  0,
+				Sum:     0,
+			})
+		}
+	}
 
 	return res
 }
@@ -143,7 +226,8 @@ func (r *Backend) PostRawData(tenant string, id string, t int64, v float64) bool
 	r.checkID(tenant, id)
 
 	// update time value pair to the time serias
-	r.tenant[tenant].ts[id].data = append(r.tenant[tenant].ts[id].data, TimeValuePair{timeStamp: t, value: v})
+	p := r.getPosForTimestamp(t)
+	r.tenant[tenant].ts[id].data[p] = TimeValuePair{timeStamp: t, value: v}
 
 	return true
 }
@@ -173,6 +257,13 @@ func (r *Backend) DeleteTags(tenant string, id string, tags []string) bool {
 // Helper functions
 // Not required by backend interface
 
+func (r *Backend) getPosForTimestamp(timestamp int64) int64 {
+	arraySize := r.timeRetentionSec / r.timeGranularitySec
+	arrayPos := timestamp / 1000 / r.timeGranularitySec
+
+	return arrayPos % arraySize
+}
+
 func (r *Backend) checkID(tenant string, id string) {
 	var ok bool
 
@@ -185,7 +276,7 @@ func (r *Backend) checkID(tenant string, id string) {
 	if _, ok = r.tenant[tenant].ts[id]; !ok {
 		r.tenant[tenant].ts[id] = &TimeSeries{
 			tags: make(map[string]string),
-			data: make([]TimeValuePair, 10),
+			data: make([]TimeValuePair, r.timeRetentionSec/r.timeGranularitySec),
 		}
 	}
 }

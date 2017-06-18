@@ -253,15 +253,16 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 		}
 	}
 
+	if h.Verbose {
+		log.Printf("Tenant: %s, IDs: %+v", tenant, u.IDs)
+		log.Printf("End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", end, start, limit, order, bucketDuration)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, "[")
 
 	for i, id := range u.IDs {
-		if h.Verbose {
-			log.Printf("ID: %s@%s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", tenant, id, end, start, limit, order, bucketDuration)
-		}
-
 		// call backend for data
 		resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
 
