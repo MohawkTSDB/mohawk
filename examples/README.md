@@ -14,13 +14,10 @@ MoHawk Metrics provides flexible tagging support that makes it easy to organize 
 ### Querying
 MoHawk Metrics offers a rich set of features around querying that are ideal for rendering data in graphs and in charts. This includes:
 
-    Filtering and grouping with tags
-
-    Searching metric definitions
-
-    Downsampling and aggregation
-
-    Limit and order results
+  - Filtering and grouping with tags
+  - Searching metric definitions
+  - Downsampling and aggregation
+  - Limit and order results
 
 ## Tenants
 
