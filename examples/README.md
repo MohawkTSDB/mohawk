@@ -27,7 +27,7 @@ All data is partitioned by tenant. The partitioning happens at the API level. Th
 
 ```
 curl -X POST http://server/hawkular/metrics/gauges/raw -d @request.json \
--H "Content-Type: application/json" -H "Hawkular-Tenant: com.acme"
+-H "Hawkular-Tenant: com.acme"
 ```
 
 This is a request to insert gauge data points for the com.acme tenant. If that tenant does not already exist, it will be request when storing the metric data. Specific details on inserting data can be found in Inserting Data.
@@ -40,7 +40,7 @@ Using the Hawkular-Tenant HTTP header in request:
 
 ```
 curl http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9 \
--H "Content-Type: application/json" -H "Hawkular-Tenant: com.acme"
+-H "Hawkular-Tenant: com.acme"
 ```
 
 ### Tenant Ids
@@ -58,8 +58,7 @@ A data point in MoHawk Metrics is a tuple that in its simplest form consists of 
 #### Insert data points
 
 ```
-curl -X POST http://server/hawkular/metrics/gauges/raw -d @request.json \
--H "Content-Type: application/json"
+curl -X POST http://server/hawkular/metrics/gauges/raw -d @request.json
 ```
 
 request.json
@@ -94,8 +93,7 @@ Tags in MoHawk Metrics are key/value pairs. Tags can be applied to a metric to p
 These endpoints are used to add or replace tags.
 
 ```
-curl -X PUT http://server/hawkular/metrics/gauges/request_size/tags -d @tags.json \
--H "Content-Type: application/json"
+curl -X PUT http://server/hawkular/metrics/gauges/request_size/tags -d @tags.json
 ```
 
 tags.json
@@ -126,8 +124,7 @@ The next example illustrates the type parameter which filters the results by the
 Fetch all metric definitions
 
 ```
-curl -X POST http://server/hawkular/metrics/metrics \
--H "Content-Type: application/json"
+curl http://server/hawkular/metrics/metrics
 ```
 
 response body
@@ -158,6 +155,5 @@ The next example demonstrates querying metric and filtering the results using ta
 Fetch all metric definitions with tag filters
 
 ```
-curl http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9 \
--H "Content-Type: application/json"
+curl http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9
 ```
