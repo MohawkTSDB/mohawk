@@ -26,6 +26,7 @@ import (
 
 	"github.com/yaacov/mohawk/backend"
 	"github.com/yaacov/mohawk/backend/example"
+	"github.com/yaacov/mohawk/backend/memory"
 	"github.com/yaacov/mohawk/backend/sqlite"
 	"github.com/yaacov/mohawk/middleware"
 	"github.com/yaacov/mohawk/router"
@@ -61,10 +62,10 @@ func main() {
 
 	// Get user options
 	portPtr := flag.Int("port", defaultPort, "server port")
-	backendPtr := flag.String("backend", defaultBackend, "the backend to use [sqlite]")
+	backendPtr := flag.String("backend", defaultBackend, "the backend to use [sqlite, memory, example]")
 	tlsPtr := flag.Bool("tls", defaultTLS, "use TLS server")
 	gzipPtr := flag.Bool("gzip", false, "accept gzip encoding")
-	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname (sqlite), max-size (random)]")
+	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname]")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	quietPtr := flag.Bool("quiet", false, "less debug output")
 	versionPtr := flag.Bool("version", false, "version number")
@@ -82,6 +83,8 @@ func main() {
 	switch *backendPtr {
 	case "sqlite":
 		db = &sqlite.Backend{}
+	case "memory":
+		db = &memory.Backend{}
 	case "example":
 		db = &example.Backend{}
 	default:

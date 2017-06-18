@@ -17,8 +17,9 @@
 package example
 
 import (
+	"fmt"
+	"math/rand"
 	"net/url"
-	"time"
 
 	"github.com/yaacov/mohawk/backend"
 )
@@ -48,12 +49,15 @@ func (r Backend) GetTenants() []backend.Tenant {
 
 func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
 	var res []backend.Item
+	maxSize := 42
 
-	res = append(res, backend.Item{
-		Id:   "container/e5ff62ea43/memory/usage",
-		Type: "gauge",
-		Tags: map[string]string{"name": "memory/usage", "units": "byte"},
-	})
+	for i := 0; i < maxSize; i++ {
+		res = append(res, backend.Item{
+			Id:   fmt.Sprintf("container/%08d/example/gouge", i),
+			Type: "gauge",
+			Tags: map[string]string{"name": "example/gouge", "units": "byte"},
+		})
+	}
 
 	// filter using tags
 	// 	if we have a list of _all_ items, we need to filter them by tags
@@ -74,29 +78,49 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 
 func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
 	var res []backend.DataItem
+	var sampleDuration int64
+	var l int64
+	var i int64
 
-	res = append(res, backend.DataItem{
-		Timestamp: int64(time.Now().UTC().Unix() * 1000),
-		Value:     24.8,
-	})
+	sampleDuration = 5
+	l = (end - start) / 1000 / sampleDuration
+	if limit < l {
+		l = limit
+	}
+
+	for i = 0; i < l; i++ {
+		res = append(res, backend.DataItem{
+			Timestamp: end - sampleDuration*1000*i,
+			Value:     124 + float64(rand.Intn(42)),
+		})
+	}
 
 	return res
 }
 
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var res []backend.StatItem
+	var l int64
+	var i int64
 
-	res = append(res, backend.StatItem{
-		Start:   start,
-		End:     end,
-		Empty:   true,
-		Samples: 0,
-		Min:     0,
-		Max:     0,
-		Avg:     0,
-		Median:  0,
-		Sum:     0,
-	})
+	l = (end - start) / 1000 / bucketDuration
+	if limit < l {
+		l = limit
+	}
+
+	for i = 0; i < l; i++ {
+		res = append(res, backend.StatItem{
+			Start:   end - bucketDuration*1000*(i+1),
+			End:     end - bucketDuration*1000*i,
+			Empty:   false,
+			Samples: 1,
+			Min:     0,
+			Max:     0,
+			Avg:     124 + float64(rand.Intn(42)),
+			Median:  0,
+			Sum:     0,
+		})
+	}
 
 	return res
 }
