@@ -157,3 +157,73 @@ Fetch all metric definitions with tag filters
 ```
 curl http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9
 ```
+
+### Raw Data
+
+The simplest form of querying for raw data points does not require any parameters and returns a list of data points.
+
+```
+curl http://server/hakwular/metrics/gauges/request_size/raw
+```
+
+Response with gauge data points
+
+```
+[
+  {"timestamp": 1460413065369, "value": 3.14},
+  {"timestamp": 1460212025569, "value": 4.57},
+  {"timestamp": 1460111065369, "value": 5.056}
+]
+```
+
+### Date Range
+
+Every query is bounded by a start and an end time. The end time defaults to now, and the start time defaults to 8 hours ago. These can be overridden with the start and end parameters respectively. The expected format of their values is a unix timestamp. The start of the range is inclusive while the end is exclusive.
+
+```
+curl -X GET http://server/hawkular/metrics/gauges/request_size/raw?start=1235,end=6789
+```
+
+### Limiting Results
+
+By default there is no limit on the number of data points returned. The limit parameter will limit the number of data points returned.
+
+```
+curl -X GET http://server/hawkular/metrics/gauges/request_size/raw?limit=100
+```
+
+### Fetch gauge stats using bucketDuration parameter
+
+```
+curl -X GET http://server/hawkular/metrics/gauges/request_size/raw?start=1235&end=6789&bucketDuration=60s
+```
+
+Response with gauge data points
+
+
+```
+[
+  {
+    "start": 6789,
+    "end": 12345,
+    "empty": false,
+    "min": 100.01,
+    "avg": 107.5,
+    "max": 115.32,
+    "median": 109.0,
+    "sum": 215.0,
+    "samples": 5
+  },
+  {
+    "start": 12345,
+    "end": 18345,
+    "empty": false,
+    "min": 100.01,
+    "avg": 107.5,
+    "max": 115.32,
+    "median": 109.0,
+    "sum": 215.0,
+    "samples": 5
+  },
+]
+```
