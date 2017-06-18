@@ -39,7 +39,7 @@ As previously stated all data is partitioned by tenant. MoHawk Metrics enforces 
 Using the Hawkular-Tenant HTTP header in request:
 
 ```
-curl -X POST http://server/hawkular/metrics/counters?tags=zone:us-west-1,kernel_version=4.0.9 \
+curl http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9 \
 -H "Content-Type: application/json" -H "Hawkular-Tenant: com.acme"
 ```
 
@@ -144,11 +144,11 @@ response body
   },
   {
     "id": "request_count",
-    "type": "counter"
+    "type": "gauge"
   },
   {
     "id": "request_timeouts",
-    "type": "counter",
+    "type": "gauge",
   }
 ]
 ```
@@ -158,6 +158,6 @@ The next example demonstrates querying metric and filtering the results using ta
 Fetch all metric definitions with tag filters
 
 ```
-curl -X POST http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9 \
+curl http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9 \
 -H "Content-Type: application/json"
 ```
