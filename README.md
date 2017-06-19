@@ -64,23 +64,27 @@ $> mohawk --version
 MoHawk version: 0.10.1
 
 $> mohawk -h
-Usage of mohawk:
+Usage of ./mohawk:
   -backend string
-      the backend to use [sqlite,] (default "sqlite")
+    	the backend to use [sqlite, memory, example] (default "sqlite")
   -cert string
-      path to TLS cert file (default "server.pem")
+    	path to TLS cert file (default "server.pem")
+  -gzip
+    	accept gzip encoding
   -key string
-      path to TLS key file (default "server.key")
+    	path to TLS key file (default "server.key")
   -options string
-      specific backend options [e.g. db-dirname (sqlite)]
+    	specific backend options [e.g. db-dirname]
   -port int
-      server port (default 8080)
+    	server port (default 8080)
+  -quiet
+    	less debug output
   -tls
-      use TLS server
+    	use TLS server
   -verbose
-      more debug output
+    	more debug output
   -version
-      version number
+    	version number
 ```
 
 ## Example of use
