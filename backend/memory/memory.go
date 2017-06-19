@@ -17,10 +17,10 @@
 package memory
 
 import (
+	"fmt"
+	"github.com/yaacov/mohawk/backend"
 	"net/url"
 	"regexp"
-
-	"github.com/yaacov/mohawk/backend"
 )
 
 type TimeValuePair struct {
@@ -40,6 +40,7 @@ type Tenant struct {
 type Backend struct {
 	timeGranularitySec int64
 	timeRetentionSec   int64
+	timeLastSec        int64
 
 	tenant map[string]*Tenant
 }
@@ -52,6 +53,8 @@ func (r Backend) Name() string {
 }
 
 func (r *Backend) Open(options url.Values) {
+	// set last entry time
+	r.timeLastSec = 0
 	// set time granularity to 30 sec
 	r.timeGranularitySec = 30
 	// set time retention to 7 days
@@ -106,10 +109,20 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 
 func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
 	res := make([]backend.DataItem, 0)
+	memFirstTime := (r.timeLastSec - r.timeRetentionSec) * 1000
+	memLastTime := r.timeLastSec * 1000
 
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	pStart := r.getPosForTimestamp(start)
 	pEnd := r.getPosForTimestamp(end)
+
+	// make sure start and end times is in the retention time
+	if start < memFirstTime {
+		start = memFirstTime
+	}
+	if end > memLastTime {
+		end = memLastTime + 1
+	}
 
 	// sanity check pEnd
 	if pEnd < pStart {
@@ -125,7 +138,7 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 		d := r.tenant[tenant].ts[id].data[i%arraySize]
 
 		// if this is a valid point
-		if d.timeStamp <= end && d.timeStamp > start {
+		if d.timeStamp < end && d.timeStamp >= start {
 			count++
 			res = append(res, backend.DataItem{
 				Timestamp: d.timeStamp,
@@ -138,8 +151,23 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 }
 
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
-	var res []backend.StatItem
+	res := make([]backend.StatItem, 0)
+	memFirstTime := (r.timeLastSec - r.timeRetentionSec) * 1000
+	memLastTime := r.timeLastSec * 1000
 
+	// make sure start and end times is in the retention time
+	if start < memFirstTime {
+		start = memFirstTime
+	}
+	if end > memLastTime {
+		end = memLastTime + 1
+	}
+
+	// make sure start, end and backetDuration is a multiple of granularity
+	bucketDuration = r.timeGranularitySec * (1 + bucketDuration/r.timeGranularitySec)
+	start = r.timeGranularitySec * (1 + start/1000/r.timeGranularitySec) * 1000
+	end = r.timeGranularitySec * (1 + end/1000/r.timeGranularitySec) * 1000
+	fmt.Printf("stat: %d %d %d", bucketDuration, start, end)
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	pStep := bucketDuration / r.timeGranularitySec
 	pStart := r.getPosForTimestamp(start)
@@ -224,6 +252,9 @@ func (r *Backend) PostRawData(tenant string, id string, t int64, v float64) bool
 	// update time value pair to the time serias
 	p := r.getPosForTimestamp(t)
 	r.tenant[tenant].ts[id].data[p] = TimeValuePair{timeStamp: t, value: v}
+	fmt.Printf("post: %d %d %f %d", p, t, v, t/1000)
+	// update last
+	r.timeLastSec = t / 1000
 
 	return true
 }
