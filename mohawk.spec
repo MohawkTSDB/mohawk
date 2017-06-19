@@ -9,7 +9,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.12.5
+Version:        0.12.7
 Release:        6%{?dist}
 Summary:        Mock Hawkular server
 License:        MIT

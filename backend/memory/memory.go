@@ -254,7 +254,7 @@ func (r *Backend) PostRawData(tenant string, id string, t int64, v float64) bool
 	r.tenant[tenant].ts[id].data[p] = TimeValuePair{timeStamp: t, value: v}
 
 	// update last
-	tSec := t / 100
+	tSec := t / 1000
 	if tSec > r.timeLastSec {
 		r.timeLastSec = tSec
 	}
