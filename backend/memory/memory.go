@@ -17,7 +17,6 @@
 package memory
 
 import (
-	"fmt"
 	"net/url"
 	"regexp"
 
@@ -168,7 +167,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	bucketDuration = r.timeGranularitySec * (1 + bucketDuration/r.timeGranularitySec)
 	start = r.timeGranularitySec * (1 + start/1000/r.timeGranularitySec) * 1000
 	end = r.timeGranularitySec * (1 + end/1000/r.timeGranularitySec) * 1000
-	fmt.Printf("stat: %d %d %d", bucketDuration, start, end)
+
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	pStep := bucketDuration / r.timeGranularitySec
 	pStart := r.getPosForTimestamp(start)
@@ -253,9 +252,12 @@ func (r *Backend) PostRawData(tenant string, id string, t int64, v float64) bool
 	// update time value pair to the time serias
 	p := r.getPosForTimestamp(t)
 	r.tenant[tenant].ts[id].data[p] = TimeValuePair{timeStamp: t, value: v}
-	fmt.Printf("post: %d %d %f %d", p, t, v, t/1000)
+
 	// update last
-	r.timeLastSec = t / 1000
+	tSec := t / 100
+	if tSec > r.timeLastSec {
+		r.timeLastSec = tSec
+	}
 
 	return true
 }
