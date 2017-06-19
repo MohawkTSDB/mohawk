@@ -61,7 +61,7 @@ The `-h` flag will print out a help text, that list the command line arguments.
 ```bash
 # run `go run *.go` from the source path, or if installed use:
 $> mohawk --version
-MoHawk version: 0.10.1
+MoHawk version: 0.12.5
 
 $> mohawk -h
 Usage of ./mohawk:
