@@ -19,7 +19,6 @@ package memory
 import (
 	"net/url"
 	"regexp"
-	"time"
 
 	"github.com/yaacov/mohawk/backend"
 )
@@ -39,7 +38,6 @@ type Tenant struct {
 }
 
 type Backend struct {
-	firstPosTimestamp  int64
 	timeGranularitySec int64
 	timeRetentionSec   int64
 
@@ -58,8 +56,6 @@ func (r *Backend) Open(options url.Values) {
 	r.timeGranularitySec = 30
 	// set time retention to 7 days
 	r.timeRetentionSec = 7 * 24 * 60 * 60
-	// set first time stamp to now
-	r.firstPosTimestamp = int64(time.Now().UTC().Unix() / r.timeGranularitySec)
 
 	// open db connection
 	r.tenant = make(map[string]*Tenant, 0)
