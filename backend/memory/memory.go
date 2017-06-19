@@ -18,9 +18,10 @@ package memory
 
 import (
 	"fmt"
-	"github.com/yaacov/mohawk/backend"
 	"net/url"
 	"regexp"
+
+	"github.com/yaacov/mohawk/backend"
 )
 
 type TimeValuePair struct {
