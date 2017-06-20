@@ -85,11 +85,13 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 	}
 
 	for key, ts := range t.ts {
-		res = append(res, backend.Item{
-			Id:   key,
-			Type: "gauge",
-			Tags: ts.tags,
-		})
+		if hasMatchingTag(tags, ts.tags) {
+			res = append(res, backend.Item{
+				Id:   key,
+				Type: "gauge",
+				Tags: ts.tags,
+			})
+		}
 	}
 
 	// filter using tags
@@ -325,4 +327,26 @@ func (r *Backend) checkID(tenant string, id string) {
 			data: make([]TimeValuePair, r.timeRetentionSec/r.timeGranularitySec),
 		}
 	}
+}
+
+func hasMatchingTag(tags map[string]string, itemTags map[string]string) bool {
+	out := true
+
+	// if no tags, all items match
+	if len(tags) == 0 {
+		return true
+	}
+
+	// if item has no tags, item is invalid
+	if len(itemTags) == 0 {
+		return false
+	}
+
+	// loop on all the tags, we need _all_ query tags to match tags on item
+	for key, value := range tags {
+		r, _ := regexp.Compile("^" + value + "$")
+		out = out && r.MatchString(itemTags[key])
+	}
+
+	return out
 }
