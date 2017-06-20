@@ -125,7 +125,7 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 	}
 
 	// sanity check pEnd
-	if pEnd < pStart {
+	if pEnd <= pStart {
 		pEnd += arraySize
 	}
 
@@ -134,7 +134,7 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 
 	// fill data out array
 	count := int64(0)
-	for i := pStart; count < limit && i <= pEnd; i++ {
+	for i := pEnd; count < limit && i > pStart; i-- {
 		d := r.tenant[tenant].ts[id].data[i%arraySize]
 
 		// if this is a valid point
@@ -144,6 +144,14 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 				Timestamp: d.timeStamp,
 				Value:     d.value,
 			})
+		}
+	}
+
+	// order
+	if order == "ASC" {
+		for i := 0; i < len(res)/2; i++ {
+			j := len(res) - i - 1
+			res[i], res[j] = res[j], res[i]
 		}
 	}
 
@@ -174,7 +182,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	pEnd := r.getPosForTimestamp(end)
 
 	// sanity check pEnd
-	if pEnd < pStart {
+	if pEnd <= pStart {
 		pEnd += arraySize
 	}
 
@@ -239,6 +247,14 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 				Median:  0,
 				Sum:     0,
 			})
+		}
+	}
+
+	// order
+	if order == "ASC" {
+		for i := 0; i < len(res)/2; i++ {
+			j := len(res) - i - 1
+			res[i], res[j] = res[j], res[i]
 		}
 	}
 
