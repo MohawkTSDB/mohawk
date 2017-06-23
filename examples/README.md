@@ -229,7 +229,7 @@ By default there is no limit on the number of data points returned. The limit pa
 curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?limit=100
 ```
 
-#### Fetch gauge stats using bucketDuration parameter
+#### Aggregating Results using bucketDuration parameter
 
 ```
 curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?start=1235&end=6789&bucketDuration=60s
