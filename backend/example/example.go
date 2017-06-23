@@ -125,6 +125,8 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
+// unimplemented requests should fail silently
+
 func (r Backend) PostRawData(tenant string, id string, t int64, v float64) bool {
 	return true
 }
