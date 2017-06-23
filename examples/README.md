@@ -98,7 +98,11 @@ Inserting data is a synchronous operation with respect to the client. An HTTP re
 
 #### Data Points
 
-A data point in MoHawk Metrics is a tuple that in its simplest form consists of a timestamp and a value. Timestamps are unix timestamps in milliseconds.
+A data point in MoHawk Metrics is a tuple that in its simplest form consists of a timestamp and a value.
+
+#### Timestamps
+
+Timestamps are unix timestamps in milliseconds.
 
 ##### Insert data points
 
