@@ -19,6 +19,12 @@ sudo dnf copr enable yaacov/mohawk
 sudo dnf install mohawk
 ```
 
+Using Dockerhub repository:
+
+```
+docker run -v [PATH TO KEY AND CERT FILES]:/root/ssh:Z yaacov/mohawk
+```
+
 ## Mock Certifications
 
 The server requires certification to serve ``https`` requests. Users can use self signed credentials files for testing.
