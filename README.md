@@ -66,7 +66,7 @@ mohawk -backend sqlite -tls -port 8443
 
 For more in-depth usage information look at the [example](/examples) directory.
 
-### Running the TLS server on port 8443 supporting gzip encoding
+#### Running the TLS server on port 8443 supporting gzip encoding
 
 Using TLS server requires certification files, default file names are `server.key` and `server.crt` .
 
@@ -74,7 +74,7 @@ Using TLS server requires certification files, default file names are `server.ke
 mohawk -tls -gzip -port 8443
 ```
 
-### Reading and writing data
+#### Reading and writing data
 ```
 # get server status
 curl -ks  https://localhost:8443/hawkular/metrics/status
@@ -101,7 +101,7 @@ curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query -d "{\
 curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query -d "{\"ids\": [\"machine/example.com/test\"], \"start\": 1492434811769, \"end\": 1492435911769, \"bucketDuration\": \"1000s\"}"
 ```
 
-### Data encoding, using gzip data encoding
+#### Data encoding, using gzip data encoding
 
 ```
 # using the zcat utility to decode gzip message

@@ -44,13 +44,13 @@ Usage of ./mohawk:
 ## REST
 JSON over [RESTful API](/examples/REST.md) is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
-### Multi Tenancy
+#### Multi Tenancy
 MoHawk Metrics provides virtual multi tenancy. All data is mapped to a tenant. Everything is partitioned by tenant. All requests, both reads and writes, can include a tenant id, default tenant id is "\_ops".
 
-### Tagging
+#### Tagging
 MoHawk Metrics provides flexible tagging support that makes it easy to organize and group data. Tagging can also be used to provide additional information and context about data.
 
-### Querying
+#### Querying
 MoHawk Metrics offers a rich set of features around querying that are ideal for rendering data in graphs and in charts. This includes:
 
   - Filtering and grouping with tags
@@ -62,27 +62,25 @@ MoHawk Metrics offers a rich set of features around querying that are ideal for 
 
 All data is partitioned by tenant. The partitioning happens at the API level. This means that a metric cannot exist on its own outside of a tenant.
 
-### Implicit tenant creation
+#### Implicit tenant creation
 
 ```
-curl -X POST http://server/hawkular/metrics/gauges/raw -d @request.json \
--H "Hawkular-Tenant: com.acme"
+curl -X POST http://localhost:8080/hawkular/metrics/gauges/raw -d @request.json -H "Hawkular-Tenant: com.acme"
 ```
 
 This is a request to insert gauge data points for the com.acme tenant. If that tenant does not already exist, it will be request when storing the metric data. Specific details on inserting data can be found in Inserting Data.
 
-### Tenant Header
+#### Tenant Header
 
 As previously stated all data is partitioned by tenant. MoHawk Metrics enforces this by allowing the Hawkular-Tenant HTTP header in requests. The value of the header is the tenant id. We saw this already with the implicit tenant creation.
 
 Using the Hawkular-Tenant HTTP header in request:
 
 ```
-curl http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9 \
--H "Hawkular-Tenant: com.acme"
+curl http://localhost:8080/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9 -H "Hawkular-Tenant: com.acme"
 ```
 
-### Tenant Ids
+#### Tenant Ids
 
 A tenant has an id that uniquely identifies it. The id is a variable length, UTF-8 encoded string. MoHawk Metrics does not perform any validation checks to prevent duplicate ids. If the key already exists in the map, it will simply be overwritten with the new value.
 
@@ -90,14 +88,14 @@ A tenant has an id that uniquely identifies it. The id is a variable length, UTF
 
 Inserting data is a synchronous operation with respect to the client. An HTTP response is not returned until all data points are inserted. On the server side however, multiple inserts to the database are done in parallel to achieve higher throughput.
 
-### Data Points
+#### Data Points
 
 A data point in MoHawk Metrics is a tuple that in its simplest form consists of a timestamp and a value. Timestamps are unix timestamps in milliseconds.
 
-#### Insert data points
+##### Insert data points
 
 ```
-curl -X POST http://server/hawkular/metrics/gauges/raw -d @request.json
+curl -X POST http://localhost:8080/hawkular/metrics/gauges/raw -d @request.json
 ```
 
 request.json
@@ -127,12 +125,12 @@ Each array element is an object that has id and data properties. data contains a
 
 Tags in MoHawk Metrics are key/value pairs. Tags can be applied to a metric to provide meta data for the time series as a whole. Tags can be used to perform filtering in queries.
 
-### Updating Metric Tags
+#### Updating Metric Tags
 
 These endpoints are used to add or replace tags.
 
 ```
-curl -X PUT http://server/hawkular/metrics/gauges/request_size/tags -d @tags.json
+curl -X PUT http://localhost:8080/hawkular/metrics/gauges/request_size/tags -d @tags.json
 ```
 
 tags.json
@@ -144,7 +142,7 @@ tags.json
 }
 ```
 
-### Tag Filtering
+#### Tag Filtering
 
 MoHawk Metrics provides regular expression support for tag value filtering.
 
@@ -156,14 +154,14 @@ MoHawk Metrics provides regular expression support for tag value filtering.
 
 The examples provided in the following sections are not an exhaustive listing of the full API.
 
-### These operations do not fetch data points but rather the metric definition itself.
+#### These operations do not fetch data points but rather the metric definition itself.
 
 The next example illustrates the type parameter which filters the results by the specified types.
 
 Fetch all metric definitions
 
 ```
-curl http://server/hawkular/metrics/metrics
+curl http://localhost:8080/hawkular/metrics/metrics
 ```
 
 response body
@@ -194,15 +192,15 @@ The next example demonstrates querying metric and filtering the results using ta
 Fetch all metric definitions with tag filters
 
 ```
-curl http://server/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9
+curl http://localhost:8080/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9
 ```
 
-### Raw Data
+#### Raw Data
 
 The simplest form of querying for raw data points does not require any parameters and returns a list of data points.
 
 ```
-curl http://server/hakwular/metrics/gauges/request_size/raw
+curl http://localhost:8080/hakwular/metrics/gauges/request_size/raw
 ```
 
 Response with gauge data points
@@ -215,26 +213,26 @@ Response with gauge data points
 ]
 ```
 
-### Date Range
+#### Date Range
 
 Every query is bounded by a start and an end time. The end time defaults to now, and the start time defaults to 8 hours ago. These can be overridden with the start and end parameters respectively. The expected format of their values is a unix timestamp. The start of the range is inclusive while the end is exclusive.
 
 ```
-curl http://server/hawkular/metrics/gauges/request_size/raw?start=1235,end=6789
+curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?start=1235,end=6789
 ```
 
-### Limiting Results
+#### Limiting Results
 
 By default there is no limit on the number of data points returned. The limit parameter will limit the number of data points returned.
 
 ```
-curl http://server/hawkular/metrics/gauges/request_size/raw?limit=100
+curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?limit=100
 ```
 
-### Fetch gauge stats using bucketDuration parameter
+#### Fetch gauge stats using bucketDuration parameter
 
 ```
-curl http://server/hawkular/metrics/gauges/request_size/raw?start=1235&end=6789&bucketDuration=60s
+curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?start=1235&end=6789&bucketDuration=60s
 ```
 
 Response with gauge data points
