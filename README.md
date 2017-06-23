@@ -8,7 +8,7 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 
 ## Introduction
 
-Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a [RESTful API](/example/REST.md) identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a [RESTful API](/examples/REST.md) identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
 
 ## Installation
 
@@ -62,7 +62,7 @@ mohawk -backend sqlite -tls -port 8443
 
 ## Examples
 
-For more examples look at the [example](/example) directory.
+For more examples look at the [example](/examples) directory.
 
 ### Running the TLS server on port 8443 supporting gzip encoding
 

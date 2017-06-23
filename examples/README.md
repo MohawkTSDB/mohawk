@@ -4,7 +4,7 @@
 
 ![MoHawk](/images/logo-128.png?raw=true "MoHawk Logo")
 
-MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based [RESTful API](/example/REST.md) as the primary interface.
+MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based [RESTful API](/examples/REST.md) as the primary interface.
 
 ## Usage
 
@@ -42,7 +42,7 @@ Usage of ./mohawk:
 ```
 
 ## REST
-JSON over [RESTful API](/example/REST.md) is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
+JSON over [RESTful API](/examples/REST.md) is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
 ### Multi Tenancy
 MoHawk Metrics provides virtual multi tenancy. All data is mapped to a tenant. Everything is partitioned by tenant. All requests, both reads and writes, can include a tenant id, default tenant id is "\_ops".
