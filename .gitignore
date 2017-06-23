@@ -6,7 +6,6 @@
 server/*
 server.pem
 server.key
-server.db
 
 # Folders
 _obj

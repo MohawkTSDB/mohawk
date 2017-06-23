@@ -60,6 +60,20 @@ func main() {
 	var db backend.Backend
 	var middlewareList []middleware.MiddleWare
 
+	flag.Usage = func() {
+		fmt.Printf("Usage of mohawk:\n")
+		fmt.Printf("    Print this usage message:\n")
+		fmt.Printf("      mohawk -help\n")
+		fmt.Printf("    Print version number:\n")
+		fmt.Printf("      mohawk -version\n")
+		fmt.Printf("    Run the server (examples):\n")
+		fmt.Printf("      mohawk                        # run server using default backend (sqlite))\n")
+		fmt.Printf("      mohawk -gzip -backend memory  # run server using memory backend and accepting gzip encoding\n")
+		fmt.Printf("      mohawk -gzip -tls -port 8443  # run with tls on port 8334\n")
+		fmt.Printf("Flags:\n")
+		flag.PrintDefaults()
+	}
+
 	// Get user options
 	portPtr := flag.Int("port", defaultPort, "server port")
 	backendPtr := flag.String("backend", defaultBackend, "the backend to use [sqlite, memory, example]")
