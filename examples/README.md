@@ -6,6 +6,41 @@
 
 MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based RESTful API as the primary interface.
 
+## Usage
+
+When installed, run using the command line ``mohawk``
+
+The `-h` flag will print out a help text, that list the command line arguments.
+
+```bash
+# run `go run *.go` from the source path, or if installed use:
+$> mohawk --version
+MoHawk version: 0.12.5
+
+$> mohawk -h
+Usage of ./mohawk:
+  -backend string
+    	the backend to use [sqlite, memory, example] (default "sqlite")
+  -cert string
+    	path to TLS cert file (default "server.pem")
+  -gzip
+    	accept gzip encoding
+  -key string
+    	path to TLS key file (default "server.key")
+  -options string
+    	specific backend options [e.g. db-dirname]
+  -port int
+    	server port (default 8080)
+  -quiet
+    	less debug output
+  -tls
+    	use TLS server
+  -verbose
+    	more debug output
+  -version
+    	version number
+```
+
 ## REST
 JSON over REST is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 

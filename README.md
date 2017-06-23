@@ -35,42 +35,7 @@ openssl ecparam -genkey -name secp384r1 -out server.key
 openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 ```
 
-## Usage
-
-When installed, run using the command line ``mohawk``
-
-The `-h` flag will print out a help text, that list the command line arguments.
-
-```bash
-# run `go run *.go` from the source path, or if installed use:
-$> mohawk --version
-MoHawk version: 0.12.5
-
-$> mohawk -h
-Usage of ./mohawk:
-  -backend string
-    	the backend to use [sqlite, memory, example] (default "sqlite")
-  -cert string
-    	path to TLS cert file (default "server.pem")
-  -gzip
-    	accept gzip encoding
-  -key string
-    	path to TLS key file (default "server.key")
-  -options string
-    	specific backend options [e.g. db-dirname]
-  -port int
-    	server port (default 8080)
-  -quiet
-    	less debug output
-  -tls
-    	use TLS server
-  -verbose
-    	more debug output
-  -version
-    	version number
-```
-
-## Example of use
+## Examples
 
 Running ffrom system install using ``mohawk`` and requesting the help message.
 
@@ -79,6 +44,7 @@ mohawk -h
 Usage of mohawk:
 ...
 ```
+
 Running from system install using ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
 
 ```bash
@@ -96,13 +62,12 @@ mohawk -backend sqlite -tls -port 8443
 
 ## Examples
 
-### Creating the server.pem and server.key files
-```bash
-openssl ecparam -genkey -name secp384r1 -out server.key
-openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
-```
+For more examples look at the [example](/example) directory.
 
-### Running the tls server on port 8443 supporting gzip encoding
+### Running the TLS server on port 8443 supporting gzip encoding
+
+Using TLS server requires certification files, default file names are `server.key` and `server.crt` .
+
 ```bash
 mohawk -tls -gzip -port 8443
 ```
