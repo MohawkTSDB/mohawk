@@ -10,13 +10,14 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 
 When installed, run using the command line ``mohawk``
 
-The `-h` flag will print out a help text, that list the command line arguments.
-
 ```bash
-# run `go run *.go` from the source path, or if installed use:
 $> mohawk --version
 MoHawk version: 0.12.5
+```
 
+The `-h` flag will print out a help text, that list the command line arguments.
+
+```
 $> mohawk -h
 Usage of ./mohawk:
   -backend string
@@ -41,7 +42,7 @@ Usage of ./mohawk:
     	version number
 ```
 
-## REST
+## JSON + RESTful API
 JSON over [RESTful API](/examples/REST.md) is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
 #### Multi Tenancy
