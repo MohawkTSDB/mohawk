@@ -18,18 +18,26 @@ may slow it down.
 
 Plugins that implement a subset of the interface, must fail silently for unimplemented requests.
 
-For more starting template for a plugin, look for the [backend example](/backend/example).
+For a starting template of a plugin, look at the [backend example](/backend/example) directory.
 
-## Backend Features
+## Backends
 
-|                  |               | Example | Memory        | Sqilte           |
-|------------------|---------------|---------|---------------|------------------|
-| Write to         |               |         | Local Memory  | Local File       |
-| Speed            |               |         | Very Fast     | Fast             |
-| Scale-ability    |               |         |               |                  |
-| Retention        |               |         | 7 days        | File size        |
-| Implements       | Multi Tenants |         | Y             | Y                |
-|                  | Read          | Y       | Y             | Y                |
-|                  | Write         |         | Y             | Y                |
-|                  | Update        |         | Y             | Y                |
-|                  | Delete        |         |               |                  |
+  - Example - a backend template.
+  - Sqlite  - a file storage based backend.
+  - Memory  - a memory storage based backend.
+
+#### Features
+
+|                  | Speed         | Retention | Scaleability  | Storage          |
+|------------------|---------------|-----------|---------------|------------------|
+| Memory           | Very Fast     | 7 days    |               | Memory           |
+| Sqlite           | Fast          |           |               | Local File       |
+| Example          |               |           |               | No storage       |
+
+#### Implementation
+
+|                  | Multi Tenancy | Read| Write | Update | Delete |
+|------------------|---------------|-----|-------|--------|--------|
+| Memory           | Y             | Y   | Y     | Y      |        |
+| Sqlite           | Y             | Y   | Y     | Y      |        |
+| Example          |               | Y   |       |        |        |
