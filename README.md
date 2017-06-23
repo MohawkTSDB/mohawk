@@ -62,7 +62,7 @@ mohawk -backend sqlite -tls -port 8443
 
 ## Examples
 
-For more examples look at the [example](/examples) directory.
+For more in-depth usage information look at the [example](/examples) directory.
 
 ### Running the TLS server on port 8443 supporting gzip encoding
 
