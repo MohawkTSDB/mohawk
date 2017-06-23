@@ -42,7 +42,7 @@ Usage of ./mohawk:
     	version number
 ```
 
-## JSON + RESTful API
+#### JSON + RESTful API
 JSON over [RESTful API](/examples/REST.md) is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
 #### Multi Tenancy
@@ -59,7 +59,7 @@ MoHawk Metrics offers a rich set of features around querying that are ideal for 
   - Downsampling and aggregation
   - Limit and order results
 
-## Tenants
+#### Tenants
 
 All data is partitioned by tenant. The partitioning happens at the API level. This means that a metric cannot exist on its own outside of a tenant.
 
@@ -85,7 +85,7 @@ curl http://localhost:8080/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_v
 
 A tenant has an id that uniquely identifies it. The id is a variable length, UTF-8 encoded string. MoHawk Metrics does not perform any validation checks to prevent duplicate ids. If the key already exists in the map, it will simply be overwritten with the new value.
 
-## Inserting Data
+#### Inserting Data
 
 Inserting data is a synchronous operation with respect to the client. An HTTP response is not returned until all data points are inserted. On the server side however, multiple inserts to the database are done in parallel to achieve higher throughput.
 
@@ -122,7 +122,7 @@ request.json
 
 Each array element is an object that has id and data properties. data contains an array of data points.
 
-## Tagging
+#### Tagging
 
 Tags in MoHawk Metrics are key/value pairs. Tags can be applied to a metric to provide meta data for the time series as a whole. Tags can be used to perform filtering in queries.
 
@@ -151,7 +151,7 @@ MoHawk Metrics provides regular expression support for tag value filtering.
 |----------------|---------------|---------------------------------------------------------------|
 | tag_name:regex | hostname:.*01 | Search for tag named hostname with a value that ends with 01. |
 
-## Querying
+#### Querying
 
 The examples provided in the following sections are not an exhaustive listing of the full API.
 
