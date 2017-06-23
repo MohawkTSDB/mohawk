@@ -9,6 +9,20 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 ## Backends
 Mohawk can use different backends for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a RESTful API identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
 
-  - Example backend, a template for new backends, generate random metrics.
-  - Memory backend, speed: very fast, persistancy: while process is up (write to memory), scalability: no (write to memory)
-  - Sqlite backend, speed: fast, persistancy: yes (write to file), scalability: no (write to file)
+## Backend Features
+
+|                  |               | Example | Memory        | Sqilte           |
+|==================|===============|=========|===============|==================|
+| Write to         |               |         | Local Memory  | Local File       |
+|------------------|---------------|---------|---------------|------------------|
+| Speed            |               |         | Very Fast     | Fast             |
+|------------------|---------------|---------|---------------|------------------|
+| Scale-ability    |               |         |               |                  |
+|------------------|---------------|---------|---------------|------------------|
+| Retention        |               |         | 7 days        | File size        |
+|------------------|---------------|---------|---------------|------------------|
+| Implements       | Multi Tenants |         | Y             | Y                |
+|                  | Read          | Y       | Y             | Y                |
+|                  | Write         |         | Y             | Y                |
+|                  | Update        |         | Y             | Y                |
+|                  | Delete        |         |               |                  |
