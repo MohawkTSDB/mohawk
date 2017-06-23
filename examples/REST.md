@@ -1,6 +1,6 @@
 
 
-# mohawk/examples
+# mohawk/examples/rest
 
 ![MoHawk](/images/logo-128.png?raw=true "MoHawk Logo")
 
