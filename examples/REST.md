@@ -11,7 +11,7 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 ### Prefix: "/hawkular/metrics/"
 
 | Method | Path     | Description            | Arguments    | Example                  |
-|========|==========|========================|==============|==========================|
+|--------|----------|------------------------|--------------|--------------------------|
 | GET    | status   | Read server status     |              |                          |
 | GET    | tenants  | Read a list of tenants |              |                          |
 | GET    | metrics  | Read a list of metrics |              |                          |
@@ -19,7 +19,7 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 ### Prefix: "/hawkular/metrics/gauges/"
 
 | Method | Path           | Description           | Arguments    | Example                  |
-|========|================|=======================|==============|==========================|
+|--------|----------|------------------------|--------------|--------------------------|
 | GET    | :id/raw        | Read metric data      |              |                          |
 | POST   | raw            | Write new metric data |              |                          |
 | POST   | raw/query      | Query metric data     |              |                          |

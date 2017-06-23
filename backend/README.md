@@ -12,7 +12,7 @@ Mohawk can use different backends for different use cases. Different backends ma
 ## Backend Features
 
 |                  |               | Example | Memory        | Sqilte           |
-|==================|===============|=========|===============|==================|
+|------------------|---------------|---------|---------------|------------------|
 | Write to         |               |         | Local Memory  | Local File       |
 |------------------|---------------|---------|---------------|------------------|
 | Speed            |               |         | Very Fast     | Fast             |
