@@ -81,7 +81,7 @@ mohawk -tls -gzip -port 8443
 #### Reading and writing data
 ```
 # get server status
-curl -ks  https://localhost:8443/hawkular/metrics/status
+curl -ks https://localhost:8443/hawkular/metrics/status
 
 # get a list of all metrics
 curl -ks https://localhost:8443/hawkular/metrics/metrics
