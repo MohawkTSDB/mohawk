@@ -97,3 +97,14 @@ func validTags(tags map[string]string) bool {
 
 	return true
 }
+
+func FilterItems(vs []Item, f func(Item) bool) []Item {
+	vsf := make([]Item, 0)
+
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
+}

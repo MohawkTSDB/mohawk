@@ -59,14 +59,3 @@ type Backend interface {
 	DeleteData(tenant string, id string, end int64, start int64) bool
 	DeleteTags(tenant string, id string, tags []string) bool
 }
-
-func FilterItems(vs []Item, f func(Item) bool) []Item {
-	vsf := make([]Item, 0)
-
-	for _, v := range vs {
-		if f(v) {
-			vsf = append(vsf, v)
-		}
-	}
-	return vsf
-}
