@@ -8,30 +8,7 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 
 ## Introduction
 
-Mohawk can use different backends for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a RESTful API identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
-
-  - Example backend, a template for new backends, generate random metrics.
-  - Memory backend, speed: very fast, persistancy: while process is up (write to memory), scalability: no (write to memory)
-  - Sqlite backend, speed: fast, persistancy: yes (write to file), scalability: no (write to file)
-
-## License and copyright
-
-```
-   Copyright 2016 Red Hat, Inc. and/or its affiliates
-   and other contributors.
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-```
+Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a RESTful API identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
 
 ## Installation
 
