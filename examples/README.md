@@ -1,6 +1,10 @@
-# Introduction
 
-MoHawk Metrics is a plug-able metrics storage engine that uses REST as the primary interface.
+
+# mohawk/examples
+
+![MoHawk](/images/logo-128.png?raw=true "MoHawk Logo")
+
+MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based RESTful API as the primary interface.
 
 ## REST
 JSON over REST is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
