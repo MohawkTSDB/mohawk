@@ -11,8 +11,14 @@ Mohawk can use different backends for different use cases. Different backends ma
 
 ## Backend Development
 
-A backend should implement the [backend interface](/backend/backend.go).
-For more information and an example plugin, look for the [backend example](/backend/example).
+A backend should implement the [backend interface](/backend/backend.go). Each plugin is built for specific use case,
+with features that best suite this use case. Implementation of a feature should not interfere
+with plugin functionality, for example, a plugin built for speed may choose not to implement a feature that
+may slow it down.
+
+Plugins that implement a subset of the interface, must fail silently for unimplemented requests.
+
+For more starting template for a plugin, look for the [backend example](/backend/example).
 
 ## Backend Features
 
