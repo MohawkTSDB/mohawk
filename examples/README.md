@@ -42,6 +42,13 @@ Usage of ./mohawk:
     	version number
 ```
 
+Running ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
+
+```bash
+$> mohawk
+2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
+```
+
 #### JSON + RESTful API
 JSON over [RESTful API](/examples/REST.md) is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
