@@ -35,9 +35,9 @@ openssl ecparam -genkey -name secp384r1 -out server.key
 openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 ```
 
-## Examples
+## Running the server
 
-Running ffrom system install using ``mohawk`` and requesting the help message.
+Request usage message.
 
 ```bash
 mohawk -h
@@ -45,15 +45,15 @@ Usage of mohawk:
 ...
 ```
 
-Running from system install using ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
+Running ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
 
 ```bash
 mohawk
 2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
 ```
 
-Running from system install using  ``mohawk`` and the ``sqlite`` back end
-[ Remmeber to set up the ``server.key`` and ``server.pem`` files in your path ].
+Running from system install using  ``mohawk`` and the ``sqlite`` backend
+[ **Remmeber to set up the ``server.key`` and ``server.pem`` files in your path** ].
 
 ```bash
 mohawk -backend sqlite -tls -port 8443
