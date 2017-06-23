@@ -25,7 +25,9 @@ Using Dockerhub repository:
 docker run -v [PATH TO KEY AND CERT FILES]:/root/ssh:Z yaacov/mohawk
 ```
 
-## Mock Certifications
+## Running the server
+
+### Mock Certifications
 
 The server requires certification to serve ``https`` requests. Users can use self signed credentials files for testing.
 
@@ -34,8 +36,6 @@ To create a self signed credentials use this bash commands:
 openssl ecparam -genkey -name secp384r1 -out server.key
 openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 ```
-
-## Running the server
 
 Request usage message.
 
