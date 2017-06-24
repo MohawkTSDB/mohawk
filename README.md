@@ -14,15 +14,15 @@ Mohawk can use different [backends](/backend) for different use cases. Different
 
 ###### Example
 
-Backend template.
+Backend template. Dump random data on data requests, fails silently on unimplemented requests.
 
 ###### Sqlite
 
-File storage based backend.
+File storage based backend. Fast, low on system resources, use local files for data persistency.
 
-###### Memory 
+###### Memory
 
-Memory storage based backend.
+Memory storage based backend. Very fast, very low on system resources, 7 day data Retention, no data persistency after process end.
 
 #### Compatibility
 
