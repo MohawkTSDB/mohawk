@@ -219,12 +219,6 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 				Start:   t,
 				End:     t + timeStep,
 				Empty:   true,
-				Samples: 0,
-				Min:     0,
-				Max:     0,
-				Avg:     0,
-				Median:  0,
-				Sum:     0,
 			})
 			t += timeStep
 		}
@@ -238,7 +232,6 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 			Min:     min,
 			Max:     max,
 			Avg:     avg,
-			Median:  0,
 			Sum:     sum,
 		})
 		t += timeStep
@@ -254,12 +247,6 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 			Start:   t,
 			End:     t + timeStep,
 			Empty:   true,
-			Samples: 0,
-			Min:     0,
-			Max:     0,
-			Avg:     0,
-			Median:  0,
-			Sum:     0,
 		})
 		t += timeStep
 	}

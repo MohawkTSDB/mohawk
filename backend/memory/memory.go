@@ -230,10 +230,8 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 				End:     startTimestamp + stepMillisec,
 				Empty:   false,
 				Samples: samples,
-				Min:     0,
-				Max:     last,
+				Last:    last,
 				Avg:     sum / float64(samples),
-				Median:  0,
 				Sum:     sum,
 			})
 		} else {
@@ -242,12 +240,6 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 				Start:   startTimestamp,
 				End:     startTimestamp + stepMillisec,
 				Empty:   true,
-				Samples: 0,
-				Min:     0,
-				Max:     0,
-				Avg:     0,
-				Median:  0,
-				Sum:     0,
 			})
 		}
 	}
