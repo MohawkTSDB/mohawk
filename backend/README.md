@@ -21,7 +21,7 @@ Plugins that implement a subset of the interface, must fail silently for unimple
 
 For a starting template of a plugin, look at the [backend example](/backend/example) directory.
 
-## Backends
+## Backends Comparison
 
   - Example - a backend template.
   - Sqlite  - a file storage based backend.

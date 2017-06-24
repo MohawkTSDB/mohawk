@@ -10,6 +10,20 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 
 Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [RESTful API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
+#### Plugins
+
+###### Example
+
+Backend template.
+
+###### Sqlite
+
+File storage based backend.
+
+###### Memory 
+
+Memory storage based backend.
+
 #### Compatibility
 
 Mohawk is tested with Hawkular plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby)
