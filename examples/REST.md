@@ -29,9 +29,10 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 
 #### Item
 
-	Id   string            `json:"id"`
-	Type string            `json:"type"`
-	Tags map[string]string `json:"tags"`
+	Id         string            `json:"id"`
+	Type       string            `json:"type"`
+	Tags       map[string]string `json:"tags"`
+	LastValues []DataItem        `json:"data"`
 
 #### DataItem
 
@@ -46,6 +47,9 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 	Samples int64   `json:"samples"`
 	Min     float64 `json:"min"`
 	Max     float64 `json:"max"`
+	First   float64 `json:"first"`
+	Last    float64 `json:"last"`
 	Avg     float64 `json:"avg"`
 	Median  float64 `json:"median"`
+	Std     float64 `json:"std"`
 	Sum     float64 `json:"sum"`
