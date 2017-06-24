@@ -40,7 +40,7 @@ func (r *Router) Add(method string, path string, handler func(http.ResponseWrite
 	r.Routes = append(r.Routes, route{method, strings.Split(path, "/"), handler})
 }
 
-// match match a request to a route, and parse the arguments embeded in the route path
+// match match a request to a route, and parse the arguments embedded in the route path
 // returns
 // 	bool - true if route match
 // 	map  - a map of arguments parsed from the route path
