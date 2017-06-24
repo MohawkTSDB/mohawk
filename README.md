@@ -8,7 +8,7 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 
 ## Introduction
 
-Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a [RESTful API](/examples/REST.md) identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [RESTful API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
 #### Compatibility
 

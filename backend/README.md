@@ -7,7 +7,8 @@
 MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based RESTful API as the primary interface.
 
 ## Backends
-Mohawk can use different backends for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a [RESTful API](/examples/REST.md) identical to Hawkular, inheriting Hawkular's echosystem of clients and plugins.
+
+Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [RESTful API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
 ## Backend Development
 
@@ -28,16 +29,24 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 
 #### Features
 
-|                  | Speed         | Retention | Scaleability  | Storage          |
-|------------------|---------------|-----------|---------------|------------------|
-| Memory           | Very Fast     | 7 days    |               | Memory           |
-| Sqlite           | Fast          |           |               | Local File       |
-| Example          |               |           |               | No storage       |
+|                  | Speed         | Retention Limit | Scaleability  | Storage          |
+|------------------|---------------|-----------------|---------------|------------------|
+| Example          |               |                 |               | No storage       |
+| Memory           | Very Fast     | 7 days          |               | Memory           |
+| Sqlite           | Fast          |                 |               | Local File       |
 
-#### Implementation
+#### REST Endpoint Implementation
 
 |                  | Multi Tenancy | Read| Write | Update | Delete |
 |------------------|---------------|-----|-------|--------|--------|
+| Example          |               | Y   |       |        |        |
 | Memory           | Y             | Y   | Y     | Y      |        |
 | Sqlite           | Y             | Y   | Y     | Y      |        |
-| Example          |               | Y   |       |        |        |
+
+#### Aggregation and Statistics Implementation
+
+|                  | Min | Max| First | Last | Avg | Median | Sum | Count |
+|------------------|-----|----|-------|------|-----|--------|-----|-------|
+| Example          |     |    |       |      | Y   |        |     | Y     |
+| Memory           |     |    |       |      | Y   |        | Y   | Y     |
+| Sqlite           | Y   | Y  |       |      | Y   |        | Y   | Y     |
