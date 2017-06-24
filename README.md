@@ -4,9 +4,12 @@
 
 ![MoHawk](/images/logo-128.png?raw=true "MoHawk Logo")
 
+
 MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based RESTful API as the primary interface.
 
 ## Introduction
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/yaacov/mohawk)](https://goreportcard.com/report/github.com/yaacov/mohawk)
 
 Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [RESTful API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
