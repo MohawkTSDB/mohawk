@@ -43,6 +43,14 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 | Memory           | Y             | Y   | Y     | Y      |        |
 | Sqlite           | Y             | Y   | Y     | Y      | Y      |
 
+#### Metrics List Implementation
+
+|                  | Filter by Tag RegEx | Last Values |
+|------------------|---------------------|-------------|
+| Example          |                     |             |
+| Memory           | Y                   |             |
+| Sqlite           | Y                   |             |
+
 #### Aggregation and Statistics Implementation
 
 |                  | Min | Max| First | Last | Avg | Median | Std | Sum | Count |
