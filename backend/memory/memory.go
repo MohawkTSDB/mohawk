@@ -68,7 +68,7 @@ func (r Backend) GetTenants() []backend.Tenant {
 	res := make([]backend.Tenant, 0)
 
 	// return a list of tenants
-	for key, _ := range r.tenant {
+	for key := range r.tenant {
 		res = append(res, backend.Tenant{Id: key})
 	}
 
