@@ -19,8 +19,11 @@ package backend
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 // validRegex regexp for validating sql variables
@@ -107,4 +110,39 @@ func FilterItems(vs []Item, f func(Item) bool) []Item {
 		}
 	}
 	return vsf
+}
+
+// parseTenant return the tenant header value or "_ops"
+func parseTenant(r *http.Request) string {
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = "_ops"
+	}
+
+	return tenant
+}
+
+func parseTimespan(r *http.Request) (int64, int64, int64) {
+	end := int64(time.Now().UTC().Unix() * 1000)
+	if v, ok := r.Form["end"]; ok && len(v) > 0 {
+		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
+			end = int64(i)
+		}
+	}
+
+	start := end - int64(8*60*60*1000)
+	if v, ok := r.Form["start"]; ok && len(v) > 0 {
+		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
+			start = int64(i)
+		}
+	}
+
+	bucketDuration := int64(0)
+	if v, ok := r.Form["bucketDuration"]; ok && len(v) > 0 {
+		if i, err := strconv.Atoi(v[0][:len(v[0])-1]); err == nil && i > 1 {
+			bucketDuration = int64(i)
+		}
+	}
+
+	return end, start, bucketDuration
 }

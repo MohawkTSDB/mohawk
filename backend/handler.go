@@ -34,16 +34,6 @@ type Handler struct {
 	Backend Backend
 }
 
-// parseTenant return the tenant header value or "_ops"
-func parseTenant(r *http.Request) string {
-	tenant := r.Header.Get("Hawkular-Tenant")
-	if tenant == "" {
-		tenant = "_ops"
-	}
-
-	return tenant
-}
-
 // GetTenants return a list of metrics tenants
 func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []Tenant
@@ -111,19 +101,8 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	// get tenant
 	tenant := parseTenant(r)
 
-	end := int64(time.Now().UTC().Unix() * 1000)
-	if v, ok := r.Form["end"]; ok && len(v) > 0 {
-		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
-			end = int64(i)
-		}
-	}
-
-	start := end - int64(8*60*60*1000)
-	if v, ok := r.Form["start"]; ok && len(v) > 0 {
-		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
-			start = int64(i)
-		}
-	}
+	// get timespan
+	end, start, bucketDuration := parseTimespan(r)
 
 	limit := int64(20000)
 	if v, ok := r.Form["limit"]; ok && len(v) > 0 {
@@ -135,13 +114,6 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	order := "DESC"
 	if v, ok := r.Form["order"]; ok && len(v) > 0 && v[0] == "ASC" {
 		order = "ASC"
-	}
-
-	bucketDuration := int64(0)
-	if v, ok := r.Form["bucketDuration"]; ok && len(v) > 0 {
-		if i, err := strconv.Atoi(v[0][:len(v[0])-1]); err == nil && i > 1 {
-			bucketDuration = int64(i)
-		}
 	}
 
 	if h.Verbose {
@@ -169,22 +141,11 @@ func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[str
 	// get data from the form arguments
 	r.ParseForm()
 
-	end := int64(0)
-	if v, ok := r.Form["end"]; ok && len(v) > 0 {
-		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
-			end = int64(i)
-		}
-	}
-
-	start := int64(0)
-	if v, ok := r.Form["start"]; ok && len(v) > 0 {
-		if i, err := strconv.Atoi(v[0]); err == nil && i > 1 {
-			start = int64(i)
-		}
-	}
-
 	// get tenant
 	tenant := parseTenant(r)
+
+	// get timespan
+	end, start, _ := parseTimespan(r)
 
 	if h.Verbose {
 		log.Printf("ID: %s@%s, End: %d, Start: %d", tenant, id, end, start)
