@@ -45,8 +45,8 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 
 #### Aggregation and Statistics Implementation
 
-|                  | Min | Max| First | Last | Avg | Median | Sum | Count |
-|------------------|-----|----|-------|------|-----|--------|-----|-------|
-| Example          |     |    |       |      | Y   |        |     | Y     |
-| Memory           |     |    |       |      | Y   |        | Y   | Y     |
-| Sqlite           | Y   | Y  |       |      | Y   |        | Y   | Y     |
+|                  | Min | Max| First | Last | Avg | Median | Std | Sum | Count |
+|------------------|-----|----|-------|------|-----|--------|-----|-----|-------|
+| Example          |     |    |       |      | Y   |        |     |     | Y     |
+| Memory           |     |    |       |      | Y   |        |     | Y   | Y     |
+| Sqlite           | Y   | Y  |       |      | Y   |        |     | Y   | Y     |
