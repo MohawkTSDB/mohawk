@@ -89,7 +89,7 @@ For more in-depth usage information look at the [example](/examples) directory.
 
 #### Running the server for this examples
 
-Using TLS server requires certification files, default file names are `server.key` and `server.crt` .
+Using TLS server requires certification files, default file names are `server.key` and `server.pem` .
 
 ```bash
 mohawk -tls -gzip -port 8443
