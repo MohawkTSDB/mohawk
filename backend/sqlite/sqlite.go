@@ -216,9 +216,9 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 		// append missing
 		for t < startT {
 			res = append(res, backend.StatItem{
-				Start:   t,
-				End:     t + timeStep,
-				Empty:   true,
+				Start: t,
+				End:   t + timeStep,
+				Empty: true,
 			})
 			t += timeStep
 		}
@@ -244,9 +244,9 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	// append missing
 	for t < endTime {
 		res = append(res, backend.StatItem{
-			Start:   t,
-			End:     t + timeStep,
-			Empty:   true,
+			Start: t,
+			End:   t + timeStep,
+			Empty: true,
 		})
 		t += timeStep
 	}

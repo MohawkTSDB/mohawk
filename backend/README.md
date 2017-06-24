@@ -41,7 +41,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 |------------------|---------------|-----|-------|--------|--------|
 | Example          |               | Y   |       |        |        |
 | Memory           | Y             | Y   | Y     | Y      |        |
-| Sqlite           | Y             | Y   | Y     | Y      |        |
+| Sqlite           | Y             | Y   | Y     | Y      | Y      |
 
 #### Aggregation and Statistics Implementation
 

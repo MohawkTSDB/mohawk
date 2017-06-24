@@ -237,9 +237,9 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 		} else {
 			count++
 			res = append(res, backend.StatItem{
-				Start:   startTimestamp,
-				End:     startTimestamp + stepMillisec,
-				Empty:   true,
+				Start: startTimestamp,
+				End:   startTimestamp + stepMillisec,
+				Empty: true,
 			})
 		}
 	}
