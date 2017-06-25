@@ -55,6 +55,6 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 
 |                  | Min | Max| First | Last | Avg | Median | Std | Sum | Count |
 |------------------|-----|----|-------|------|-----|--------|-----|-----|-------|
-| Example          |     |    |       |      | Y   |        |     |     | Y     |
+| Example          |     |    |       | Y    | Y   |        |     |     | Y     |
 | Memory           |     |    |       |      | Y   |        |     | Y   | Y     |
 | Sqlite           | Y   | Y  |       |      | Y   |        |     | Y   | Y     |
