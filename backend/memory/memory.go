@@ -29,8 +29,9 @@ type TimeValuePair struct {
 }
 
 type TimeSeries struct {
-	tags map[string]string
-	data []TimeValuePair
+	tags      map[string]string
+	data      []TimeValuePair
+	lastValue TimeValuePair
 }
 
 type Tenant struct {
@@ -86,10 +87,16 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 
 	for key, ts := range t.ts {
 		if hasMatchingTag(tags, ts.tags) {
+			lastValue := backend.DataItem{
+				Timestamp: ts.lastValue.timeStamp,
+				Value:     ts.lastValue.value,
+			}
+
 			res = append(res, backend.Item{
-				Id:   key,
-				Type: "gauge",
-				Tags: ts.tags,
+				Id:         key,
+				Type:       "gauge",
+				Tags:       ts.tags,
+				LastValues: []backend.DataItem{lastValue},
 			})
 		}
 	}
@@ -262,6 +269,12 @@ func (r *Backend) PostRawData(tenant string, id string, t int64, v float64) bool
 	// update time value pair to the time serias
 	p := r.getPosForTimestamp(t)
 	r.tenant[tenant].ts[id].data[p] = TimeValuePair{timeStamp: t, value: v}
+
+	// update last value
+	if r.tenant[tenant].ts[id].lastValue.timeStamp < t {
+		r.tenant[tenant].ts[id].lastValue.timeStamp = t
+		r.tenant[tenant].ts[id].lastValue.value = v
+	}
 
 	// update last
 	tSec := t / 1000
