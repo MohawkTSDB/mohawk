@@ -15,6 +15,10 @@ fmt: $(SOURCE)
 clean:
 	$(RM) mohawk
 
+.PHONY: test
+test:
+	./test/mohawk.bats
+
 .PHONY: install
-install:
-	install -D -m0755 mohawk $(DESTDIR)/$(BINDIR)/mohawk
+install: mohawk
+	install -D -m0755 mohawk $(DESTDIR)$(BINDIR)/mohawk
