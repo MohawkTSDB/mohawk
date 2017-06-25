@@ -2,7 +2,7 @@
 
 # mohawk
 
-![MoHawk](/images/logo-128.png?raw=true "MoHawk Logo")
+![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
 
 
 MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based RESTful API as the primary interface.

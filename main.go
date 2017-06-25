@@ -43,7 +43,7 @@ const defaultTLS = false
 const defaultTLSKey = "server.key"
 const defaultTLSCert = "server.pem"
 
-// BackendName MoHawk active backend
+// BackendName Mohawk active backend
 var BackendName string
 
 // GetStatus return a json status struct
@@ -89,7 +89,7 @@ func main() {
 
 	// return version number and exit
 	if *versionPtr {
-		fmt.Printf("MoHawk version: %s\n\n", VER)
+		fmt.Printf("Mohawk version: %s\n\n", VER)
 		return
 	}
 

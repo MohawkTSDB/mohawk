@@ -2,7 +2,7 @@
 
 # mohawk/examples
 
-![MoHawk](/images/logo-128.png?raw=true "MoHawk Logo")
+![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
 
 MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based [RESTful API](/examples/REST.md) as the primary interface.
 
@@ -11,8 +11,8 @@ MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses
 When installed, run using the command line ``mohawk``
 
 ```bash
-$> mohawk --version
-MoHawk version: 0.12.5
+$> mohawk -version
+Mohawk version: 0.12.5
 ```
 
 The `-h` flag will print out a help text, that list the command line arguments.
@@ -50,16 +50,16 @@ $> mohawk
 ```
 
 #### JSON + RESTful API
-JSON over [RESTful API](/examples/REST.md) is the primary interface of MoHawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
+JSON over [RESTful API](/examples/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
 #### Multi Tenancy
-MoHawk Metrics provides virtual multi tenancy. All data is mapped to a tenant. Everything is partitioned by tenant. All requests, both reads and writes, can include a tenant id, default tenant id is "\_ops".
+Mohawk Metrics provides virtual multi tenancy. All data is mapped to a tenant. Everything is partitioned by tenant. All requests, both reads and writes, can include a tenant id, default tenant id is "\_ops".
 
 #### Tagging
-MoHawk Metrics provides flexible tagging support that makes it easy to organize and group data. Tagging can also be used to provide additional information and context about data.
+Mohawk Metrics provides flexible tagging support that makes it easy to organize and group data. Tagging can also be used to provide additional information and context about data.
 
 #### Querying
-MoHawk Metrics offers a rich set of features around querying that are ideal for rendering data in graphs and in charts. This includes:
+Mohawk Metrics offers a rich set of features around querying that are ideal for rendering data in graphs and in charts. This includes:
 
   - Filtering and grouping with tags
   - Searching metric definitions
@@ -80,7 +80,7 @@ This is a request to insert gauge data points for the com.acme tenant. If that t
 
 #### Tenant Header
 
-As previously stated all data is partitioned by tenant. MoHawk Metrics enforces this by allowing the Hawkular-Tenant HTTP header in requests. The value of the header is the tenant id. We saw this already with the implicit tenant creation.
+As previously stated all data is partitioned by tenant. Mohawk Metrics enforces this by allowing the Hawkular-Tenant HTTP header in requests. The value of the header is the tenant id. We saw this already with the implicit tenant creation.
 
 Using the Hawkular-Tenant HTTP header in request:
 
@@ -90,7 +90,7 @@ curl http://localhost:8080/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_v
 
 #### Tenant Ids
 
-A tenant has an id that uniquely identifies it. The id is a variable length, UTF-8 encoded string. MoHawk Metrics does not perform any validation checks to prevent duplicate ids. If the key already exists in the map, it will simply be overwritten with the new value.
+A tenant has an id that uniquely identifies it. The id is a variable length, UTF-8 encoded string. Mohawk Metrics does not perform any validation checks to prevent duplicate ids. If the key already exists in the map, it will simply be overwritten with the new value.
 
 #### Inserting Data
 
@@ -98,7 +98,7 @@ Inserting data is a synchronous operation with respect to the client. An HTTP re
 
 #### Data Points
 
-A data point in MoHawk Metrics is a tuple that in its simplest form consists of a timestamp and a value.
+A data point in Mohawk Metrics is a tuple that in its simplest form consists of a timestamp and a value.
 
 ##### Timestamps
 
@@ -135,7 +135,7 @@ Each array element is an object that has id and data properties. data contains a
 
 #### Tagging
 
-Tags in MoHawk Metrics are key/value pairs. Tags can be applied to a metric to provide meta data for the time series as a whole. Tags can be used to perform filtering in queries.
+Tags in Mohawk Metrics are key/value pairs. Tags can be applied to a metric to provide meta data for the time series as a whole. Tags can be used to perform filtering in queries.
 
 #### Updating Metric Tags
 
@@ -156,7 +156,7 @@ tags.json
 
 #### Tag Filtering
 
-MoHawk Metrics provides regular expression support for tag value filtering.
+Mohawk Metrics provides regular expression support for tag value filtering.
 
 | Type           | Example       |                                                               |
 |----------------|---------------|---------------------------------------------------------------|
