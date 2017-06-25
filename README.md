@@ -21,7 +21,9 @@ Mohawk can use different [backends](/backend) for different use cases. Different
 | Memory           | Very Fast     | 7 days          |               | Memory           |
 | Sqlite           | Fast          |                 |               | Local File       |
 
-#### Compatibility - Mohawk is tested with Hawkular plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby)
+#### Compatibility
+
+Mohawk is tested with Hawkular plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby)
 
 ## Installation
 
