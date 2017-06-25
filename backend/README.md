@@ -48,7 +48,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 |                  | Filter by Tag RegEx | Last Values |
 |------------------|---------------------|-------------|
 | Example          |                     |             |
-| Memory           | Y                   |             |
+| Memory           | Y                   | Y           |
 | Sqlite           | Y                   |             |
 
 #### Aggregation and Statistics Implementation
