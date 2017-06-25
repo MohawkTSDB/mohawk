@@ -15,9 +15,7 @@ Mohawk can use different [backends](/backend) for different use cases. Different
 
 #### Plugins
 
-###### Example
-
-Backend template. Dump random data on data requests, fails silently on unimplemented requests.
+###### Example - Backend template. Dump random data on data requests, fails silently on unimplemented requests.
 
 ###### Sqlite - File storage based backend. Fast, low on system resources, use local files for data persistency.
 
