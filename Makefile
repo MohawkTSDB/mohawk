@@ -17,7 +17,7 @@ clean:
 
 .PHONY: test
 test:
-	./test/mohawk.bats
+	bats test/mohawk.bats
 
 .PHONY: install
 install: mohawk
