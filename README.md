@@ -15,9 +15,11 @@ Mohawk can use different [backends](/backend) for different use cases. Different
 
 #### Plugins
 
-  Example - Backend template. Dump random data on data requests, fails silently on unimplemented requests.
-  Sqlite - File storage based backend. Fast, low on system resources, use local files for data persistency.
-  Memory - Memory storage based backend. Very fast, very low on system resources, 7 day data Retention, no data persistency after process end.
+| Backend |                                                                                                                                      |
+|---------|--------------------------------------------------------------------------------------------------------------------------------------|
+| Example | Backend template. Dump random data on data requests, fails silently on unimplemented requests.                                       |
+| Sqlite  | File storage based backend. Fast, low on system resources, use local files for data persistency.                                     |
+| Memory  | Memory storage based backend. Very fast, very low on system resources, 7 day data Retention, no data persistency after process end.  |
 
 #### Compatibility - Mohawk is tested with Hawkular plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby)
 
