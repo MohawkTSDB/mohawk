@@ -118,20 +118,13 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 
 func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
 	res := make([]backend.DataItem, 0)
-	memFirstTime := (r.timeLastSec - r.timeRetentionSec) * 1000
-	memLastTime := r.timeLastSec * 1000
 
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	pStart := r.getPosForTimestamp(start)
 	pEnd := r.getPosForTimestamp(end)
 
 	// make sure start and end times is in the retention time
-	if start < memFirstTime {
-		start = memFirstTime
-	}
-	if end > memLastTime {
-		end = memLastTime + 1
-	}
+	start, end = r.checkTimespan(start, end)
 
 	// sanity check pEnd
 	if pEnd <= pStart {
@@ -169,16 +162,9 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	res := make([]backend.StatItem, 0)
-	memFirstTime := (r.timeLastSec - r.timeRetentionSec) * 1000
-	memLastTime := r.timeLastSec * 1000
 
 	// make sure start and end times is in the retention time
-	if start < memFirstTime {
-		start = memFirstTime
-	}
-	if end > memLastTime {
-		end = memLastTime + 1
-	}
+	start, end = r.checkTimespan(start, end)
 
 	// make sure start, end are multiple of granularity
 	start = r.timeGranularitySec * (start / 1000 / r.timeGranularitySec) * 1000
@@ -314,6 +300,21 @@ func (r *Backend) DeleteTags(tenant string, id string, tags []string) bool {
 
 // Helper functions
 // Not required by backend interface
+
+func (r *Backend) checkTimespan(start int64, end int64) (int64, int64) {
+	memFirstTime := (r.timeLastSec - r.timeRetentionSec) * 1000
+	memLastTime := r.timeLastSec * 1000
+
+	// make sure start and end times is in the retention time
+	if start < memFirstTime {
+		start = memFirstTime
+	}
+	if end > memLastTime {
+		end = memLastTime + 1
+	}
+
+	return start, end
+}
 
 func (r *Backend) getPosForTimestamp(timestamp int64) int64 {
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
