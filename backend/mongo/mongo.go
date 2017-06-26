@@ -126,8 +126,20 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 					"_id": bson.M{
 						"$trunc": bson.M{"$divide": []interface{}{"$timestamp", bucketDuration * 1000}},
 					},
-					"start":   bson.M{"$first": "$timestamp"},
-					"end":     bson.M{"$last": "$timestamp"},
+					"start": bson.M{"$first": bson.M{"$multiply": []interface{}{
+						bson.M{"$trunc": bson.M{"$divide": []interface{}{
+							"$timestamp",
+							bucketDuration * 1000,
+						}}},
+						bucketDuration * 1000,
+					}}},
+					"end": bson.M{"$first": bson.M{"$multiply": []interface{}{
+						bson.M{"$ceil": bson.M{"$divide": []interface{}{
+							"$timestamp",
+							bucketDuration * 1000,
+						}}},
+						bucketDuration * 1000,
+					}}},
 					"first":   bson.M{"$first": "$value"},
 					"last":    bson.M{"$last": "$value"},
 					"sum":     bson.M{"$sum": "$value"},
