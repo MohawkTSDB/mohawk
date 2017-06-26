@@ -12,7 +12,7 @@ When installed, run using the command line ``mohawk``
 
 ```bash
 $> mohawk -version
-Mohawk version: 0.12.5
+Mohawk version: 0.14.1
 ```
 
 The `-h` flag will print out a help text, that list the command line arguments.
@@ -21,7 +21,7 @@ The `-h` flag will print out a help text, that list the command line arguments.
 $> mohawk -h
 Usage of ./mohawk:
   -backend string
-    	the backend to use [sqlite, memory, example] (default "sqlite")
+    	the backend to use [sqlite, memory, mongo, example] (default "sqlite")
   -cert string
     	path to TLS cert file (default "server.pem")
   -gzip
