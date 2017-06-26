@@ -26,6 +26,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
   - Example - a backend template.
   - Sqlite  - a file storage based backend.
   - Memory  - a memory storage based backend.
+  - Mongo   - a cluster based backend.
 
 #### Features
 
@@ -34,6 +35,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 | Example          |               |                 |               | No storage       |
 | Memory           | Very Fast     | 7 days          |               | Memory           |
 | Sqlite           | Fast          |                 |               | Local File       |
+| Mongo            | Fast          |                 | Cluster       | Mongo DB         |
 
 #### REST Endpoint Implementation
 
@@ -42,6 +44,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 | Example          |               | Y   |       |        |        |
 | Memory           | Y             | Y   | Y     | Y      |        |
 | Sqlite           | Y             | Y   | Y     | Y      | Y      |
+| Mongo            | Y             | Y   | Y     | Y      |        |
 
 #### Metrics List Implementation
 
@@ -50,6 +53,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 | Example          |                     |             |
 | Memory           | Y                   | Y           |
 | Sqlite           | Y                   |             |
+| Mongo            | Y                   |             |
 
 #### Aggregation and Statistics Implementation
 
@@ -58,3 +62,4 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 | Example          |     |    |       |      | Y   |        |     |     | Y     |
 | Memory           |     |    |       | Y    | Y   |        |     | Y   | Y     |
 | Sqlite           | Y   | Y  |       |      | Y   |        |     | Y   | Y     |
+| Mongo            | Y   | Y  | Y     | Y    | Y   |        |     | Y   | Y     |

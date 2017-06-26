@@ -77,10 +77,10 @@ func main() {
 
 	// Get user options
 	portPtr := flag.Int("port", defaultPort, "server port")
-	backendPtr := flag.String("backend", defaultBackend, "the backend to use [sqlite, memory, example]")
+	backendPtr := flag.String("backend", defaultBackend, "the backend to use [sqlite, memory, mongo, example]")
 	tlsPtr := flag.Bool("tls", defaultTLS, "use TLS server")
 	gzipPtr := flag.Bool("gzip", false, "accept gzip encoding")
-	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname]")
+	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname, db-url]")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	quietPtr := flag.Bool("quiet", false, "less debug output")
 	versionPtr := flag.Bool("version", false, "version number")

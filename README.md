@@ -20,6 +20,7 @@ Mohawk can use different [backends](/backend) for different use cases. Different
 | Example          |               |                 |               | No storage       |
 | Memory           | Very Fast     | 7 days          |               | Memory           |
 | Sqlite           | Fast          |                 |               | Local File       |
+| Mongo            | Fast          |                 | Cluster       | Mongo DB         |
 
 #### Compatibility
 
