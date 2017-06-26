@@ -1,6 +1,6 @@
 PREFIX := $(GOPATH)
 BINDIR := $(PREFIX)/bin
-SOURCE := *.go router/*.go middleware/*.go middleware/gzip/*.go backend/*.go backend/example/*.go backend/memory/*.go backend/sqlite/*.go
+SOURCE := *.go router/*.go middleware/*.go middleware/*/*.go backend/*.go backend/*/*.go
 
 all: fmt mohawk
 
@@ -33,5 +33,5 @@ container:
 	# docker run --name mohawk -v $(readlink -f ./):/root/ssh:Z yaacov/mohawk
 
 .PHONY: install
-install: mohawk
+install: fmt mohawk
 	install -D -m0755 mohawk $(DESTDIR)$(BINDIR)/mohawk

@@ -25,15 +25,15 @@ type Tenant struct {
 }
 
 type Item struct {
-	Id         string            `json:"id"`
-	Type       string            `json:"type"`
-	Tags       map[string]string `json:"tags"`
-	LastValues []DataItem        `json:"data,omitempty"`
+	Id         string            `json:"id" bson:"_id"`
+	Type       string            `json:"type" bson:"type"`
+	Tags       map[string]string `json:"tags" bson:"tags"`
+	LastValues []DataItem        `json:"data,omitempty" bson:"data,omitempty"`
 }
 
 type DataItem struct {
-	Timestamp int64   `json:"timestamp"`
-	Value     float64 `json:"value"`
+	Timestamp int64   `json:"timestamp" bson:"timestamp"`
+	Value     float64 `json:"value" bson:"value"`
 }
 
 type StatItem struct {

@@ -39,7 +39,7 @@ func (r *Backend) Open(options url.Values) {
 }
 
 func (r Backend) GetTenants() []backend.Tenant {
-	var res []backend.Tenant
+	res := make([]backend.Tenant, 0)
 
 	// return a list of tenants
 	res = append(res, backend.Tenant{Id: "Example tenant"})
@@ -48,7 +48,7 @@ func (r Backend) GetTenants() []backend.Tenant {
 }
 
 func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
-	var res []backend.Item
+	res := make([]backend.Item, 0)
 	maxSize := 42
 
 	for i := 0; i < maxSize; i++ {
@@ -77,7 +77,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 }
 
 func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
-	var res []backend.DataItem
+	res := make([]backend.DataItem, 0)
 	var sampleDuration int64
 	var l int64
 	var i int64
@@ -99,7 +99,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 }
 
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
-	var res []backend.StatItem
+	res := make([]backend.StatItem, 0)
 	var l int64
 	var i int64
 
@@ -145,3 +145,6 @@ func (r Backend) DeleteData(tenant string, id string, end int64, start int64) bo
 func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 	return true
 }
+
+// Helper functions
+// Not required by backend interface

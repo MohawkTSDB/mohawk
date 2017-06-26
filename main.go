@@ -27,6 +27,7 @@ import (
 	"github.com/yaacov/mohawk/backend"
 	"github.com/yaacov/mohawk/backend/example"
 	"github.com/yaacov/mohawk/backend/memory"
+	"github.com/yaacov/mohawk/backend/mongo"
 	"github.com/yaacov/mohawk/backend/sqlite"
 	"github.com/yaacov/mohawk/middleware"
 	"github.com/yaacov/mohawk/router"
@@ -99,6 +100,8 @@ func main() {
 		db = &sqlite.Backend{}
 	case "memory":
 		db = &memory.Backend{}
+	case "mongo":
+		db = &mongo.Backend{}
 	case "example":
 		db = &example.Backend{}
 	default:
