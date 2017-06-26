@@ -2,7 +2,7 @@ PREFIX := $(GOPATH)
 BINDIR := $(PREFIX)/bin
 SOURCE := *.go router/*.go middleware/*.go middleware/gzip/*.go backend/*.go backend/example/*.go backend/memory/*.go backend/sqlite/*.go
 
-all: mohawk
+all: fmt mohawk
 
 mohawk: $(SOURCE)
 	go build -o mohawk *.go
@@ -23,6 +23,14 @@ test:
 secret:
 	openssl ecparam -genkey -name secp384r1 -out server.key
 	openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650 -subj /C=US/ST=name/O=comp
+
+.PHONY: container
+container:
+	# systemctl start docker
+	docker build -t yaacov/mohawk ./
+	docker tag yaacov/mohawk docker.io/yaacov/mohawk
+	# docker push docker.io/yaacov/mohawk
+	# docker run --name mohawk -v $(readlink -f ./):/root/ssh:Z yaacov/mohawk
 
 .PHONY: install
 install: mohawk
