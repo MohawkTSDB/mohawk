@@ -28,7 +28,7 @@ type Item struct {
 	Id         string            `json:"id"`
 	Type       string            `json:"type"`
 	Tags       map[string]string `json:"tags"`
-	LastValues []DataItem        `json:"data"`
+	LastValues []DataItem        `json:"data,omitempty"`
 }
 
 type DataItem struct {
@@ -40,15 +40,15 @@ type StatItem struct {
 	Start   int64   `json:"start"`
 	End     int64   `json:"end"`
 	Empty   bool    `json:"empty"`
-	Samples int64   `json:"samples"`
-	Min     float64 `json:"min"`
-	Max     float64 `json:"max"`
-	First   float64 `json:"first"`
-	Last    float64 `json:"last"`
-	Avg     float64 `json:"avg"`
-	Median  float64 `json:"median"`
-	Std     float64 `json:"std"`
-	Sum     float64 `json:"sum"`
+	Samples int64   `json:"samples,omitempty"`
+	Min     float64 `json:"min,omitempty"`
+	Max     float64 `json:"max,omitempty"`
+	First   float64 `json:"first,omitempty"`
+	Last    float64 `json:"last,omitempty"`
+	Avg     float64 `json:"avg,omitempty"`
+	Median  float64 `json:"median,omitempty"`
+	Std     float64 `json:"std,omitempty"`
+	Sum     float64 `json:"sum,omitempty"`
 }
 
 type Backend interface {

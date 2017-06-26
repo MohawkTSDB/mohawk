@@ -116,8 +116,11 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 			Samples: 1,
 			Min:     0,
 			Max:     0,
+			First:   0,
+			Last:    0,
 			Avg:     124 + float64(rand.Intn(42)),
 			Median:  0,
+			Std:     0,
 			Sum:     0,
 		})
 	}

@@ -180,10 +180,15 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 		end = memLastTime + 1
 	}
 
-	// make sure start, end and backetDuration is a multiple of granularity
-	bucketDuration = r.timeGranularitySec * (1 + bucketDuration/r.timeGranularitySec)
-	start = r.timeGranularitySec * (1 + start/1000/r.timeGranularitySec) * 1000
+	// make sure start, end are multiple of granularity
+	start = r.timeGranularitySec * (start / 1000 / r.timeGranularitySec) * 1000
 	end = r.timeGranularitySec * (1 + end/1000/r.timeGranularitySec) * 1000
+
+	// make sure bucket duration is not less then timeGranularitySec and a multiple of granularity
+	bucketDuration = r.timeGranularitySec * (bucketDuration / r.timeGranularitySec)
+	if bucketDuration < r.timeGranularitySec {
+		bucketDuration = r.timeGranularitySec
+	}
 
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	pStep := bucketDuration / r.timeGranularitySec
@@ -211,7 +216,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 
 	// fill data out array
 	count := int64(0)
-	for b := pEnd; count < limit && b > pStart && startTimestamp > stepMillisec; b -= pStep {
+	for b := pEnd; count < limit && b > pStart && startTimestamp >= stepMillisec; b -= pStep {
 		samples := int64(0)
 		sum := float64(0)
 		last := float64(0)
