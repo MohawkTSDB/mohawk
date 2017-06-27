@@ -133,7 +133,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 	c := sessionCopy.DB(tenant).C(id)
 
 	// Query
-	err := c.Find(bson.M{"timestamp": bson.M{"$gte": start, "$lte": end}}).Sort(sort).Limit(int(limit)).All(&res)
+	err := c.Find(bson.M{"timestamp": bson.M{"$gte": start, "$lt": end}}).Sort(sort).Limit(int(limit)).All(&res)
 	if err != nil {
 		log.Printf("%q\n", err)
 		return res
@@ -163,6 +163,9 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	err := c.Pipe(
 		[]bson.M{
 			{
+				"$match": bson.M{"timestamp": bson.M{"$gte": start, "$lt": end}},
+			},
+			{
 				"$group": bson.M{
 					"_id": bson.M{
 						"$trunc": bson.M{"$divide": []interface{}{"$timestamp", bucketDuration * 1000}},
@@ -190,8 +193,12 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 					"samples": bson.M{"$sum": 1},
 				},
 			},
-			{"$sort": bson.M{"start": sort}},
-			{"$limit": int(limit)},
+			{
+				"$sort": bson.M{"start": sort},
+			},
+			{
+				"$limit": int(limit),
+			},
 		},
 	).All(&res)
 	if err != nil {
