@@ -28,7 +28,7 @@ Mohawk architecture makes it easy to build and set up plugins for new data stora
 
 #### Banchmarks
 
-1000 writes + 1000 reads, for more information see [banchmark.py](/banchmark/banchmark.py)
+1000 writes + 1000 reads, for more information see the [banchmark](/banchmark) directory.
 
 | Backend  | Time       | %CPU      | RSS byte      |
 |----------|------------|-----------|---------------|
