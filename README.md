@@ -21,8 +21,8 @@ Mohowk exposes the same simple REST API for different backend storage options, c
 |                  | Speed         |  Storage          | Advantages                                  |
 |------------------|---------------|-------------------|---------------------------------------------|
 | Example          |               | No storage        |                                             |
-| Memory           | Very Fast     | Memory            | Less storage ware and tear from fast I/O    |
-| Sqlite           | Fast          | Local File        | Local data is available on network outages  | 
+| Memory           | Very Fast     | Memory            | No storage ware and tear from fast I/O      |
+| Sqlite           | Fast          | Local File        | No data loss on network outages             | 
 | Mongo            | Fast          | Mongo DB          | High availabilty, High volume storage       |
 
 #### Compatibility
