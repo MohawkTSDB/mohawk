@@ -4,7 +4,7 @@
 
 ![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
 
-MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based [RESTful API](/examples/REST.md) as the primary interface.
+Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
 ## Usage
 
@@ -49,8 +49,8 @@ $> mohawk
 2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
 ```
 
-#### JSON + RESTful API
-JSON over [RESTful API](/examples/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
+#### JSON + REST API
+JSON over [REST API](/examples/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
 #### Multi Tenancy
 Mohawk Metrics provides virtual multi tenancy. All data is mapped to a tenant. Everything is partitioned by tenant. All requests, both reads and writes, can include a tenant id, default tenant id is "\_ops".
