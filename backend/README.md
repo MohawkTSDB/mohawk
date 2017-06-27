@@ -41,25 +41,25 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 
 |                  | Multi Tenancy | Read| Write | Update | Delete |
 |------------------|---------------|-----|-------|--------|--------|
-| Example          |               | Y   |       |        |        |
-| Memory           | Y             | Y   | Y     | Y      |        |
-| Sqlite           | Y             | Y   | Y     | Y      | Y      |
-| Mongo            | Y             | Y   | Y     | Y      |        |
+| Example          |               | ✔️   |       |        |        |
+| Memory           | ✔️             | ✔️   | ✔️     | ✔️      |        |
+| Sqlite           | ✔️             | ✔️   | ✔️     | ✔️      | ✔️      |
+| Mongo            | ✔️             | ✔️   | ✔️     | ✔️      |        |
 
 #### Metrics List Implementation
 
 |                  | Filter by Tag RegEx | Last Values |
 |------------------|---------------------|-------------|
 | Example          |                     |             |
-| Memory           | Y                   | Y           |
-| Sqlite           | Y                   |             |
-| Mongo            | Y                   |             |
+| Memory           | ✔️                   | ✔️           |
+| Sqlite           | ✔️                   |             |
+| Mongo            | ✔️                   |             |
 
 #### Aggregation and Statistics Implementation
 
 |                  | Min | Max| First | Last | Avg | Median | Std | Sum | Count |
 |------------------|-----|----|-------|------|-----|--------|-----|-----|-------|
-| Example          |     |    |       |      | Y   |        |     |     | Y     |
-| Memory           |     |    |       | Y    | Y   |        |     | Y   | Y     |
-| Sqlite           | Y   | Y  |       |      | Y   |        |     | Y   | Y     |
-| Mongo            | Y   | Y  | Y     | Y    | Y   |        |     | Y   | Y     |
+| Example          |     |    |       |      | ✔️   |        |     |     | ✔️     |
+| Memory           |     |    |       | ✔️    | ✔️   |        |     | ✔️   | ✔️     |
+| Sqlite           | ✔️   | ✔️  |       |      | ✔️   |        |     | ✔️   | ✔️     |
+| Mongo            | ✔️   | ✔️  | ✔️     | ✔️    | ✔️   |        |     | ✔️   | ✔️     |
