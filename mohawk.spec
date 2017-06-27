@@ -22,7 +22,7 @@ BuildRequires:  golang >= 1.2-7
 
 # pull in golang libraries by explicit import path, inside the meta golang()
 BuildRequires:  golang(github.com/mattn/go-sqlite3) >= 0-0.1
-BuildRequires:  golang(github.com/go-mgo/mgo) >= 0-0.6
+BuildRequires:  golang-github-go-mgo-mgo >= 0-0.6
 
 %description
 Mock Hawkular server
