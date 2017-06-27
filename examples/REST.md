@@ -3,10 +3,9 @@
 # mohawk/examples/rest
 
 ![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
+Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
-MOck HAWKular, a Hawk[ular] with a mohawk, is a metrics storage engine that uses a plugin architecture for data storage and a Hawkular based RESTful API as the primary interface.
-
-## RESTful API
+## REST API
 
 #### Prefix: "/hawkular/metrics/"
 
