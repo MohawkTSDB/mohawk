@@ -99,7 +99,9 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 
 	// Query All
 	// TODO: find only taged items
-	err := c.Find(nil).Sort("_id").All(&res)
+	findTags := make([]bson.M, 0)
+
+	err := c.Find(bson.M{"$and": findTags}).Sort("_id").All(&res)
 	if err != nil {
 		log.Printf("%q\n", err)
 		return res
@@ -121,16 +123,24 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 }
 
 func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
+	var sort string
 	res := make([]backend.DataItem, 0)
 
 	// copy backend session
 	sessionCopy := r.mongoSession.Copy()
 	defer sessionCopy.Close()
 
+	// order to sort
+	if order == "DESC" {
+		sort = "timestamp"
+	} else {
+		sort = "-timestamp"
+	}
+
 	c := sessionCopy.DB(tenant).C(id)
 
 	// Query
-	err := c.Find(bson.M{"timestamp": bson.M{"$gte": start, "$lte": end}}).Sort("timestamp").Limit(int(limit)).All(&res)
+	err := c.Find(bson.M{"timestamp": bson.M{"$gte": start, "$lte": end}}).Sort(sort).Limit(int(limit)).All(&res)
 	if err != nil {
 		log.Printf("%q\n", err)
 		return res
@@ -140,16 +150,23 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 }
 
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
+	var sort int
 	res := make([]backend.StatItem, 0)
 
 	// copy backend session
 	sessionCopy := r.mongoSession.Copy()
 	defer sessionCopy.Close()
 
+	// order to sort
+	if order == "DESC" {
+		sort = 1
+	} else {
+		sort = -1
+	}
+
 	c := sessionCopy.DB(tenant).C(id)
 
 	// Query
-	// TODO: sort and limit
 	err := c.Pipe(
 		[]bson.M{
 			{
@@ -179,6 +196,8 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 					"max":     bson.M{"$max": "$value"},
 					"samples": bson.M{"$sum": 1},
 				},
+				"$sort":  bson.M{"$start": sort},
+				"$limit": int(limit),
 			},
 		},
 	).All(&res)
