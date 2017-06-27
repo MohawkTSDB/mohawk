@@ -17,8 +17,12 @@
 package mongo
 
 import (
-	"gopkg.in/v2/mgo"
-	"gopkg.in/v2/mgo/bson"
+	// when using rpm system use gopkg.in
+	// "gopkg.in/v2/mgo"
+	// "gopkg.in/v2/mgo/bson"
+
+	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 	"log"
 	"net/url"
 	"time"
