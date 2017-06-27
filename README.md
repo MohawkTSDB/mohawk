@@ -33,8 +33,10 @@ Mohawk architecture makes it easy to build and set up plugins for new data stora
 | Backend  | Time       | %CPU      | RSS byte      |
 |----------|------------|-----------|---------------|
 |memory    |  0m2.011s  | 0.2 - 5.5 | 7456 - 11028  |
-|mongo     |  0m4.885s  | 0.5 - 0.8 | 11892 - 11892 |
+|mongo (*) |  0m4.885s  | 0.5 - 0.8 | 11892 - 11892 |
 |sqlite3   |  0m14.471s | 0.2 - 7.4 | 8416 - 12560  |
+
+(*) the mongo usage metrics does not include usage of the mongodb server.
 
 #### Compatibility
 
