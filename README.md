@@ -26,6 +26,16 @@ Mohowk exposes the same simple REST API for different backend storage options, c
 
 Mohawk architecture makes it easy to build and set up plugins for new data storage.
 
+#### Banchmarks
+
+1000 writes + 1000 reads, for more information see [banchmark.py](/banchmark/banchmark.py)
+
+| Backend  | Time       | %CPU      | RSS byte      |
+|----------|------------|-----------|---------------|
+|memory    |  0m2.011s  | 0.2 - 5.5 | 7456 - 11028  |
+|mongo     |  0m4.885s  | 0.5 - 0.8 | 11892 - 11892 |
+|sqlite3   |  0m14.471s | 0.2 - 7.4 | 8416 - 12560  |
+
 #### Compatibility
 
 Mohawk is tested with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby)
