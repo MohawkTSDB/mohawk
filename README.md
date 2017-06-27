@@ -14,7 +14,7 @@ Mohawk can use different [backends](/backend) for different use cases. Different
 
 Different use cases may have conflicting requirements for the metric engein, some use case may require fast data transfer, but no long term data retention, other may depend on long term, high availabilty data retention. We can use different metric data engins for each usecase, but then our consumer application will have to know how to interact with each different metric engien we choose.
 
-Mohowk exposes the same simple REST API for different backend storage options, consumer application can use the same REST API with the fast, short term stroage and with the high availabilty, long term storage. Mohowk make hierarchical data base settings easy to set up and consume.     
+Mohowk exposes the same simple REST API for different backend storage options, consumer application can use the same REST API with the fast, short term stroage and with the high availabilty, long term storage. Mohowk make hierarchical data storage settings with short, middle and long term data retention easy to set up and consume.     
 
 #### Plugins
 
