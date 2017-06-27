@@ -22,6 +22,7 @@ import (
 	"log"
 	"net/url"
 	"regexp"
+	"time"
 
 	"github.com/yaacov/mohawk/backend"
 )
@@ -47,8 +48,17 @@ func (r *Backend) Open(options url.Values) {
 		r.dbURL = "127.0.0.1"
 	}
 
-	// open db connection
-	r.mongoSession, err = mgo.Dial(r.dbURL)
+	// We need this object to establish a session to our MongoDB.
+	mongoDBDialInfo := &mgo.DialInfo{
+		Addrs:    []string{r.dbURL},
+		Timeout:  10 * time.Second,
+		Username: "",
+		Password: "",
+	}
+
+	// Create a session which maintains a pool of socket connections
+	// to our MongoDB.
+	r.mongoSession, err = mgo.DialWithInfo(mongoDBDialInfo)
 	if err != nil {
 		panic(err)
 	}
@@ -59,8 +69,12 @@ func (r *Backend) Open(options url.Values) {
 func (r Backend) GetTenants() []backend.Tenant {
 	res := make([]backend.Tenant, 0)
 
+	// copy backend session
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
+
 	// return a list of tenants
-	names, err := r.mongoSession.DatabaseNames()
+	names, err := sessionCopy.DatabaseNames()
 	if err != nil {
 		log.Printf("%q\n", err)
 		return res
@@ -76,9 +90,15 @@ func (r Backend) GetTenants() []backend.Tenant {
 
 func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
 	res := make([]backend.Item, 0)
-	c := r.mongoSession.DB(tenant).C("ids")
+
+	// copy backend session
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
+
+	c := sessionCopy.DB(tenant).C("ids")
 
 	// Query All
+	// TODO: find only taged items
 	err := c.Find(nil).Sort("_id").All(&res)
 	if err != nil {
 		log.Printf("%q\n", err)
@@ -102,7 +122,12 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 
 func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
 	res := make([]backend.DataItem, 0)
-	c := r.mongoSession.DB(tenant).C(id)
+
+	// copy backend session
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
+
+	c := sessionCopy.DB(tenant).C(id)
 
 	// Query
 	err := c.Find(bson.M{"timestamp": bson.M{"$gte": start, "$lte": end}}).Sort("timestamp").Limit(int(limit)).All(&res)
@@ -116,9 +141,15 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	res := make([]backend.StatItem, 0)
-	c := r.mongoSession.DB(tenant).C(id)
+
+	// copy backend session
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
+
+	c := sessionCopy.DB(tenant).C(id)
 
 	// Query
+	// TODO: sort and limit
 	err := c.Pipe(
 		[]bson.M{
 			{
@@ -195,15 +226,26 @@ func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 
 func (r Backend) IdExist(tenant string, id string) bool {
 	result := backend.Item{}
-	c := r.mongoSession.DB(tenant).C("ids")
+
+	// copy backend session
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
+
+	c := sessionCopy.DB(tenant).C("ids")
 
 	err := c.Find(bson.M{"_id": id}).One(&result)
 	return err == nil
 }
 
 func (r Backend) createId(tenant string, id string) bool {
-	c := r.mongoSession.DB(tenant).C("ids")
+	// copy backend session
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
 
+	c := sessionCopy.DB(tenant).C("ids")
+
+	// TODO: check id name is not "ids" :-)
+	// TODO: check tenant name is not "admin" or "local" :-)
 	err := c.Insert(&backend.Item{Id: id, Type: "gauge", Tags: map[string]string{}, LastValues: []backend.DataItem{}})
 	if err != nil {
 		log.Printf("%q\n", err)
@@ -215,7 +257,12 @@ func (r Backend) createId(tenant string, id string) bool {
 
 func (r Backend) insertTag(tenant string, id string, k string, v string) {
 	result := backend.Item{}
-	c := r.mongoSession.DB(tenant).C("ids")
+
+	// copy backend session
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
+
+	c := sessionCopy.DB(tenant).C("ids")
 
 	// get current tags
 	err := c.Find(bson.M{"_id": id}).One(&result)
@@ -232,7 +279,11 @@ func (r Backend) insertTag(tenant string, id string, k string, v string) {
 }
 
 func (r Backend) insertData(tenant string, id string, t int64, v float64) {
-	c := r.mongoSession.DB(tenant).C(id)
+	// copy backend session
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
+
+	c := sessionCopy.DB(tenant).C(id)
 	err := c.Insert(&backend.DataItem{Timestamp: t, Value: v})
 
 	if err != nil {
