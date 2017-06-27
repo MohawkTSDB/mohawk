@@ -21,7 +21,6 @@ import (
 	"labix.org/v2/mgo/bson"
 	"log"
 	"net/url"
-	"regexp"
 	"time"
 
 	"github.com/yaacov/mohawk/backend"
@@ -89,6 +88,7 @@ func (r Backend) GetTenants() []backend.Tenant {
 }
 
 func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
+	var query bson.M
 	res := make([]backend.Item, 0)
 
 	// copy backend session
@@ -97,26 +97,19 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 
 	c := sessionCopy.DB(tenant).C("ids")
 
-	// Query All
-	// TODO: find only taged items
-	findTags := make([]bson.M, 0)
+	// Query taged items
+	if len(tags) > 0 {
+		query = bson.M{}
 
-	err := c.Find(bson.M{"$and": findTags}).Sort("_id").All(&res)
+		for key, value := range tags {
+			query["tags."+key] = bson.RegEx{"^" + value + "$", ""}
+		}
+	}
+
+	err := c.Find(query).Sort("_id").All(&res)
 	if err != nil {
 		log.Printf("%q\n", err)
 		return res
-	}
-
-	// filter using tags
-	// 	if we have a list of _all_ items, we need to filter them by tags
-	// 	if the list is already filtered, we do not need to re-filter it
-	if len(tags) > 0 {
-		for key, value := range tags {
-			res = backend.FilterItems(res, func(i backend.Item) bool {
-				r, _ := regexp.Compile("^" + value + "$")
-				return r.MatchString(i.Tags[key])
-			})
-		}
 	}
 
 	return res
@@ -159,9 +152,9 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 
 	// order to sort
 	if order == "DESC" {
-		sort = 1
-	} else {
 		sort = -1
+	} else {
+		sort = 1
 	}
 
 	c := sessionCopy.DB(tenant).C(id)
@@ -196,9 +189,9 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 					"max":     bson.M{"$max": "$value"},
 					"samples": bson.M{"$sum": 1},
 				},
-				"$sort":  bson.M{"$start": sort},
-				"$limit": int(limit),
 			},
+			{"$sort": bson.M{"start": sort}},
+			{"$limit": int(limit)},
 		},
 	).All(&res)
 	if err != nil {
@@ -263,8 +256,6 @@ func (r Backend) createId(tenant string, id string) bool {
 
 	c := sessionCopy.DB(tenant).C("ids")
 
-	// TODO: check id name is not "ids" :-)
-	// TODO: check tenant name is not "admin" or "local" :-)
 	err := c.Insert(&backend.Item{Id: id, Type: "gauge", Tags: map[string]string{}, LastValues: []backend.DataItem{}})
 	if err != nil {
 		log.Printf("%q\n", err)
