@@ -19,11 +19,11 @@ Source0:        https://github.com/yaacov/mohawk/archive/%{version}.tar.gz
 BuildRequires:  gcc
 
 BuildRequires:  golang >= 1.2-7
-
+BuildRequires:  golang-github-go-mgo-mgo
 # pull in golang libraries by explicit import path, inside the meta golang()
 BuildRequires:  golang(github.com/mattn/go-sqlite3) >= 0-0.1
-BuildRequires:  golang(labix.org/v2/mgo) >= 0-0.1
-BuildRequires:  golang(labix.org/v2/mgo/bson) >= 0-0.1
+#BuildRequires:  golang(labix.org/v2/mgo) >= 0-0.1
+#BuildRequires:  golang(labix.org/v2/mgo/bson) >= 0-0.1
 
 %description
 Mock Hawkular server
