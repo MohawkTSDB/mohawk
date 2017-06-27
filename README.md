@@ -18,12 +18,12 @@ Mohowk exposes the same simple REST API for different backend storage options, c
 
 #### Plugins
 
-|                  | Speed         | Retention Limit | Scaleability  | Storage          |
-|------------------|---------------|-----------------|---------------|------------------|
-| Example          |               |                 |               | No storage       |
-| Memory           | Very Fast     | 7 days          |               | Memory           |
-| Sqlite           | Fast          |                 |               | Local File       |
-| Mongo            | Fast          |                 | Cluster       | Mongo DB         |
+|                  | Speed         |  Storage          | Advantages                                  |
+|------------------|---------------|-------------------|---------------------------------------------|
+| Example          |               | No storage        |                                             |
+| Memory           | Very Fast     | Memory            | Less storage ware and tear from fast I/O    |
+| Sqlite           | Fast          | Local File        | Local data is available on network outages  | 
+| Mongo            | Fast          | Mongo DB          | High availabilty, High volume storage       |
 
 #### Compatibility
 
