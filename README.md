@@ -40,7 +40,9 @@ Mohawk architecture makes it easy to build and set up plugins for new data stora
 
 #### Compatibility
 
-Mohawk is tested with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby)
+Mohawk is tested(*) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby)
+
+(*) Mohawk implement only part of Hawkular API, some functionalty may be missing.
 
 ## Installation
 
