@@ -18,8 +18,8 @@ package mongo
 
 import (
 	// when using rpm system use gopkg.in
-	// "gopkg.in/v2/mgo"
-	// "gopkg.in/v2/mgo/bson"
+	//"gopkg.in/v2/mgo"
+	//"gopkg.in/v2/mgo/bson"
 
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
