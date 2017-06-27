@@ -17,6 +17,7 @@ URL:            https://%{import_path}
 Source0:        https://github.com/yaacov/mohawk/archive/%{version}.tar.gz
 
 BuildRequires:  gcc
+BuildRequires:  bzr
 
 BuildRequires:  golang >= 1.2-7
 BuildRequires:  golang-github-mattn-go-sqlite3-devel
