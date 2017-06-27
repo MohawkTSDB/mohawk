@@ -17,8 +17,8 @@
 package mongo
 
 import (
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"gopkg.in/v2/mgo"
+	"gopkg.in/v2/mgo/bson"
 	"log"
 	"net/url"
 	"time"
