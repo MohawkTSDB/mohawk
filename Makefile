@@ -30,7 +30,7 @@ container:
 	docker build -t yaacov/mohawk ./
 	docker tag yaacov/mohawk docker.io/yaacov/mohawk
 	# docker push docker.io/yaacov/mohawk
-	# docker run --name mohawk -v $(readlink -f ./):/root/ssh:Z yaacov/mohawk
+	# docker run --name mohawk  -e HAWKULAE_BACKEND="memory" -v $(readlink -f ./):/root/ssh:Z yaacov/mohawk
 
 .PHONY: install
 install: fmt mohawk
