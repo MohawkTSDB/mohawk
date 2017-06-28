@@ -2,7 +2,6 @@
 %global provider_tld    com
 %global project         yaacov
 %global repo            mohawk
-# https://github.com/yaacov/mohawk
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 %global import_path     %{provider_prefix}
 %global commit          8eefab3f90ab8c828e202a5a0fc20150ecae1ff2
@@ -11,7 +10,7 @@
 Name:           %{repo}
 Version:        0.15.4
 Release:        6%{?dist}
-Summary:        Mock Hawkular server
+Summary:        Mohawk metric data storage
 License:        MIT
 URL:            https://%{import_path}
 Source0:        https://github.com/yaacov/mohawk/archive/%{version}.tar.gz
@@ -24,7 +23,7 @@ BuildRequires:  golang-github-mattn-go-sqlite3-devel
 BuildRequires:  golang-github-go-mgo-mgo-devel
 
 %description
-Mock Hawkular server
+Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
 %prep
 %setup -q -n mohawk-%{version}
