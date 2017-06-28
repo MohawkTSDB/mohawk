@@ -11,7 +11,7 @@ Name:           %{repo}
 Version:        0.15.4
 Release:        6%{?dist}
 Summary:        Mohawk metric data storage
-License:        MIT
+License:        Apache
 URL:            https://%{import_path}
 Source0:        https://github.com/yaacov/mohawk/archive/%{version}.tar.gz
 
