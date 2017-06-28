@@ -40,6 +40,10 @@ Mohawk architecture makes it easy to build and set up plugins for new data stora
 
 (*) the mongo usage metrics does not include usage of the mongodb server.
 
+###### Chart: different Backends vs. Run Time
+
+![Time chart](/banchmark/time.png?raw=true "banchmark time vm")
+
 ###### Banchmarks Mohawk vs. Hawkular running on a vm under same load.
 
 | DB/Backend          | Time        |
