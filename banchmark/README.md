@@ -9,6 +9,18 @@ Banchmark - 1000 writes + 1000 reads
 |mongo     |  0m4.885s  | 0.5 - 0.8 | 11892 - 11892 |
 |sqlite3   |  0m14.471s | 0.2 - 7.4 | 8416 - 12560  |
 
+###### Banchmark real run time chart
+
+![Time chart](/banchmark/time.png?raw=true "banchmark time")
+
+###### Banchmark cpu usage chart
+
+![CPU chart](/banchmark/cpu.png?raw=true "banchmark cpu")
+
+###### Banchmark memory usage chart
+
+![Mem chart](/banchmark/mem.png?raw=true "banchmark mem")
+
 #### Backend-Mongo
 
 ```
