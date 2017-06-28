@@ -30,6 +30,8 @@ Mohawk architecture makes it easy to build and set up plugins for new data stora
 
 1000 writes + 1000 reads, for more information see the [banchmark](/banchmark) directory.
 
+###### Banchmarks Mohawk with different Backends running on a desktop machine.
+
 | Backend  | Time       | %CPU      | RSS byte      |
 |----------|------------|-----------|---------------|
 |memory    |  0m2.011s  | 0.2 - 5.5 | 7456 - 11028  |
@@ -37,6 +39,17 @@ Mohawk architecture makes it easy to build and set up plugins for new data stora
 |sqlite3   |  0m14.471s | 0.2 - 7.4 | 8416 - 12560  |
 
 (*) the mongo usage metrics does not include usage of the mongodb server.
+
+###### Banchmarks Mohawk vs. Hawkular running on a vm under same load.
+
+| DB/Backend          | Time        |
+|---------------------|-------------|
+|Hawkular/Casandra    |  2m8.783s   |
+|Mohawk/Memory        |  0m22.833s  |
+
+###### Chart: DB/Backend vs. Run Time
+
+![Time chart](/banchmark/time-vm.png?raw=true "banchmark time vm")
 
 #### Compatibility
 
