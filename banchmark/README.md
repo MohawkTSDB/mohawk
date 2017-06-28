@@ -3,11 +3,24 @@
 
 Banchmark - 1000 writes + 1000 reads
 
+#### Run on desktop:
+
 | Backend  | Time       | %CPU      | RSS byte      |
 |----------|------------|-----------|---------------|
 |memory    |  0m2.011s  | 0.2 - 5.5 | 7456 - 11028  |
 |mongo     |  0m4.885s  | 0.5 - 0.8 | 11892 - 11892 |
 |sqlite3   |  0m14.471s | 0.2 - 7.4 | 8416 - 12560  |
+
+#### Run on VM running OpenShift:
+
+| DB/Backend          | Time        |
+|---------------------|-------------|
+|Hawkular/Casandra    |  2m8.783s   |
+|Mohawk/Memory        |  0m22.833s  |
+
+###### Banchmark real run time chart
+
+![Time chart](/banchmark/time-vm.png?raw=true "banchmark time vm")
 
 ###### Banchmark real run time chart
 
@@ -130,4 +143,35 @@ Tue Jun 27 23:46:51 IDT 2017 5.1 11028
 Tue Jun 27 23:46:52 IDT 2017 6.1 11028
 Tue Jun 27 23:46:52 IDT 2017 5.5 11028
 Tue Jun 27 23:46:53 IDT 2017 5.5 11028
+```
+
+#### Hawkular/Casandra vs. Mohawk/Memory
+
+This banchmark run on two identical vms running OpenShift with identical load.
+The benchmark was done using the OpenShift metric engine.
+
+###### Hawkular/Casandra
+
+```
+[root@yzamir-centos7-1 ~]# time ./test.py
+```
+```
+{u'Cassandra': u'up', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.26.1.Final', u'Built-From-Git-SHA1': u'45b148c834ed62018f153c23187b4436ae4208fe'}
+
+real	2m8.783s
+user	0m9.555s
+sys	0m0.785s
+```
+
+###### Mohawk/Memory
+
+```
+[root@yzamir-centos7-2 ~]# time ./test.py 
+```
+```
+{u'MohawkVersion': u'0.15.3', u'MohawkBackend': u'Backend-Memory', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.21.0'}
+
+real	0m22.833s
+user	0m8.508s
+sys	0m0.627s
 ```
