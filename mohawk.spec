@@ -9,7 +9,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.15.3
+Version:        0.15.4
 Release:        6%{?dist}
 Summary:        Mock Hawkular server
 License:        MIT
@@ -22,9 +22,6 @@ BuildRequires:  bzr
 BuildRequires:  golang >= 1.2-7
 BuildRequires:  golang-github-mattn-go-sqlite3-devel
 BuildRequires:  golang-github-go-mgo-mgo-devel
-
-# pull in golang libraries by explicit import path, inside the meta golang()
-BuildRequires:  golang(github.com/mattn/go-sqlite3) >= 0-0.1
 
 %description
 Mock Hawkular server

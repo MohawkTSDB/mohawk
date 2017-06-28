@@ -14,7 +14,7 @@ Banchmark - 1000 writes + 1000 reads
 ```
 $ date; time ./banchmark.py; date
 Tue Jun 27 23:41:45 IDT 2017
-{u'MohawkVersion': u'0.15.3', u'MohawkBackend': u'Backend-Mongo', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.21.0'}
+{u'MohawkVersion': u'0.15.4', u'MohawkBackend': u'Backend-Mongo', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.21.0'}
 
 real	0m4.885s
 user	0m1.257s
@@ -43,7 +43,7 @@ Tue Jun 27 23:41:51 IDT 2017 0.8 11892
 ```
 $ date; time ./banchmark.py; date
 Tue Jun 27 23:43:36 IDT 2017
-{u'MohawkVersion': u'0.15.3', u'MohawkBackend': u'Backend-Sqlite3', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.21.0'}
+{u'MohawkVersion': u'0.15.4', u'MohawkBackend': u'Backend-Sqlite3', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.21.0'}
 
 real	0m14.471s
 user	0m1.144s
@@ -89,7 +89,7 @@ Tue Jun 27 23:43:51 IDT 2017 7.4 12560
 ```
 $ date; time ./banchmark.py; date
 Tue Jun 27 23:46:50 IDT 2017
-{u'MohawkVersion': u'0.15.3', u'MohawkBackend': u'Backend-Memory', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.21.0'}
+{u'MohawkVersion': u'0.15.4', u'MohawkBackend': u'Backend-Memory', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.21.0'}
 
 real	0m2.011s
 user	0m1.108s
