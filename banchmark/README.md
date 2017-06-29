@@ -1,7 +1,11 @@
 
 ## Banchmarks
 
-Banchmark - 1000 writes + 1000 reads
+Read + Write time [Sec] Banchmark : 1000 writes + 1000 reads
+
+#### Performance
+
+When run on desktop, cpu and memory usage are also recorded. On VM, see the [Performance](/banchmark/PERF.md) doc.
 
 #### Run on desktop:
 
