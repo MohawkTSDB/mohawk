@@ -18,17 +18,22 @@ Mohowk exposes the same simple REST API for different backend storage options, c
 
 #### Plugins
 
-|                  | Speed         |  Storage          | Advantages                                  |
-|------------------|---------------|-------------------|---------------------------------------------|
-| Memory           | Very Fast     | Memory            | No storage ware and tear from fast I/O      |
-| Sqlite           | Fast          | Local File        | No data loss on network outages             | 
-| Mongo            | Fast          | Mongo DB          | High availabilty, High volume storage       |
+Mohawk architecture makes it easy to implement and set up plugins for new data storage.
 
-Mohawk architecture makes it easy to build and set up plugins for new data storage.
+Current plugin list include:
+
+| Plugin name       |  Storage          | Advantages                                  |
+|-------------------|-------------------|---------------------------------------------|
+| memory            | Memory            | No storage ware and tear from fast I/O      |
+| sqlite            | Local File        | No data loss on network outages             | 
+| mongo             | Mongo DB          | High availabilty, High volume storage       |
 
 #### Banchmarks
 
-1000 writes + 1000 reads ( [banchmark.py](/banchmark/banchmark.py) ), for more information see the [banchmark](/banchmark) directory.
+Banchmark: 1000 writes + 1000 reads ( [banchmark.py](/banchmark/banchmark.py) ).
+Banchmark results depend on system resurcses, current work load and, for plugins that use remote storage, network.
+
+For more information see the [banchmark](/banchmark) directory. 
 
 ###### Banchmarks Mohawk with different Backends running on a desktop machine.
 
