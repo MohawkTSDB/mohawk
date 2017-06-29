@@ -22,11 +22,11 @@ Mohawk architecture makes it easy to implement and set up plugins for new data s
 
 ###### Current plugin list include:
 
-| Plugin name       |  Storage          | Advantages                                  |
-|-------------------|-------------------|---------------------------------------------|
-| memory            | Memory            | No storage ware and tear from fast I/O      |
-| sqlite            | Local File        | No data loss on network outages             | 
-| mongo             | Mongo DB          | High availabilty, High volume storage       |
+| Plugin name       |  Storage          | Advantages                                  | Use case                                 |
+|-------------------|-------------------|---------------------------------------------|------------------------------------------|
+| memory            | Memory            | No storage ware and tear from fast I/O      | Fast I/O, no need for persistence data   |
+| sqlite            | Local File        | No data loss on network outages             | Persistence data, W/O external data base |
+| mongo             | Mongo DB          | High availabilty, High volume storage       | Long term H.A. storage                   |
 
 #### Banchmarks
 
