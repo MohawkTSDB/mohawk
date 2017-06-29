@@ -62,7 +62,7 @@ For more information on tests and run enviroments, see the [benchmark](/benchmar
 
 #### Performance
 
-Moahawk cpu and memory usage is lower than Hawkular and comparable to Prometheus, for more details see [Performance](/banchmark/PERF.md) doc.
+Moahawk cpu and memory usage is lower than Hawkular and comparable to Prometheus, for more details see [Performance](/benchmark/PERF.md) doc.
 
 ###### Mohawk vs. Prometheus CPU (Pod name is hawkular-metrics, but actually running mohawk)
 
