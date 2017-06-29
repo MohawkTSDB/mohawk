@@ -62,7 +62,7 @@ For more information on tests and run enviroments, see the [banchmark](/banchmar
 
 #### Performance
 
-Moahawk cpu and memory usage is comparable to Prometheus, for more detail see [Performance](/banchmark/PERF.md) doc.
+Moahawk cpu and memory usage is lower than Hawkular and comparable to Prometheus, for more details see [Performance](/banchmark/PERF.md) doc.
 
 #### Compatibility
 
