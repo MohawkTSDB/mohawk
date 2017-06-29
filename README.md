@@ -20,7 +20,7 @@ Mohowk exposes the same simple REST API for different backend storage options, c
 
 Mohawk architecture makes it easy to implement and set up plugins for new data storage.
 
-Current plugin list include:
+###### Current plugin list include:
 
 | Plugin name       |  Storage          | Advantages                                  |
 |-------------------|-------------------|---------------------------------------------|
@@ -35,7 +35,7 @@ Banchmark results depend on system resurcses, current work load and, for plugins
 
 For more information see the [banchmark](/banchmark) directory. 
 
-###### Banchmarks Mohawk with different Backends running on a desktop machine.
+###### Mohawk with different Backends running on a desktop machine.
 
 | Backend  | Time       | %CPU      | RSS byte      |
 |----------|------------|-----------|---------------|
@@ -49,7 +49,7 @@ For more information see the [banchmark](/banchmark) directory.
 
 ![Time chart](/banchmark/time.png?raw=true "banchmark time vm")
 
-###### Banchmarks Mohawk vs. Hawkular running on a vm under same load.
+###### Mohawk vs. Hawkular running on a vm under same load.
 
 | DB/Backend          | Time        |
 |---------------------|-------------|
