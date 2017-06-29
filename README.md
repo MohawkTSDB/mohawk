@@ -30,10 +30,10 @@ Mohawk architecture makes it easy to implement and set up plugins for new data s
 
 #### Banchmarks
 
-Banchmark: 1000 writes + 1000 reads ( [banchmark.py](/banchmark/banchmark.py) ).
-Banchmark results depend on system resurcses, current work load and, for plugins that use remote storage, network.
+Run time, real: 1000 writes + 1000 reads ( [banchmark.py](/banchmark/banchmark.py) ) less is better.
 
-For more information see the [banchmark](/banchmark) directory. 
+Banchmark results depend on system resurcses, current work load and network.
+For more information on tests and run enviroments, see the [banchmark](/banchmark) directory. 
 
 ###### Mohawk with different Backends running on a desktop machine.
 
