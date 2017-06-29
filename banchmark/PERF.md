@@ -8,7 +8,7 @@ CPU and Memory usage on VMs running openshift, metrics are collected via Heapste
 
 ![CPU chart](/banchmark/hawkular-cpu.png?raw=true "banchmark cpu vm")
 
-###### Mohawk
+###### Mohawk (Pod name is hawkular-metrics, but actually running mohawk)
 
 ![CPU chart](/banchmark/mohawk-cpu.png?raw=true "banchmark cpu vm")
 
