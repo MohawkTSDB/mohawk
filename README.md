@@ -66,13 +66,13 @@ Moahawk cpu and memory usage is lower than Hawkular and comparable to Prometheus
 
 ###### Mohawk vs. Prometheus CPU (Pod name is hawkular-metrics, but actually running mohawk)
 
-![CPU chart](/banchmark/mohawk-cpu.png?raw=true "banchmark cpu vm")
-![CPU chart](/banchmark/prometheus-cpu.png?raw=true "banchmark cpu vm")
+![CPU chart](/benchmark/mohawk-cpu.png?raw=true "benchmark cpu vm")
+![CPU chart](/benchmark/prometheus-cpu.png?raw=true "benchmark cpu vm")
 
 ###### Mohawk vs. Prometheus Memory (Pod name is hawkular-metrics, but actually running mohawk)
 
-![CPU chart](/banchmark/mohawk-mem.png?raw=true "banchmark cpu vm")
-![CPU chart](/banchmark/prometheus-mem.png?raw=true "banchmark cpu vm")
+![CPU chart](/benchmark/mohawk-mem.png?raw=true "benchmark cpu vm")
+![CPU chart](/benchmark/prometheus-mem.png?raw=true "benchmark cpu vm")
 
 #### Compatibility
 
