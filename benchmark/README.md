@@ -1,11 +1,11 @@
 
-## Banchmarks
+## Benchmarks
 
 Read + Write time [Sec] Banchmark : 1000 writes + 1000 reads
 
 #### Performance
 
-When run on desktop, cpu and memory usage are also recorded. On VM, see the [Performance](/banchmark/PERF.md) doc.
+When run on desktop, cpu and memory usage are also recorded. On VM, see the [Performance](/benchmark/PERF.md) doc.
 
 #### Run on desktop:
 
@@ -22,26 +22,26 @@ When run on desktop, cpu and memory usage are also recorded. On VM, see the [Per
 |Hawkular/Casandra    |  2m8.783s   |
 |Mohawk/Memory        |  0m22.833s  |
 
-###### Banchmark real run time chart
+###### Benchmark real run time chart
 
-![Time chart](/banchmark/time-vm.png?raw=true "banchmark time vm")
+![Time chart](/benchmark/time-vm.png?raw=true "benchmark time vm")
 
-###### Banchmark real run time chart
+###### Benchmark real run time chart
 
-![Time chart](/banchmark/time.png?raw=true "banchmark time")
+![Time chart](/benchmark/time.png?raw=true "benchmark time")
 
-###### Banchmark cpu usage chart
+###### Benchmark cpu usage chart
 
-![CPU chart](/banchmark/cpu.png?raw=true "banchmark cpu")
+![CPU chart](/benchmark/cpu.png?raw=true "benchmark cpu")
 
-###### Banchmark memory usage chart
+###### Benchmark memory usage chart
 
-![Mem chart](/banchmark/mem.png?raw=true "banchmark mem")
+![Mem chart](/benchmark/mem.png?raw=true "benchmark mem")
 
 #### Backend-Mongo
 
 ```
-$ date; time ./banchmark.py; date
+$ date; time ./benchmark.py; date
 ```
 ```
 Tue Jun 27 23:41:45 IDT 2017
@@ -74,7 +74,7 @@ Tue Jun 27 23:41:51 IDT 2017 0.8 11892
 #### Backend-Sqlite3
 
 ```
-$ date; time ./banchmark.py; date
+$ date; time ./benchmark.py; date
 ```
 ```
 Tue Jun 27 23:43:36 IDT 2017
@@ -124,7 +124,7 @@ Tue Jun 27 23:43:51 IDT 2017 7.4 12560
 #### Backend-Memory
 
 ```
-$ date; time ./banchmark.py; date
+$ date; time ./benchmark.py; date
 ```
 ```
 Tue Jun 27 23:46:50 IDT 2017
@@ -151,7 +151,7 @@ Tue Jun 27 23:46:53 IDT 2017 5.5 11028
 
 #### Hawkular/Casandra vs. Mohawk/Memory
 
-This banchmark run on two identical vms running OpenShift with identical load.
+This benchmark run on two identical vms running OpenShift with identical load.
 The benchmark was done using the OpenShift metric engine.
 
 ###### Hawkular/Casandra
@@ -170,7 +170,7 @@ sys	0m0.785s
 ###### Mohawk/Memory
 
 ```
-[root@yzamir-centos7-2 ~]# time ./test.py 
+[root@yzamir-centos7-2 ~]# time ./test.py
 ```
 ```
 {u'MohawkVersion': u'0.15.3', u'MohawkBackend': u'Backend-Memory', u'MetricsService': u'STARTED', u'Implementation-Version': u'0.21.0'}

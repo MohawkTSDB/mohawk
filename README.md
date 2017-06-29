@@ -28,12 +28,12 @@ Mohawk architecture makes it easy to implement and set up plugins for new data s
 | sqlite            | Local File        | No data loss on network outages             | Persistence data, W/O external data base |
 | mongo             | Mongo DB          | High availabilty, High volume storage       | Long term H.A. storage                   |
 
-#### Banchmarks
+#### Benchmarks
 
-Run time, real: 1000 writes + 1000 reads ( [banchmark.py](/banchmark/banchmark.py) ) less is better.
+Run time, real: 1000 writes + 1000 reads ( [benchmark.py](/benchmark/benchmark.py) ) less is better.
 
-Banchmark results depend on system resurcses, current work load and network.
-For more information on tests and run enviroments, see the [banchmark](/banchmark) directory. 
+Benchmark results depend on system resurcses, current work load and network.
+For more information on tests and run enviroments, see the [benchmark](/benchmark) directory. 
 
 ###### Mohawk with different Backends running on a desktop machine.
 
@@ -47,7 +47,7 @@ For more information on tests and run enviroments, see the [banchmark](/banchmar
 
 ###### Chart: different Backends vs. Run Time
 
-![Time chart](/banchmark/time.png?raw=true "banchmark time vm")
+![Time chart](/benchmark/time.png?raw=true "benchmark time vm")
 
 ###### Mohawk vs. Hawkular running on a vm under same load.
 
@@ -58,7 +58,7 @@ For more information on tests and run enviroments, see the [banchmark](/banchmar
 
 ###### Chart: DB/Backend vs. Run Time
 
-![Time chart](/banchmark/time-vm.png?raw=true "banchmark time vm")
+![Time chart](/benchmark/time-vm.png?raw=true "benchmark time vm")
 
 #### Performance
 
