@@ -3,7 +3,12 @@
 # mohawk/examples/rest
 
 ![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
+
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
+
+## Examples
+
+For usage information look at the [example](/examples) directory.
 
 ## REST API
 
