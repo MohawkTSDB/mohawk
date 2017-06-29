@@ -60,6 +60,10 @@ For more information on tests and run enviroments, see the [banchmark](/banchmar
 
 ![Time chart](/banchmark/time-vm.png?raw=true "banchmark time vm")
 
+#### Performance
+
+Moahawk cpu and memory usage is comparable to Prometheus, for more detail see [Performance](/banchmark/PERF.md) doc.
+
 #### Compatibility
 
 Mohawk is tested(**) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster). 
