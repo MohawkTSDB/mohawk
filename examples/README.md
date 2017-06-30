@@ -11,14 +11,16 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 When installed, run using the command line ``mohawk``
 
 ```bash
-$> mohawk -version
+mohawk -version
+
 Mohawk version: 0.15.4
 ```
 
 The `-h` flag will print out a help text, that list the command line arguments.
 
 ```
-$> mohawk -h
+mohawk -h
+
 Usage of ./mohawk:
   -backend string
     	the backend to use [sqlite, memory, mongo, example] (default "sqlite")
@@ -42,13 +44,15 @@ Usage of ./mohawk:
     	version number
 ```
 
-Running ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
+Running ``mohawk`` with ``tls`` and using the ``memory`` back end.
 
-```bash
-$> mohawk
-2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
+```
+$> mohawk -tls -gzip -port 8443 -backend memory
+2017/06/30 11:37:08 Start server, listen on https://0.0.0.0:8443
 ```
 
+###### Examples below use this server configuration, since each backend may implement different feature set, responses may be a little different for different backends.
+ 
 #### JSON + REST API
 JSON over [REST API](/examples/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
@@ -73,7 +77,7 @@ All data is partitioned by tenant. The partitioning happens at the API level. Th
 #### Implicit tenant creation
 
 ```
-curl -X POST http://localhost:8080/hawkular/metrics/gauges/raw -d @request.json -H "Hawkular-Tenant: com.acme"
+curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw -d @data.json -H "Hawkular-Tenant: com.acme"
 ```
 
 This is a request to insert gauge data points for the com.acme tenant. If that tenant does not already exist, it will be request when storing the metric data. Specific details on inserting data can be found in Inserting Data.
@@ -85,7 +89,7 @@ As previously stated all data is partitioned by tenant. Mohawk Metrics enforces 
 Using the Hawkular-Tenant HTTP header in request:
 
 ```
-curl http://localhost:8080/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9 -H "Hawkular-Tenant: com.acme"
+curl -ks -X GET https://localhost:8443/hawkular/metrics/metrics -H "Hawkular-Tenant: com.acme"
 ```
 
 #### Tenant Ids
@@ -107,10 +111,10 @@ Timestamps are unix timestamps in milliseconds.
 ##### Insert data points
 
 ```
-curl -X POST http://localhost:8080/hawkular/metrics/gauges/raw -d @request.json
+curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw -d @data.json
 ```
 
-request.json
+data.json
 
 ```
 [
@@ -118,14 +122,18 @@ request.json
     "id": "free_memory",
     "data": [
       {"timestamp": 1460111065369, "value": 2048},
-      {"timestamp": 1460151065369, "value": 2012}
+      {"timestamp": 1460151065352, "value": 2012},
+      ...
+      {"timestamp": 1460711012361, "value": 2012}
     ]
   },
   {
-    "id": "used_memory",
+    "id": "cpu_usage",
     "data": [
-      {"timestamp": 1460111065369, "value": 2048},
-      {"timestamp": 1460151065369, "value": 2075}
+      {"timestamp": 1460111065369, "value": 1.34},
+      {"timestamp": 1460151085344, "value": 0.45},
+      ...
+      {"timestamp": 1460711075351, "value": 1.34}
     ]
   }
 ]
@@ -142,12 +150,12 @@ Tags in Mohawk Metrics are key/value pairs. Tags can be applied to a metric to p
 These endpoints are used to add or replace tags.
 
 ```
-curl -X PUT http://localhost:8080/hawkular/metrics/gauges/request_size/tags -d @tags.json
+curl -ks -X PUT https://localhost:8443/hawkular/metrics/gauges/free_memory/tags -d @tags.json
 ```
 
 tags.json
 
-```
+```json
 {
   "datacenter": "dc2",
   "hostname": "server1"
@@ -173,28 +181,37 @@ The next example illustrates the type parameter which filters the results by the
 Fetch all metric definitions
 
 ```
-curl http://localhost:8080/hawkular/metrics/metrics
+curl -ks -X GET https://localhost:8443/hawkular/metrics/metrics
 ```
 
 response body
 
-```
+```json
 [
   {
-    "id": "gauge_1"
-    "type": "gauge"
-  },
-  {
-    "id": "gauge_2",
-    "type": "gauge"
-  },
-  {
-    "id": "request_count",
-    "type": "gauge"
-  },
-  {
-    "id": "request_timeouts",
+    "id": "free_memory",
     "type": "gauge",
+    "tags": {
+      "datacenter": "dc2",
+      "hostname": "server1"
+    },
+    "data": [
+      {
+        "timestamp": 1460711012361,
+        "value": 2012
+      }
+    ]
+  },
+  {
+    "id": "cpu_usage",
+    "type": "gauge",
+    "tags": {},
+    "data": [
+      {
+        "timestamp": 1460711075351,
+        "value": 1.34
+      }
+    ]
   }
 ]
 ```
@@ -204,7 +221,51 @@ The next example demonstrates querying metric and filtering the results using ta
 Fetch all metric definitions with tag filters
 
 ```
-curl http://localhost:8080/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_version=4.0.9
+curl -ks -X GET https://localhost:8443/hawkular/metrics/metrics?tags=datacenter:dc2,hostname:server1
+```
+
+```json
+[
+  {
+    "id": "free_memory",
+    "type": "gauge",
+    "tags": {
+      "datacenter": "dc2",
+      "hostname": "server1"
+    },
+    "data": [
+      {
+        "timestamp": 1460711012361,
+        "value": 2012
+      }
+    ]
+  }
+]
+```
+
+Fetch all metric definitions using RegExp tag filters
+
+```
+curl -ks -X GET https://localhost:8443/hawkular/metrics/metrics?tags=hostname:server.*
+```
+
+```json
+[
+  {
+    "id": "free_memory",
+    "type": "gauge",
+    "tags": {
+      "datacenter": "dc2",
+      "hostname": "server1"
+    },
+    "data": [
+      {
+        "timestamp": 1460711012361,
+        "value": 2012
+      }
+    ]
+  }
+]
 ```
 
 #### Raw Data
@@ -212,17 +273,28 @@ curl http://localhost:8080/hawkular/metrics/metrics?tags=zone:us-west-1,kernel_v
 The simplest form of querying for raw data points does not require any parameters and returns a list of data points.
 
 ```
-curl http://localhost:8080/hakwular/metrics/gauges/request_size/raw
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000"
 ```
 
 Response with gauge data points
 
 ```
 [
-  {"timestamp": 1460413065369, "value": 3.14},
-  {"timestamp": 1460212025569, "value": 4.57},
-  {"timestamp": 1460111065369, "value": 5.056}
+  {
+    "timestamp": 1460711012361,
+    "value": 2012
+  },
+  {
+    "timestamp": 1460671067863,
+    "value": 2048
+  },
+  ...
+  {
+    "timestamp": 1460111065369,
+    "value": 2048
+  }
 ]
+
 ```
 
 #### Date Range
@@ -230,7 +302,7 @@ Response with gauge data points
 Every query is bounded by a start and an end time. The end time defaults to now, and the start time defaults to 8 hours ago. These can be overridden with the start and end parameters respectively. The expected format of their values is a unix timestamp. The start of the range is inclusive while the end is exclusive.
 
 ```
-curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?start=1235,end=6789
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000&end=1460711120000"
 ```
 
 #### Limiting Results
@@ -238,41 +310,71 @@ curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?start=1235,e
 By default there is no limit on the number of data points returned. The limit parameter will limit the number of data points returned.
 
 ```
-curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?limit=100
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000&end=1460711120000&limit=3"
+```
+
+Response with 3 gauge data points
+
+```json
+[
+  {
+    "timestamp": 1460711012361,
+    "value": 2012
+  },
+  {
+    "timestamp": 1460671067863,
+    "value": 2048
+  },
+  {
+    "timestamp": 1460631064349,
+    "value": 2012
+  }
+]
 ```
 
 #### Aggregating Results using bucketDuration parameter
 
 ```
-curl http://localhost:8080/hawkular/metrics/gauges/request_size/raw?start=1235&end=6789&bucketDuration=60s
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000&end=1460711120000&bucketDuration=302400s"
 ```
 
-Response with gauge data points
-
-
-```
+```json
 [
   {
-    "start": 6789,
-    "end": 12345,
+    "start": 1460408700000,
+    "end": 1460711100000,
     "empty": false,
-    "min": 0,
-    "avg": 107.5,
-    "max": 0,
-    "median": 0,
-    "sum": 0,
-    "samples": 5
+    "samples": 8,
+    "last": 2012,
+    "avg": 2030,
+    "sum": 16240
   },
   {
-    "start": 12345,
-    "end": 18345,
+    "start": 1460106300000,
+    "end": 1460408700000,
     "empty": false,
-    "min": 0,
-    "avg": 107.5,
-    "max": 0,
-    "median": 0,
-    "sum": 0,
-    "samples": 5
-  },
+    "samples": 8,
+    "last": 2012,
+    "avg": 2030,
+    "sum": 16240
+  }
+]
+```
+
+```
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000&end=1460711120000&bucketDuration=302400s&limit=1"
+```
+
+```json
+[
+  {
+    "start": 1460408700000,
+    "end": 1460711100000,
+    "empty": false,
+    "samples": 8,
+    "last": 2012,
+    "avg": 2030,
+    "sum": 16240
+  }
 ]
 ```
