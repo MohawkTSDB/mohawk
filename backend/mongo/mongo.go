@@ -125,9 +125,9 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 
 	// order to sort
 	if order == "DESC" {
-		sort = "timestamp"
-	} else {
 		sort = "-timestamp"
+	} else {
+		sort = "timestamp"
 	}
 
 	c := sessionCopy.DB(tenant).C(id)
@@ -163,7 +163,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	err := c.Pipe(
 		[]bson.M{
 			{
-				"$match": bson.M{"timestamp": bson.M{"$gte": start, "$lt": end}},
+				"$match": bson.M{"timestamp": bson.M{"$gte": start, "$lte": end}},
 			},
 			{
 				"$group": bson.M{
