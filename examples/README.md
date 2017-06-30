@@ -345,7 +345,7 @@ Response with 3 gauge data points
 #### Aggregating Results using bucketDuration parameter
 
 ```
-curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1498832548306&end=1498835518306&bucketDuration=302400s"
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1498832548306&end=1498835518306&bucketDuration=600s"
 ```
 
 ```json
