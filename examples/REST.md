@@ -25,9 +25,10 @@ For usage information look at the [example](/examples) directory.
 | Method | Path           | Description                    |
 |--------|----------------|--------------------------------|
 | GET    | :id/raw        | Query metric data              |
-| POST   | raw            | Insert new metric data         |
 | POST   | raw/query      | Query multiple metric data     |
 | PUT    | :id/tags       | Update metric tags             |
+| PUT    | tags           | Update multiple metric tags    |
+| POST   | raw            | Insert new metric data         |
 
 ## Data Structures
 
