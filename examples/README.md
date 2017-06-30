@@ -53,6 +53,13 @@ mohawk -tls -gzip -port 8443 -backend memory
 
 ###### Examples below use this server configuration, since each backend may implement different feature set, responses may be a little different for different plugins.
 
+###### Running with tls on, we need .key and .pem files:
+
+```
+openssl ecparam -genkey -name secp384r1 -out server.key
+openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
+```
+
 #### JSON + REST API
 JSON over [REST API](/examples/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
