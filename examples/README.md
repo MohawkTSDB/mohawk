@@ -385,3 +385,44 @@ curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?
   }
 ]
 ```
+
+#### Query multi data time series
+
+```
+curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query -d @query.json
+```
+
+query.json
+
+```json
+{
+  "ids": ["free_memory"],
+  "start": 1460111000000,
+  "end": 1460711120000
+}
+```
+
+result
+
+```
+[
+  {
+    "id": "free_memory",
+    "data": [
+      {
+        "timestamp": 1460111065369,
+        "value": 2048
+      },
+      {
+        "timestamp": 1460151065352,
+        "value": 2012
+      },
+      ...
+      {
+        "timestamp": 1460711012361,
+        "value": 2012
+      }
+    ]
+  }
+]
+```
