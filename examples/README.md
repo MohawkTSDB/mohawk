@@ -118,14 +118,15 @@ curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw -d @data.jso
 
 data.json
 
-```
+```json
 [
   {
     "id": "free_memory",
     "data": [
       {"timestamp": 1460111065369, "value": 2048},
       {"timestamp": 1460151065352, "value": 2012},
-      ...
+      
+      
       {"timestamp": 1460711012361, "value": 2012}
     ]
   },
@@ -134,7 +135,8 @@ data.json
     "data": [
       {"timestamp": 1460111065369, "value": 1.34},
       {"timestamp": 1460151085344, "value": 0.45},
-      ...
+      
+      
       {"timestamp": 1460711075351, "value": 1.34}
     ]
   }
@@ -285,7 +287,7 @@ curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?
 
 Response with gauge data points
 
-```
+```json
 [
   {
     "timestamp": 1460711012361,
@@ -295,7 +297,8 @@ Response with gauge data points
     "timestamp": 1460671067863,
     "value": 2048
   },
-  ...
+  
+  
   {
     "timestamp": 1460111065369,
     "value": 2048
@@ -404,7 +407,7 @@ query.json
 
 result
 
-```
+```json
 [
   {
     "id": "free_memory",
@@ -417,7 +420,8 @@ result
         "timestamp": 1460151065352,
         "value": 2012
       },
-      ...
+      
+      
       {
         "timestamp": 1460711012361,
         "value": 2012
