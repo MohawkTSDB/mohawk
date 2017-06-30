@@ -57,7 +57,7 @@ mohawk -tls -gzip -port 8443 -backend memory
 JSON over [REST API](/examples/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
 #### Multi Tenancy
-Mohawk Metrics provides virtual multi tenancy. All data is mapped to a tenant. Everything is partitioned by tenant. All requests, both reads and writes, can include a tenant id, default tenant id is "\_ops".
+Mohawk Metrics provides virtual multi tenancy. All data is mapped to a tenant. Everything is partitioned by tenant. All requests, both reads and writes, can include a tenant id, default tenant id is `_ops`.
 
 #### Tagging
 Mohawk Metrics provides flexible tagging support that makes it easy to organize and group data. Tagging can also be used to provide additional information and context about data.
@@ -91,6 +91,8 @@ Using the Hawkular-Tenant HTTP header in request:
 ```
 curl -ks -X GET https://localhost:8443/hawkular/metrics/metrics -H "Hawkular-Tenant: com.acme"
 ```
+
+###### All requests, both reads and writes, can include a tenant id, default tenant id is `_ops`. If no tenant id is provided the `_ops` tenant will be used.
 
 #### Tenant Ids
 
@@ -150,16 +152,21 @@ Tags in Mohawk Metrics are key/value pairs. Tags can be applied to a metric to p
 These endpoints are used to add or replace tags.
 
 ```
-curl -ks -X PUT https://localhost:8443/hawkular/metrics/gauges/free_memory/tags -d @tags.json
+curl -ks -X PUT https://localhost:8443/hawkular/metrics/gauges/tags -d @tags.json
 ```
 
 tags.json
 
 ```json
-{
-  "datacenter": "dc2",
-  "hostname": "server1"
-}
+[
+  {
+    "id": "free_memory",
+    "tags": {
+      "datacenter": "dc2",
+      "hostname": "server1"
+    }
+  }
+]
 ```
 
 #### Tag Filtering
@@ -246,7 +253,7 @@ curl -ks -X GET https://localhost:8443/hawkular/metrics/metrics?tags=datacenter:
 Fetch all metric definitions using RegExp tag filters
 
 ```
-curl -ks -X GET https://localhost:8443/hawkular/metrics/metrics?tags=hostname:server.*
+curl -ks -X GET https://localhost:8443/hawkular/metrics/metrics?tags=datacenter:.*2
 ```
 
 ```json

@@ -1,4 +1,9 @@
-{
-  "datacenter": "dc2",
-  "hostname": "server1"
-}
+[
+  {
+    "id": "free_memory",
+    "tags": {
+      "datacenter": "dc2",
+      "hostname": "server1"
+    }
+  }
+]

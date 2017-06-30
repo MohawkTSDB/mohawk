@@ -49,6 +49,12 @@ type postDataItems struct {
 	Data []postDataItem `json:"data"`
 }
 
+// json struct used to parse put tags http request
+type putTags struct {
+	ID   string            `json:"id"`
+	Tags map[string]string `json:"tags"`
+}
+
 // getData querys data from the backend, and return a json string
 func getData(h Handler, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
 	var resStr string

@@ -290,6 +290,34 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 	fmt.Fprintln(w, "{}")
 }
 
+// PutMultiTags send tags pet dataItem - tag, value pairs to the backend
+func (h Handler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	var u []putTags
+	json.NewDecoder(r.Body).Decode(&u)
+
+	for _, item := range u {
+		if !validStr(item.ID) {
+			w.WriteHeader(504)
+			fmt.Fprintf(w, "<p>Error 504, Bad metrics ID</p>")
+			return
+		}
+	}
+
+	// get tenant
+	tenant := parseTenant(r)
+
+	for _, item := range u {
+		id := item.ID
+		if validTags(item.Tags) {
+			h.Backend.PutTags(tenant, id, item.Tags)
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	fmt.Fprintln(w, "{}")
+}
+
 // DeleteTags delete a tag
 func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	// use the id from the argv list

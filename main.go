@@ -143,6 +143,7 @@ func main() {
 	rGauges.Add("GET", ":id/stats", h.GetData)
 	rGauges.Add("POST", "raw", h.PostData)
 	rGauges.Add("POST", "raw/query", h.PostQuery)
+	rGauges.Add("PUT", "tags", h.PutMultiTags)
 	rGauges.Add("PUT", ":id/tags", h.PutTags)
 	rGauges.Add("DELETE", ":id/raw", h.DeleteData)
 	rGauges.Add("DELETE", ":id/tags/:tags", h.DeleteTags)
