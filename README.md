@@ -10,7 +10,7 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/yaacov/mohawk)](https://goreportcard.com/report/github.com/yaacov/mohawk)
 
-Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different [plugins](/backend) for different use cases. Different plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
 Different use cases may have conflicting requirements for the metric engein, some use case may require fast data transfer, but no long term data retention, other may depend on long term, high availabilty data retention. We can use different metric data engins for each usecase, but then our consumer application will have to know how to interact with each different metric engien we choose.
 
@@ -33,30 +33,30 @@ Mohawk architecture makes it easy to implement and set up plugins for new data s
 Run time, real: 1000 writes + 1000 reads ( [benchmark.py](/benchmark/benchmark.py) ) less is better.
 
 Benchmark results depend on system resurcses, current work load and network.
-For more information on tests and run enviroments, see the [benchmark](/benchmark) directory. 
+For more information on tests and run enviroments, see the [benchmark](/benchmark) directory.
 
-###### Mohawk with different Backends running on a desktop machine.
+###### Mohawk with different Plugins running on a desktop machine.
 
-| Backend  | Time       | %CPU      | RSS byte      |
+| Plugin   | Time       | %CPU      | RSS byte      |
 |----------|------------|-----------|---------------|
 |memory    |  0m2.011s  | 0.2 - 5.5 | 7456 - 11028  |
-|mongo (*) |  0m4.885s  | 0.5 - 0.8 | 11892 - 11892 |
+|mongo (1) |  0m4.885s  | 0.5 - 0.8 | 11892 - 11892 |
 |sqlite3   |  0m14.471s | 0.2 - 7.4 | 8416 - 12560  |
 
-(*) the mongo usage metrics does not include usage of the mongodb server.
+(1) the mongo usage metrics does not include usage of the mongodb server.
 
-###### Chart: different Backends vs. Run Time
+###### Chart: different Plugins vs. Run Time
 
 ![Time chart](/benchmark/time.png?raw=true "benchmark time vm")
 
 ###### Mohawk vs. Hawkular running on a vm under same load.
 
-| DB/Backend          | Time        |
+| DB/Plugin          | Time        |
 |---------------------|-------------|
 |Hawkular/Casandra    |  2m8.783s   |
 |Mohawk/Memory        |  0m22.833s  |
 
-###### Chart: DB/Backend vs. Run Time
+###### Chart: DB/Plugin vs. Run Time
 
 ![Time chart](/benchmark/time-vm.png?raw=true "benchmark time vm")
 
@@ -76,9 +76,9 @@ Moahawk cpu and memory usage is lower than Hawkular and comparable to Prometheus
 
 #### Compatibility
 
-Mohawk is tested(**) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster). 
+Mohawk is tested(2) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster).
 
-(**) Mohawk implement only part of Hawkular's API, some functionalty may be missing.
+(2) Mohawk implement only part of Hawkular's API, some functionalty may be missing.
 
 ## Installation
 

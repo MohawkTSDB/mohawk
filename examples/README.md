@@ -51,7 +51,7 @@ mohawk -tls -gzip -port 8443 -backend memory
 2017/06/30 11:37:08 Start server, listen on https://0.0.0.0:8443
 ```
 
-###### Examples below use this server configuration, since each backend may implement different feature set, responses may be a little different for different backends.
+###### Examples below use this server configuration, since each backend may implement different feature set, responses may be a little different for different plugins.
 
 #### JSON + REST API
 JSON over [REST API](/examples/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:

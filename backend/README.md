@@ -6,11 +6,11 @@
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
-## Backends
+## Plugins
 
-Mohawk can use different [backends](/backend) for different use cases. Different backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different [plugins](/backend) for different use cases. Different plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
-## Backend Development
+## Plugin Development
 
 A backend should implement the [backend interface](/backend/backend.go). Each plugin is built for specific use case,
 with features that best suite this use case. Implementation of a feature should not interfere
@@ -21,7 +21,7 @@ Plugins that implement a subset of the interface, must fail silently for unimple
 
 For a starting template of a plugin, look at the [backend example](/backend/example) directory.
 
-## Backends Comparison
+## Plugins Comparison
 
   - Example - a backend template.
   - Sqlite  - a file storage based backend.
