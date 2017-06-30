@@ -1,0 +1,44 @@
+[
+  {
+    "id": "free_memory",
+    "data": [
+      {"timestamp": 1460111065369, "value": 2048},
+      {"timestamp": 1460151065352, "value": 2012},
+      {"timestamp": 1460191045341, "value": 2048},
+      {"timestamp": 1460231066363, "value": 2012},
+      {"timestamp": 1460271065341, "value": 2048},
+      {"timestamp": 1460311015369, "value": 2012},
+      {"timestamp": 1460351065338, "value": 2048},
+      {"timestamp": 1460391067345, "value": 2012},
+      {"timestamp": 1460431021369, "value": 2048},
+      {"timestamp": 1460471085369, "value": 2012},
+      {"timestamp": 1460511065359, "value": 2048},
+      {"timestamp": 1460551062351, "value": 2012},
+      {"timestamp": 1460591045355, "value": 2048},
+      {"timestamp": 1460631064349, "value": 2012},
+      {"timestamp": 1460671067863, "value": 2048},
+      {"timestamp": 1460711012361, "value": 2012}
+    ]
+  },
+  {
+    "id": "cpu_usage",
+    "data": [
+      {"timestamp": 1460111065369, "value": 1.34},
+      {"timestamp": 1460151085344, "value": 0.45},
+      {"timestamp": 1460191415363, "value": 9.51},
+      {"timestamp": 1460231095369, "value": 3.31},
+      {"timestamp": 1460271165355, "value": 5.12},
+      {"timestamp": 1460311215369, "value": 4.33},
+      {"timestamp": 1460351095361, "value": 1.12},
+      {"timestamp": 1460391245349, "value": 0.67},
+      {"timestamp": 1460431065348, "value": 0.45},
+      {"timestamp": 1460471025317, "value": 0.41},
+      {"timestamp": 1460511045369, "value": 0.51},
+      {"timestamp": 1460551055391, "value": 0.33},
+      {"timestamp": 1460591675306, "value": 0.25},
+      {"timestamp": 1460631114352, "value": 1.00},
+      {"timestamp": 1460671044361, "value": 1.50},
+      {"timestamp": 1460711075351, "value": 1.34}
+    ]
+  }
+]
