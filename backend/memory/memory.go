@@ -136,7 +136,7 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 
 	// fill data out array
 	count := int64(0)
-	for i := pEnd; count < limit && i > pStart; i-- {
+	for i := pEnd; count < limit && i >= pStart; i-- {
 		d := r.tenant[tenant].ts[id].data[i%arraySize]
 
 		// if this is a valid point
@@ -166,15 +166,16 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	// make sure start and end times is in the retention time
 	start, end = r.checkTimespan(start, end)
 
-	// make sure start, end are multiple of granularity
-	start = r.timeGranularitySec * (start / 1000 / r.timeGranularitySec) * 1000
-	end = r.timeGranularitySec * (1 + end/1000/r.timeGranularitySec) * 1000
-
-	// make sure bucket duration is not less then timeGranularitySec and a multiple of granularity
-	bucketDuration = r.timeGranularitySec * (bucketDuration / r.timeGranularitySec)
+	// bucketDuration can't be smaller then granularity
 	if bucketDuration < r.timeGranularitySec {
 		bucketDuration = r.timeGranularitySec
 	}
+	bucketDuration = r.timeGranularitySec * (bucketDuration / r.timeGranularitySec)
+
+	// start and tend must be integer multiplections of bucketDuration
+	bucketDurationMilli := bucketDuration * 1000
+	start = bucketDurationMilli * (start / bucketDurationMilli)
+	end = bucketDurationMilli * (1 + end/bucketDurationMilli)
 
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	pStep := bucketDuration / r.timeGranularitySec

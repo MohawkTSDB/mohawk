@@ -141,7 +141,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 	// id exist, get timestamp, value pairs
 	sqlStmt := fmt.Sprintf(`select timestamp, value
 		from '%s'
-		where timestamp > %d and timestamp <= %d
+		where timestamp >= %d and timestamp < %d
 		order by timestamp %s limit %d`,
 		id, start, end, order, limit)
 	rows, err := db.Query(sqlStmt)
@@ -172,12 +172,13 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 
 func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
 	var t int64
+	count := int64(0)
 	res := make([]backend.StatItem, 0)
 	db, _ := r.GetTenant(tenant)
 
 	timeStep := bucketDuration * 1000
 	startTime := int64(start/timeStep) * timeStep
-	endTime := int64(end/timeStep) * timeStep
+	endTime := int64(1+end/timeStep) * timeStep
 
 	// check if id exist
 	if !r.IdExist(tenant, id) {
@@ -191,15 +192,15 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 		from '%s'
 		where timestamp >= %d and timestamp < %d
 		group by start
-		order by start ASC`,
+		order by start DESC`,
 		timeStep, timeStep, id, startTime, endTime)
 	rows, err := db.Query(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 	defer rows.Close()
-	t = startTime
-	for rows.Next() {
+	t = endTime
+	for rows.Next() && count < limit {
 		var samples int64
 		var startT int64
 		var endT int64
@@ -214,16 +215,18 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 		}
 
 		// append missing
-		for t < startT {
+		for t >= (endT+timeStep) && count < limit {
+			count++
 			res = append(res, backend.StatItem{
 				Start: t,
 				End:   t + timeStep,
 				Empty: true,
 			})
-			t += timeStep
+			t -= timeStep
 		}
 
 		// add data
+		count++
 		res = append(res, backend.StatItem{
 			Start:   startT,
 			End:     startT + timeStep,
@@ -234,7 +237,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 			Avg:     avg,
 			Sum:     sum,
 		})
-		t += timeStep
+		t -= timeStep
 	}
 	err = rows.Err()
 	if err != nil {
@@ -242,13 +245,22 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	}
 
 	// append missing
-	for t < endTime {
+	for t >= (startTime+timeStep) && count < limit {
+		count++
 		res = append(res, backend.StatItem{
 			Start: t,
 			End:   t + timeStep,
 			Empty: true,
 		})
-		t += timeStep
+		t -= timeStep
+	}
+
+	// order
+	if order == "ASC" {
+		for i := 0; i < len(res)/2; i++ {
+			j := len(res) - i - 1
+			res[i], res[j] = res[j], res[i]
+		}
 	}
 
 	return res

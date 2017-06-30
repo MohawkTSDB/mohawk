@@ -26,6 +26,9 @@ import (
 	"time"
 )
 
+const DEFAULT_ORDER = "DESC"
+const SECONDARY_ORDER = "ASC"
+
 // Handler common variables to be used by all Handler functions
 // 	version the version of the Hawkular server we are mocking
 // 	backend the backend to be used by the Handler functions
@@ -111,9 +114,9 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 		}
 	}
 
-	order := "DESC"
-	if v, ok := r.Form["order"]; ok && len(v) > 0 && v[0] == "ASC" {
-		order = "ASC"
+	order := DEFAULT_ORDER
+	if v, ok := r.Form["order"]; ok && len(v) > 0 && v[0] == SECONDARY_ORDER {
+		order = SECONDARY_ORDER
 	}
 
 	if h.Verbose {
@@ -202,9 +205,9 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 		limit = int64(20000)
 	}
 
-	order := "ASC"
-	if u.Order == "DESC" {
-		order = "DESC"
+	order := DEFAULT_ORDER
+	if u.Order == SECONDARY_ORDER {
+		order = SECONDARY_ORDER
 	}
 
 	bucketDuration := int64(0)

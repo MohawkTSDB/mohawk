@@ -309,7 +309,7 @@ Response with gauge data points
 Every query is bounded by a start and an end time. The end time defaults to now, and the start time defaults to 8 hours ago. These can be overridden with the start and end parameters respectively. The expected format of their values is a unix timestamp. The start of the range is inclusive while the end is exclusive.
 
 ```
-curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000&end=1460711120000"
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1498832548306&end=1498835518306"
 ```
 
 #### Limiting Results
@@ -317,7 +317,7 @@ curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?
 By default there is no limit on the number of data points returned. The limit parameter will limit the number of data points returned.
 
 ```
-curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000&end=1460711120000&limit=3"
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1498832548306&end=1498835518306&limit=3"
 ```
 
 Response with 3 gauge data points
@@ -342,7 +342,7 @@ Response with 3 gauge data points
 #### Aggregating Results using bucketDuration parameter
 
 ```
-curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000&end=1460711120000&bucketDuration=302400s"
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1498832548306&end=1498835518306&bucketDuration=302400s"
 ```
 
 ```json
@@ -369,7 +369,7 @@ curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?
 ```
 
 ```
-curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1460111000000&end=1460711120000&bucketDuration=302400s&limit=1"
+curl -ks -X GET "https://localhost:8443/hawkular/metrics/gauges/free_memory/raw?start=1498832548306&end=1498835518306&bucketDuration=600s&limit=1"
 ```
 
 ```json
