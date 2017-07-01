@@ -18,7 +18,7 @@ Mohowk exposes the same simple REST API for different backend storage options, c
 
 #### Storage Plugins
 
-Mohawk architecture makes it easy to implement and set up plugins for new data storage. The backend directory include documentation, examples and a template for plugin develpment.
+Mohawk architecture makes it easy to implement and set up [plugins](/backend) for new data storage. The backend directory include documentation, examples and a template for plugin develpment.
 
 ###### Current storage plugin list include:
 
@@ -28,7 +28,7 @@ Mohawk architecture makes it easy to implement and set up plugins for new data s
 | sqlite            | Local File        | No data loss on network outages             | Persistence data, W/O external data base |
 | mongo             | Mongo DB          | High availabilty, High volume storage       | Long term H.A. storage                   |
 
-A template plugin named example is also available.
+A template plugin named [example](/backend/example) is also available.
 
 #### Benchmarks
 
