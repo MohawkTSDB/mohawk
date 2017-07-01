@@ -34,7 +34,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.16.3"
+const VER = "0.17.2"
 
 // defaults
 const defaultPort = 8080
