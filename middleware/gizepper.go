@@ -17,7 +17,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
@@ -38,14 +37,15 @@ func (g *GZipper) SetNext(h http.Handler) {
 
 // ServeHTTP http serve func
 func (g *GZipper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if !g.UseGzip || !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+	// if Content-Encoding: gzip, unzip request body
+	if g.UseGzip && r.Header.Get("Content-Encoding") == "gzip" {
+		r.Body = gzip.ReqBody(r)
+	}
+
+	// if Accept-Encoding: gzip, zip response
+	if g.UseGzip && strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		gzip.Decorator(g.next.ServeHTTP)(w, r)
+	} else {
 		g.next.ServeHTTP(w, r)
-		return
 	}
-
-	if g.Verbose {
-		log.Printf("Using gzip encoding")
-	}
-
-	gzip.Decorator(g.next.ServeHTTP)(w, r)
 }
