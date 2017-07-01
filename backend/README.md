@@ -6,20 +6,19 @@
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
-## Plugins
+## Storage Plugins
 
-Mohawk can use different [plugins](/backend) for different use cases. Different plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different storage [plugins](/backend) for different use cases. Different storage backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
 ## Plugin Development
 
-A backend should implement the [backend interface](/backend/backend.go). Each plugin is built for specific use case,
-with features that best suite this use case. Implementation of a feature should not interfere
-with plugin functionality, for example, a plugin built for speed may choose not to implement a feature that
-may slow it down.
+A storage plugin should implement the [backend interface](/backend/backend.go). Each storage plugin is built for specific use case, with features that best suite this use case.
+
+Implementation of a feature should not interfere with the storage plugin functionality, for example, a plugin built for speed may choose not to implement a feature that may slow it down.
 
 Plugins that implement a subset of the interface, must fail silently for unimplemented requests.
 
-For a starting template of a plugin, look at the [backend example](/backend/example) directory.
+For a starting template of a storage plugin, look at the [backend example](/backend/example) directory.
 
 ## Plugins Comparison
 
@@ -30,7 +29,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 
 #### Features
 
-|                  | Speed         | Retention Limit | Scaleability  | Storage          |
+| Plugin           | Speed         | Retention Limit | Scaleability  | Storage          |
 |------------------|---------------|-----------------|---------------|------------------|
 | Example          |               |                 |               | No storage       |
 | Memory           | Very Fast     | 7 days          |               | Memory           |
@@ -39,7 +38,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 
 #### REST Endpoint Implementation
 
-|                  | Multi Tenancy | Read| Write | Update | Delete |
+| Plugin           | Multi Tenancy | Read| Write | Update | Delete |
 |------------------|---------------|-----|-------|--------|--------|
 | Example          |               | ✔️   |       |        |        |
 | Memory           | ✔️             | ✔️   | ✔️     | ✔️      |        |
@@ -48,7 +47,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 
 #### Metrics List Implementation
 
-|                  | Filter by Tag RegEx | Last Values |
+| Plugin           | Filter by Tag RegEx | Last Values |
 |------------------|---------------------|-------------|
 | Example          |                     |             |
 | Memory           | ✔️                   | ✔️           |
@@ -57,7 +56,7 @@ For a starting template of a plugin, look at the [backend example](/backend/exam
 
 #### Aggregation and Statistics Implementation
 
-|                  | Min | Max| First | Last | Avg | Median | Std | Sum | Count |
+| Plugin           | Min | Max| First | Last | Avg | Median | Std | Sum | Count |
 |------------------|-----|----|-------|------|-----|--------|-----|-----|-------|
 | Example          |     |    |       |      | ✔️   |        |     |     | ✔️     |
 | Memory           |     |    |       | ✔️    | ✔️   |        |     | ✔️   | ✔️     |
