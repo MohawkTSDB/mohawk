@@ -18,7 +18,7 @@ Mohowk exposes the same simple REST API for different backend storage options, c
 
 #### Storage Plugins
 
-Mohawk architecture makes it easy to implement and set up plugins for new data storage. The backend directory include documentation and examples and a template for plugin develpment.
+Mohawk architecture makes it easy to implement and set up plugins for new data storage. The backend directory include documentation, examples and a template for plugin develpment.
 
 ###### Current storage plugin list include:
 
