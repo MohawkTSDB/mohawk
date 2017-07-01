@@ -180,3 +180,8 @@ curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query -d "{\
 # using the zcat utility to decode gzip message
 curl -ks -H "Accept-Encoding: gzip" https://localhost:8443/hawkular/metrics/metrics | zcat
 ```
+
+```
+# sendig gziped data file with curl's --data-binary flag
+curl -ks -H "Content-Encoding: gzip" -X PUT "https://localhost:8443/hawkular/metrics/gauges/tags" --data-binary @tags.json.gz
+```
