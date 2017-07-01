@@ -10,17 +10,17 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/yaacov/mohawk)](https://goreportcard.com/report/github.com/yaacov/mohawk)
 
-Mohawk can use different [plugins](/backend) for different use cases. Different plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different storage [plugins](/backend) for different use cases. Different storage plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
-Different use cases may have conflicting requirements for the metric engein, some use case may require fast data transfer, but no long term data retention, other may depend on long term, high availabilty data retention. We can use different metric data engins for each usecase, but then our consumer application will have to know how to interact with each different metric engien we choose.
+Different use cases may have conflicting requirements for the metric engein, some use case may require fast data transfer, but no long term data retention, other may depend on long term, high availabilty data retention.
 
-Mohowk exposes the same simple REST API for different backend storage options, consumer application can use the same REST API with the fast, short term stroage and with the high availabilty, long term storage. Mohowk makes hierarchical data storage settings with short, middle and long term data retention easy to set up and consume.     
+Mohowk exposes the same simple REST API for different backend storage options, consumer application can use the same REST API with a fast, short term stroage and with the high availabilty, long term storage. Mohowk makes hierarchical data storage using short, middle and long term data retention tiers easy to set up and consume.     
 
-#### Plugins
+#### Storage Plugins
 
 Mohawk architecture makes it easy to implement and set up plugins for new data storage.
 
-###### Current plugin list include:
+###### Current storage plugin list include:
 
 | Plugin name       |  Storage          | Advantages                                  | Use case                                 |
 |-------------------|-------------------|---------------------------------------------|------------------------------------------|
