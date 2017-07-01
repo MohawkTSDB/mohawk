@@ -12,13 +12,13 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 Mohawk can use different storage [plugins](/backend) for different use cases. Different storage plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
-Different use cases may have conflicting requirements for the metric engein, some use case may require fast data transfer, but no long term data retention, other may depend on long term, high availabilty data retention.
+Different use cases may have conflicting requirements for the metric engein, some use cases may require fast data transfer, while others may depend on long term, high availabilty data retention that inherently makes the system slower.
 
-Mohowk exposes the same simple REST API for different backend storage options, consumer application can use the same REST API with a fast, short term stroage and with the high availabilty, long term storage. Mohowk makes hierarchical data storage using short, middle and long term data retention tiers easy to set up and consume.     
+Mohowk exposes the same simple REST API for different backend storage options, consumer application can use the same REST API with a lean low footprint stroage and with a resource-intensive high availabilty storage. Mohowk makes hierarchical data storage using short, middle and long term data retention tiers easy to set up and consume.     
 
 #### Storage Plugins
 
-Mohawk architecture makes it easy to implement and set up plugins for new data storage.
+Mohawk architecture makes it easy to implement and set up plugins for new data storage. The backend directory include documentation and examples and a template for plugin develpment.
 
 ###### Current storage plugin list include:
 
@@ -28,9 +28,12 @@ Mohawk architecture makes it easy to implement and set up plugins for new data s
 | sqlite            | Local File        | No data loss on network outages             | Persistence data, W/O external data base |
 | mongo             | Mongo DB          | High availabilty, High volume storage       | Long term H.A. storage                   |
 
+A template plugin named example is also available.
+
 #### Benchmarks
 
-Run time, real: 1000 writes + 1000 reads ( [benchmark.py](/benchmark/benchmark.py) ) less is better.
+###### Name: Run time, real
+###### Description: 1000 writes + 1000 reads ( [benchmark.py](/benchmark/benchmark.py) ) less is better.
 
 Benchmark results depend on system resurcses, current work load and network.
 For more information on tests and run enviroments, see the [benchmark](/benchmark) directory.
