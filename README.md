@@ -135,6 +135,14 @@ mohawk -backend memory -tls -gzip -port 8443
 2016/12/01 14:23:48 Start server, listen on https://0.0.0.0:8443
 ```
 
+#### Syndication and hierarchical server setup
+
+It is easy to scrape data from one server to another, creating a hierarchy of servers
+with a central server collecting specific data from the peripheral servers.
+
+The [syndication.sh](/examples/syndication.sh) script is an example of a script that scrape
+data from one server to another. Scraping scripts can be simple or complicated as needed.
+
 ## Examples
 
 For more in-depth usage information look at the [example](/examples) directory.
