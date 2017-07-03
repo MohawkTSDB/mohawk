@@ -34,15 +34,22 @@ if [ -z "${TO_URL}" ]; then
   exit 1
 fi
 
+# set a tmp file for the source data
+tmpfile=$(mktemp /tmp/mohawk-syndication.XXXXXX.json.gz)
+
 # Get data from source
-curl -ks -H "Accept-Encoding: gzip"  -X GET  ${FROM_URL}/hawkular/metrics/metrics > syn.json.gz
+curl -ks -H "Accept-Encoding: gzip"  -X GET  ${FROM_URL}/hawkular/metrics/metrics > "${tmpfile}"
 
 # Post data to higher teir
-curl -ks -H "Content-Encoding: gzip" -X POST ${TO_URL}/hawkular/metrics/gauges/raw --data-binary @syn.json.gz
+curl -ks -H "Content-Encoding: gzip" -X POST ${TO_URL}/hawkular/metrics/gauges/raw --data-binary "@${tmpfile}"
 
+# if no tags, exit now
 if [ -z "${TAGS}" ]; then
+  rm "$tmpfile"
   exit
 fi
 
 # Post tags to higher teir
-curl -ks -H "Content-Encoding: gzip" -X PUT ${TO_URL}/hawkular/metrics/gauges/tags --data-binary @syn.json.gz
+curl -ks -H "Content-Encoding: gzip" -X PUT ${TO_URL}/hawkular/metrics/gauges/tags --data-binary "@${tmpfile}"
+
+rm "$tmpfile"
