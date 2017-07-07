@@ -179,7 +179,7 @@ func main() {
 		Verbose: *verbosePtr,
 	}
 
-	// logger a logging middleware
+	// authorization middleware
 	authorization := middleware.Authorization{
 		Verbose:         *verbosePtr,
 		UseToken:        *tokenPtr != "",
