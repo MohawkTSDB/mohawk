@@ -81,6 +81,7 @@ func main() {
 	tlsPtr := flag.Bool("tls", defaultTLS, "use TLS server")
 	gzipPtr := flag.Bool("gzip", false, "accept gzip encoding")
 	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname, db-url]")
+	tokenPtr := flag.String("token", "", "authorization token")
 	verbosePtr := flag.Bool("verbose", false, "more debug output")
 	quietPtr := flag.Bool("quiet", false, "less debug output")
 	versionPtr := flag.Bool("version", false, "version number")
@@ -178,6 +179,14 @@ func main() {
 		Verbose: *verbosePtr,
 	}
 
+	// logger a logging middleware
+	authorization := middleware.Authorization{
+		Verbose:         *verbosePtr,
+		UseToken:        *tokenPtr != "",
+		PublicPathRegex: "^/hawkular/metrics/status$",
+		Token:           *tokenPtr,
+	}
+
 	// gzipper a gzip encoding middleware
 	gzipper := middleware.GZipper{
 		UseGzip: *gzipPtr,
@@ -191,7 +200,16 @@ func main() {
 	}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	middlewareList = []middleware.MiddleWare{&logger, &gzipper, &rGauges, &rCounters, &rAvailability, &rRoot, &badrequest}
+	middlewareList = []middleware.MiddleWare{
+		&logger,
+		&authorization,
+		&gzipper,
+		&rGauges,
+		&rCounters,
+		&rAvailability,
+		&rRoot,
+		&badrequest,
+	}
 	middleware.Append(middlewareList)
 
 	// Run the server
