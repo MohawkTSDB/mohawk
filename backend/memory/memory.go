@@ -66,6 +66,7 @@ func (r *Backend) Open(options url.Values) {
 	// open db connection
 	r.tenant = make(map[string]*Tenant, 0)
 
+	// start a maintenance worker that will clean the db periodically
 	go r.maintenance()
 }
 
