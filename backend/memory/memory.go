@@ -17,8 +17,10 @@
 package memory
 
 import (
+	"fmt"
 	"net/url"
 	"regexp"
+	"time"
 
 	"github.com/yaacov/mohawk/backend"
 )
@@ -63,6 +65,8 @@ func (r *Backend) Open(options url.Values) {
 
 	// open db connection
 	r.tenant = make(map[string]*Tenant, 0)
+
+	go r.maintenance()
 }
 
 func (r Backend) GetTenants() []backend.Tenant {
@@ -361,4 +365,36 @@ func hasMatchingTag(tags map[string]string, itemTags map[string]string) bool {
 	}
 
 	return out
+}
+
+func (r *Backend) maintenance() {
+	// clean data every 120 minutes
+	c := time.Tick(120 * time.Minute)
+
+	// once a tick clean data
+	for range c {
+		fmt.Printf("maintenance: start\n")
+		r.cleanData()
+	}
+}
+
+func (r *Backend) cleanData() {
+	var lastTimeStampSec int64
+	validTimeStamp := time.Now().Unix() - r.timeRetentionSec
+
+	// loop on all tenants
+	for _, t := range r.tenant {
+		// loop on all time series in this tenant
+		for key, ts := range t.ts {
+			lastTimeStampSec = ts.lastValue.timeStamp / 1000
+
+			// if last value is more then time span old, remove data
+			if lastTimeStampSec <= validTimeStamp {
+				fmt.Printf("maintenance: delete item %s\n", key)
+				delete(t.ts, key)
+			}
+		}
+
+		// TODO: delete tenant if no time seriess
+	}
 }
