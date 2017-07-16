@@ -24,7 +24,7 @@ EXPOSE $HAWKULAR_PORT
 # run the application
 WORKDIR /root
 RUN chmod -R ugo+rwx /root/server
-CMD /usr/bin/mohawk -tls -gzip -quiet -port $HAWKULAR_PORT \
-  -cert $HAWKULAR_FILE_PEM -key $HAWKULAR_FILE_KEY \
-  -backend $HAWKULAE_BACKEND \
-  -options "db-dirname=${HAWKULAE_DB_DIR}&db-url=${HAWKULAE_DB_URL}"
+CMD /usr/bin/mohawk --tls --gzip --port $HAWKULAR_PORT \
+  --cert $HAWKULAR_FILE_PEM --key $HAWKULAR_FILE_KEY \
+  --backend $HAWKULAE_BACKEND \
+  --options "db-dirname=${HAWKULAE_DB_DIR}&db-url=${HAWKULAE_DB_URL}"

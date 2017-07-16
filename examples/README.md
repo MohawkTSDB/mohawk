@@ -11,7 +11,7 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 When installed, run using the command line ``mohawk``
 
 ```bash
-mohawk -version
+mohawk --version
 
 Mohawk version: 0.18.1
 ```
@@ -21,33 +21,42 @@ The `-h` flag will print out a help text, that list the command line arguments.
 ```
 mohawk -h
 
-Usage of ./mohawk:
-  -backend string
-    	the backend to use [sqlite, memory, mongo, example] (default "sqlite")
-  -cert string
-    	path to TLS cert file (default "server.pem")
-  -gzip
-    	accept gzip encoding
-  -key string
-    	path to TLS key file (default "server.key")
-  -options string
-    	specific backend options [e.g. db-dirname]
-  -port int
-    	server port (default 8080)
-  -quiet
-    	less debug output
-  -tls
-    	use TLS server
-  -verbose
-    	more debug output
-  -version
-    	version number
+NAME:
+   mohawk - Metric data storage engine
+
+USAGE:
+   mohawk [global options] command [command options] [arguments...]
+
+VERSION:
+   0.18.1
+
+DESCRIPTION:
+   Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
+
+AUTHOR:
+   Yaacov Zamir <kobi.zamir@gmail.com>
+
+COMMANDS:
+     help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --backend value, -b value  the backend plugin to use (default: "memory")
+   --token value              authorization token
+   --key value                path to TLS key file (default: "server.key")
+   --cert value               path to TLS cert file (default: "server.pem")
+   --options value            specific backend options [e.g. db-dirname, db-url]
+   --port value, -p value     server port (default: 8080)
+   --tls, -t                  use TLS server
+   --gzip, -g                 enable gzip encoding
+   --verbose, -V              more debug output
+   --help, -h                 show help
+   --version, -v              print the version
 ```
 
 Running ``mohawk`` with ``tls`` and using the ``memory`` back end.
 
 ```
-mohawk -tls -gzip -port 8443 -backend memory
+mohawk --tls --gzip --port 8443 --backend memory
 2017/06/30 11:37:08 Start server, listen on https://0.0.0.0:8443
 ```
 
@@ -132,8 +141,8 @@ data.json
     "data": [
       {"timestamp": 1460111065369, "value": 2048},
       {"timestamp": 1460151065352, "value": 2012},
-      
-      
+
+
       {"timestamp": 1460711012361, "value": 2012}
     ]
   },
@@ -142,8 +151,8 @@ data.json
     "data": [
       {"timestamp": 1460111065369, "value": 1.34},
       {"timestamp": 1460151085344, "value": 0.45},
-      
-      
+
+
       {"timestamp": 1460711075351, "value": 1.34}
     ]
   }
@@ -304,8 +313,8 @@ Response with gauge data points
     "timestamp": 1460671067863,
     "value": 2048
   },
-  
-  
+
+
   {
     "timestamp": 1460111065369,
     "value": 2048
@@ -427,8 +436,8 @@ result
         "timestamp": 1460151065352,
         "value": 2012
       },
-      
-      
+
+
       {
         "timestamp": 1460711012361,
         "value": 2012

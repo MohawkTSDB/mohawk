@@ -73,6 +73,7 @@ func main() {
 		cli.StringFlag{Name: "token", Value: "", Usage: "authorization token"},
 		cli.StringFlag{Name: "key", Value: defaultTLSKey, Usage: "path to TLS key file"},
 		cli.StringFlag{Name: "cert", Value: defaultTLSCert, Usage: "path to TLS cert file"},
+		cli.StringFlag{Name: "options", Value: "", Usage: "specific backend options [e.g. db-dirname, db-url]"},
 		cli.UintFlag{Name: "port,p", Value: defaultPort, Usage: "server port"},
 		cli.BoolFlag{Name: "tls,t", Usage: "use TLS server"},
 		cli.BoolFlag{Name: "gzip,g", Usage: "enable gzip encoding"},
@@ -101,7 +102,11 @@ func serve(c *cli.Context) error {
 	}
 
 	// parse options
-	db.Open(url.Values{})
+	if options, err := url.ParseQuery(c.String("options")); err == nil {
+		db.Open(options)
+	} else {
+		log.Fatal("Can't parse opetions:", c.String("options"))
+	}
 
 	// set global variables
 	BackendName = db.Name()
