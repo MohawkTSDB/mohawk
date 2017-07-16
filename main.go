@@ -38,10 +38,7 @@ import (
 const VER = "0.19.5"
 
 // defaults
-const defaultPort = 8080
-const defaultBackend = "sqlite"
 const defaultAPI = "0.21.0"
-const defaultTLS = false
 const defaultTLSKey = "server.key"
 const defaultTLSCert = "server.pem"
 
@@ -72,7 +69,7 @@ func main() {
 		cli.StringFlag{Name: "key", Value: defaultTLSKey, Usage: "path to TLS key file"},
 		cli.StringFlag{Name: "cert", Value: defaultTLSCert, Usage: "path to TLS cert file"},
 		cli.StringFlag{Name: "options", Value: "", Usage: "specific backend options [e.g. db-dirname, db-url]"},
-		cli.UintFlag{Name: "port,p", Value: defaultPort, Usage: "server port"},
+		cli.UintFlag{Name: "port,p", Value: 8080, Usage: "server port"},
 		cli.BoolFlag{Name: "tls,t", Usage: "use TLS server"},
 		cli.BoolFlag{Name: "gzip,g", Usage: "enable gzip encoding"},
 		cli.BoolFlag{Name: "verbose,V", Usage: "more debug output"},
