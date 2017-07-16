@@ -23,7 +23,6 @@ import (
 
 // Logger middleware that will log http requests
 type Logger struct {
-	Quiet   bool
 	Verbose bool
 	next    http.Handler
 }
@@ -35,9 +34,7 @@ func (l *Logger) SetNext(h http.Handler) {
 
 // ServeHTTP http serve func
 func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if !l.Quiet {
-		log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
-	}
+	log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
 
 	l.next.ServeHTTP(w, r)
 }

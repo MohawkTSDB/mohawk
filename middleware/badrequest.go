@@ -17,7 +17,6 @@
 package middleware
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -25,7 +24,6 @@ import (
 
 // BadRequest will be called if no route found
 type BadRequest struct {
-	Quiet   bool
 	Verbose bool
 }
 
@@ -35,18 +33,8 @@ func (b *BadRequest) SetNext(_h http.Handler) {
 
 // ServeHTTP http serve func
 func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var u interface{}
-	if !b.Quiet {
-		log.Printf("Page not found - 404:\n")
-		log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
-	} else {
-		json.NewDecoder(r.Body).Decode(&u)
-		r.ParseForm()
-
-		log.Printf("BadRequest:\n")
-		log.Printf("Request: %+v\n", r)
-		log.Printf("Body: %+v\n", u)
-	}
+	log.Printf("Page not found - 404:\n")
+	log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
 
 	w.WriteHeader(404)
 	fmt.Fprintf(w, "Page not found - 404\n")
