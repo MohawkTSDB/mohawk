@@ -30,9 +30,6 @@ USAGE:
 VERSION:
    0.18.1
 
-DESCRIPTION:
-   Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
-
 AUTHOR:
    Yaacov Zamir <kobi.zamir@gmail.com>
 
