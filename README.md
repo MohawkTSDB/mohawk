@@ -131,7 +131,7 @@ Running the server with ``tls``, ``gzip`` encoding support and using the ``memor
 **Remmeber to set up the ``server.key`` and ``server.pem`` files in your path**.
 
 ```bash
-mohawk -backend memory -tls -gzip -port 8443
+mohawk --backend memory --tls --gzip --port 8443
 2016/12/01 14:23:48 Start server, listen on https://0.0.0.0:8443
 ```
 
