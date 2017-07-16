@@ -1,4 +1,4 @@
-// Copyright 2016 Red Hat, Inc. and/or its affiliates
+// Copyright 2016,2017 Yaacov Zamir <kobi.zamir@gmail.com>
 // and other contributors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
