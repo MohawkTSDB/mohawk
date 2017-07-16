@@ -35,7 +35,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.19.4"
+const VER = "0.19.5"
 
 // defaults
 const defaultPort = 8080
@@ -63,11 +63,9 @@ func main() {
 	app.Name = "mohawk"
 	app.Version = VER
 	app.Usage = "Metric data storage engine"
-	app.Description = "Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface."
 	app.Authors = []cli.Author{
 		{Name: "Yaacov Zamir", Email: "kobi.zamir@gmail.com"},
 	}
-	app.EnableBashCompletion = true
 	app.Flags = []cli.Flag{
 		cli.StringFlag{Name: "backend,b", Value: "memory", Usage: "the backend plugin to use"},
 		cli.StringFlag{Name: "token", Value: "", Usage: "authorization token"},
