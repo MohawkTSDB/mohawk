@@ -17,11 +17,12 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"github.com/urfave/cli"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/yaacov/mohawk/backend"
@@ -58,45 +59,35 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 }
 
 func main() {
+	app := cli.NewApp()
+	app.Name = "mohawk"
+	app.Version = VER
+	app.Usage = "Metric data storage engine"
+	app.Description = "Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface."
+	app.Authors = []cli.Author{
+		{Name: "Yaacov Zamir", Email: "kobi.zamir@gmail.com"},
+	}
+	app.EnableBashCompletion = true
+	app.Flags = []cli.Flag{
+		cli.StringFlag{Name: "backend,b", Value: "memory", Usage: "the backend plugin to use"},
+		cli.StringFlag{Name: "token", Value: "", Usage: "authorization token"},
+		cli.StringFlag{Name: "key", Value: defaultTLSKey, Usage: "path to TLS key file"},
+		cli.StringFlag{Name: "cert", Value: defaultTLSCert, Usage: "path to TLS cert file"},
+		cli.UintFlag{Name: "port,p", Value: defaultPort, Usage: "server port"},
+		cli.BoolFlag{Name: "tls,t", Usage: "use TLS server"},
+		cli.BoolFlag{Name: "gzip,g", Usage: "enable gzip encoding"},
+		cli.BoolFlag{Name: "verbose,V", Usage: "more debug output"},
+	}
+	app.Action = serve
+	app.Run(os.Args)
+}
+
+func serve(c *cli.Context) error {
 	var db backend.Backend
 	var middlewareList []middleware.MiddleWare
 
-	flag.Usage = func() {
-		fmt.Printf("Usage of mohawk:\n")
-		fmt.Printf("    Print this usage message:\n")
-		fmt.Printf("      mohawk -help\n")
-		fmt.Printf("    Print version number:\n")
-		fmt.Printf("      mohawk -version\n")
-		fmt.Printf("    Run the server (examples):\n")
-		fmt.Printf("      mohawk                        # run server using default backend (sqlite))\n")
-		fmt.Printf("      mohawk -gzip -backend memory  # run server using memory backend and accepting gzip encoding\n")
-		fmt.Printf("      mohawk -gzip -tls -port 8443  # run with tls on port 8334\n")
-		fmt.Printf("Flags:\n")
-		flag.PrintDefaults()
-	}
-
-	// Get user options
-	portPtr := flag.Int("port", defaultPort, "server port")
-	backendPtr := flag.String("backend", defaultBackend, "the backend to use [sqlite, memory, mongo, example]")
-	tlsPtr := flag.Bool("tls", defaultTLS, "use TLS server")
-	gzipPtr := flag.Bool("gzip", false, "accept gzip encoding")
-	optionsPtr := flag.String("options", "", "specific backend options [e.g. db-dirname, db-url]")
-	tokenPtr := flag.String("token", "", "authorization token")
-	verbosePtr := flag.Bool("verbose", false, "more debug output")
-	quietPtr := flag.Bool("quiet", false, "less debug output")
-	versionPtr := flag.Bool("version", false, "version number")
-	keyPtr := flag.String("key", defaultTLSKey, "path to TLS key file")
-	certPtr := flag.String("cert", defaultTLSCert, "path to TLS cert file")
-	flag.Parse()
-
-	// return version number and exit
-	if *versionPtr {
-		fmt.Printf("Mohawk version: %s\n\n", VER)
-		return
-	}
-
 	// Create and init the backend
-	switch *backendPtr {
+	switch c.String("backend") {
 	case "sqlite":
 		db = &sqlite.Backend{}
 	case "memory":
@@ -106,15 +97,11 @@ func main() {
 	case "example":
 		db = &example.Backend{}
 	default:
-		log.Fatal("Can't find backend:", *backendPtr)
+		log.Fatal("Can't find backend:", c.String("backend"))
 	}
 
 	// parse options
-	if options, err := url.ParseQuery(*optionsPtr); err == nil {
-		db.Open(options)
-	} else {
-		log.Fatal("Can't parse opetions:", *optionsPtr)
-	}
+	db.Open(url.Values{})
 
 	// set global variables
 	BackendName = db.Name()
@@ -122,7 +109,7 @@ func main() {
 	// h common variables to be used for the backend Handler functions
 	// backend the backend to use for metrics source
 	h := backend.Handler{
-		Verbose: *verbosePtr,
+		Verbose: c.Bool("verbose"),
 		Backend: db,
 	}
 
@@ -175,28 +162,26 @@ func main() {
 	// Create the middlewares
 	// logger a logging middleware
 	logger := middleware.Logger{
-		Quiet:   *quietPtr,
-		Verbose: *verbosePtr,
+		Verbose: c.Bool("verbose"),
 	}
 
 	// authorization middleware
 	authorization := middleware.Authorization{
-		Verbose:         *verbosePtr,
-		UseToken:        *tokenPtr != "",
+		Verbose:         c.Bool("verbose"),
+		UseToken:        c.String("token") != "",
 		PublicPathRegex: "^/hawkular/metrics/status$",
-		Token:           *tokenPtr,
+		Token:           c.String("token"),
 	}
 
 	// gzipper a gzip encoding middleware
 	gzipper := middleware.GZipper{
-		UseGzip: *gzipPtr,
-		Verbose: *verbosePtr,
+		UseGzip: c.Bool("gzip"),
+		Verbose: c.Bool("verbose"),
 	}
 
 	// badrequest a BadRequest middleware
 	badrequest := middleware.BadRequest{
-		Quiet:   *quietPtr,
-		Verbose: *verbosePtr,
+		Verbose: c.Bool("verbose"),
 	}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
@@ -214,17 +199,19 @@ func main() {
 
 	// Run the server
 	srv := &http.Server{
-		Addr:           fmt.Sprintf("0.0.0.0:%d", *portPtr),
+		Addr:           fmt.Sprintf("0.0.0.0:%d", c.Int("port")),
 		Handler:        logger,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	if *tlsPtr {
+	if c.Bool("tls") {
 		log.Printf("Start server, listen on https://%+v", srv.Addr)
-		log.Fatal(srv.ListenAndServeTLS(*certPtr, *keyPtr))
+		log.Fatal(srv.ListenAndServeTLS(c.String("cert"), c.String("key")))
 	} else {
 		log.Printf("Start server, listen on http://%+v", srv.Addr)
 		log.Fatal(srv.ListenAndServe())
 	}
+
+	return nil
 }
