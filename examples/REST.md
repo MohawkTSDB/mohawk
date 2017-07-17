@@ -14,21 +14,21 @@ For usage information look at the [example](/examples) directory.
 
 #### Prefix: "/hawkular/metrics/"
 
-| Method | Path           | Description             |
-|--------|----------------|-------------------------|
-| GET    | status         | Query server status     |
-| GET    | tenants        | Query a list of tenants |
-| GET    | metrics        | Query a list of metrics |
+| Method | Path           | Description             | Response Type |
+|--------|----------------|-------------------------|---------------|
+| GET    | status         | Query server status     | Object        |
+| GET    | tenants        | Query a list of tenants | []String      |
+| GET    | metrics        | Query a list of metrics | []Item        |
 
 #### Prefix: "/hawkular/metrics/gauges/"
 
-| Method | Path           | Description                    |
-|--------|----------------|--------------------------------|
-| GET    | :id/raw        | Query metric data              |
-| POST   | raw/query      | Query multiple metric data     |
-| PUT    | :id/tags       | Update metric tags             |
-| PUT    | tags           | Update multiple metric tags    |
-| POST   | raw            | Insert new metric data         |
+| Method | Path           | Description                    | Response Type           |
+|--------|----------------|--------------------------------|-------------------------|
+| GET    | :id/raw        | Query metric data              | []DataItem / []StatItem |
+| POST   | raw/query      | Query multiple metric data     | []DataItem / []StatItem |
+| PUT    | :id/tags       | Update metric tags             |                         |
+| PUT    | tags           | Update multiple metric tags    |                         |
+| POST   | raw            | Insert new metric data         |                         |
 
 ## Data Structures
 
