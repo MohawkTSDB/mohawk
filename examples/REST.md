@@ -14,21 +14,21 @@ For usage information look at the [example](/examples) directory.
 
 #### Prefix: "/hawkular/metrics/"
 
-| Method | Path           | Description             | Response Type |
-|--------|----------------|-------------------------|---------------|
-| GET    | status         | Query server status     | Object        |
-| GET    | tenants        | Query a list of tenants | []String      |
-| GET    | metrics        | Query a list of metrics | []Item        |
+| Method | Path           | Description             | Response Type    |
+|--------|----------------|-------------------------|------------------|
+| GET    | status         | Query server status     | Object           |
+| GET    | tenants        | Query a list of tenants | Array of Strings |
+| GET    | metrics        | Query a list of metrics | Array of Items   |
 
 #### Prefix: "/hawkular/metrics/gauges/"
 
-| Method | Path           | Description                    | Response Type           |
-|--------|----------------|--------------------------------|-------------------------|
-| GET    | :id/raw        | Query metric data              | []DataItem / []StatItem |
-| POST   | raw/query      | Query multiple metric data     | []DataItem / []StatItem |
-| PUT    | :id/tags       | Update metric tags             |                         |
-| PUT    | tags           | Update multiple metric tags    |                         |
-| POST   | raw            | Insert new metric data         |                         |
+| Method | Path           | Description                    | Response Type                   |
+|--------|----------------|--------------------------------|---------------------------------|
+| GET    | :id/raw        | Query metric data              | Array of DataItems or StatItems |
+| POST   | raw/query      | Query multiple metric data     | Array of DataItems or StatItems |
+| PUT    | :id/tags       | Update metric tags             |                                 |
+| PUT    | tags           | Update multiple metric tags    |                                 |
+| POST   | raw            | Insert new metric data         |                                 |
 
 ## Data Structures
 
