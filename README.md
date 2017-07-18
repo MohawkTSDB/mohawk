@@ -18,6 +18,12 @@ Different use cases may have conflicting requirements for the metric engein, som
 
 Mohowk exposes the same simple REST API for different backend storage options, consumer application can use the same REST API with a lean low footprint stroage and with a resource-intensive high availabilty storage. Mohowk makes hierarchical data storage using short, middle and long term data retention tiers easy to set up and consume.     
 
+#### Compatibility
+
+Mohawk is tested(2) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster).
+
+(2) Mohawk implement only part of Hawkular's API, some functionalty may be missing.
+
 ## Installation
 
 Using a Copr repository for Fedora:
@@ -93,12 +99,6 @@ Moahawk cpu and memory usage is lower than Hawkular and comparable to Prometheus
 
 ![CPU chart](/benchmark/mohawk-mem.png?raw=true "benchmark cpu vm")
 ![CPU chart](/benchmark/prometheus-mem.png?raw=true "benchmark cpu vm")
-
-#### Compatibility
-
-Mohawk is tested(2) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster).
-
-(2) Mohawk implement only part of Hawkular's API, some functionalty may be missing.
 
 ## Running the server
 
