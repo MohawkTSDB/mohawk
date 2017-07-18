@@ -4,11 +4,13 @@
 
 ![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
 
-Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
+Mohawk is a metric data storage engine, it's fun, fast, light and easy to use.
 
 ## Introduction
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/yaacov/mohawk)](https://goreportcard.com/report/github.com/yaacov/mohawk)
+
+Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
 Mohawk can use different storage [plugins](/backend) for different use cases. Different storage plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
