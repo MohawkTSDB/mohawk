@@ -39,6 +39,8 @@ Using Dockerhub repository:
 docker run -v [PATH TO KEY AND CERT FILES]:/root/ssh:Z yaacov/mohawk
 ```
 
+Jump to the [usage](/examples) docs to get started.
+
 #### Storage Plugins
 
 Mohawk architecture makes it easy to implement and set up [plugins](/backend) for new data storage. The backend directory include documentation, examples and a template for plugin develpment.
