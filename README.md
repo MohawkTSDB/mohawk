@@ -6,6 +6,8 @@
 
 Mohawk is a metric data storage engine, it's fun, fast, light and easy to use.
 
+#### Table of contents
+
   - [Introduction](#introduction)
   - [Installation](#installation)
   - [Running the server](#running-the-server)
