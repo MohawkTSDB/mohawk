@@ -8,7 +8,7 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 ## Storage Plugins
 
-Mohawk can use different storage [plugins](/backend) for different use cases. Different storage backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different storage [plugins](/backend) for different use cases. Different storage backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/usage/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
 ## Plugin Development
 

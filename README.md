@@ -12,7 +12,7 @@ Mohawk is a metric data storage engine, it's fun, fast, light and easy to use.
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
-Mohawk can use different storage [plugins](/backend) for different use cases. Different storage plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/examples/REST.md), inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different storage [plugins](/backend) for different use cases. Different storage plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/usage/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
 Different use cases may have conflicting requirements for the metric engein, some use cases may require fast data transfer, while others may depend on long term, high availabilty data retention that inherently makes the system slower.
 
@@ -39,7 +39,7 @@ Using Dockerhub repository:
 docker run -v [PATH TO KEY AND CERT FILES]:/root/ssh:Z yaacov/mohawk
 ```
 
-Jump to the [usage](/examples) docs to get started.
+Jump to the [usage](/usage) docs to get started.
 
 #### Storage Plugins
 
@@ -144,12 +144,12 @@ mohawk --backend memory --tls --gzip --port 8443
 It is easy to scrape data from one server to another, creating a hierarchy of servers
 with a central server collecting specific data from the peripheral servers.
 
-The [syndication.sh](/examples/syndication.sh) script is an example of a script that scrape
+The [syndication.sh](/usage/syndication.sh) script is an example of a script that scrape
 data from one server to another. Scraping scripts can be simple or complicated as needed.
 
 ## Examples
 
-For more in-depth usage information look at the [example](/examples) directory.
+For more in-depth usage information look at the [usage](/usage) directory.
 
 #### Running the server for this examples
 
