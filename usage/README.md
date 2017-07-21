@@ -83,6 +83,14 @@ Mohawk Metrics offers a rich set of features around querying that are ideal for 
   - Downsampling and aggregation
   - Limit and order results
 
+#### Token authentication
+
+If the token flag is set, all API requests must send the valid bearer token in the "Authorization" request header.
+
+```
+curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw -d @data.json -H "Authorization: Bearer THE_TOKEN" \
+```
+
 #### Tenants
 
 All data is partitioned by tenant. The partitioning happens at the API level. This means that a metric cannot exist on its own outside of a tenant.
