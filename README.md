@@ -147,7 +147,7 @@ with a central server collecting specific data from the peripheral servers.
 The [syndication.sh](/usage/syndication.sh) script is an example of a script that scrape
 data from one server to another. Scraping scripts can be simple or complicated as needed.
 
-## Examples
+## Usage
 
 For more in-depth usage information look at the [usage](/usage) directory.
 
