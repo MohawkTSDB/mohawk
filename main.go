@@ -165,6 +165,13 @@ func serve(c *cli.Context) error {
 		Verbose: c.Bool("verbose"),
 	}
 
+	// Create the middlewares
+	// static a file server middleware
+	static := middleware.Static{
+		Verbose: c.Bool("verbose"),
+		Handler: http.FileServer(http.Dir("./images")),
+	}
+
 	// authorization middleware
 	authorization := middleware.Authorization{
 		Verbose:         c.Bool("verbose"),
@@ -187,6 +194,7 @@ func serve(c *cli.Context) error {
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
 	middlewareList = []middleware.MiddleWare{
 		&logger,
+		&static,
 		&authorization,
 		&gzipper,
 		&rGauges,
