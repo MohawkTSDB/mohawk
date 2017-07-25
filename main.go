@@ -66,6 +66,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{Name: "backend,b", Value: "memory", Usage: "the backend plugin to use"},
 		cli.StringFlag{Name: "token", Value: "", Usage: "authorization token"},
+		cli.StringFlag{Name: "media", Value: "./mohawk-webui", Usage: "path to media files"},
 		cli.StringFlag{Name: "key", Value: defaultTLSKey, Usage: "path to TLS key file"},
 		cli.StringFlag{Name: "cert", Value: defaultTLSCert, Usage: "path to TLS cert file"},
 		cli.StringFlag{Name: "options", Value: "", Usage: "specific backend options [e.g. db-dirname, db-url]"},
@@ -165,11 +166,10 @@ func serve(c *cli.Context) error {
 		Verbose: c.Bool("verbose"),
 	}
 
-	// Create the middlewares
 	// static a file server middleware
 	static := middleware.Static{
-		Verbose: c.Bool("verbose"),
-		Handler: http.FileServer(http.Dir("./images")),
+		Verbose:   c.Bool("verbose"),
+		MediaPath: c.String("media"),
 	}
 
 	// authorization middleware
@@ -194,13 +194,13 @@ func serve(c *cli.Context) error {
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
 	middlewareList = []middleware.MiddleWare{
 		&logger,
-		&static,
 		&authorization,
 		&gzipper,
 		&rGauges,
 		&rCounters,
 		&rAvailability,
 		&rRoot,
+		&static,
 		&badrequest,
 	}
 	middleware.Append(middlewareList)

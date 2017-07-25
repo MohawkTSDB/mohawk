@@ -4,6 +4,11 @@
 *.so
 mohawk
 
+# Web UI static files
+mohawk-webui
+mohawk-webui/*
+
+# Server DB and authentication
 server/*
 server.pem
 server.key
