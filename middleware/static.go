@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"mime"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -42,6 +43,11 @@ func (s Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Add index.html to path if it ends with /
 	if path[len(path)-1:] == "/" {
 		path = path + "index.html"
+	}
+
+	// Add /index.html to path if a directory
+	if fi, err := os.Stat(path); err == nil && fi.IsDir() {
+		path = path + "/index.html"
 	}
 
 	// If file exist serve it
