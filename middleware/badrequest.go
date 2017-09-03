@@ -33,6 +33,13 @@ func (b *BadRequest) SetNext(_h http.Handler) {
 
 // ServeHTTP http serve func
 func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// we return 200 for any OPTIONS request
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(200)
+		fmt.Fprintf(w, "{\"GET\":{},\"PUT\":{},\"POST\":{}}")
+		return
+	}
+
 	log.Printf("Page not found - 404:\n")
 	log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
 

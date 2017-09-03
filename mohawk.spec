@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.19.7
+Version:        0.19.8
 Release:        6%{?dist}
 Summary:        Mohawk metric data storage
 License:        Apache
