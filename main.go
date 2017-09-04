@@ -35,7 +35,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.19.8"
+const VER = "0.20.1"
 
 // defaults
 const defaultAPI = "0.21.0"
@@ -51,6 +51,8 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	res := fmt.Sprintf(resTemplate, defaultAPI, VER, BackendName)
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
 }

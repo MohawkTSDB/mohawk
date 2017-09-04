@@ -21,10 +21,10 @@ kill_mohawk() {
   [ "$status" -eq 0 ]
 }
 
-@test "Mohawk is installed in version 0.19.8" {
+@test "Mohawk is installed in version 0.20.1" {
   run mohawk -version
 
-  [[ "$output" =~ "0.19.8"  ]]
+  [[ "$output" =~ "0.20.1"  ]]
 }
 
 @test "Server should be available" {

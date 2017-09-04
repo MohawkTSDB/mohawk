@@ -36,6 +36,9 @@ func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// we return 200 for any OPTIONS request
 	if r.Method == "OPTIONS" {
 		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 		fmt.Fprintf(w, "{\"GET\":{},\"PUT\":{},\"POST\":{}}")
 		return
 	}
