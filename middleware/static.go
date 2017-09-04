@@ -55,6 +55,8 @@ func (s Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ext := filepath.Ext(path)
 
 		w.Header().Set("Content-Type", mime.TypeByExtension(ext))
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
 		w.WriteHeader(200)
 		w.Write(file)
 
