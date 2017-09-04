@@ -46,6 +46,7 @@ func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[str
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, string(resJSON))
@@ -65,6 +66,7 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 	if typeStr, ok := r.Form["type"]; ok && len(typeStr) > 0 && typeStr[0] != "gauge" {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 		w.WriteHeader(200)
 		fmt.Fprintln(w, "[]")
@@ -90,6 +92,7 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, string(resJSON))
@@ -135,6 +138,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 	// output to client
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, resStr)
@@ -169,6 +173,7 @@ func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[str
 		// output to client
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 		w.WriteHeader(200)
 		fmt.Fprintf(w, "{}")
@@ -234,6 +239,7 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, "[")
@@ -281,6 +287,7 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
@@ -304,6 +311,7 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 	h.Backend.PutTags(tenant, id, tags)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
@@ -334,6 +342,7 @@ func (h Handler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[s
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
@@ -356,6 +365,7 @@ func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[str
 	h.Backend.DeleteTags(tenant, id, tags)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")

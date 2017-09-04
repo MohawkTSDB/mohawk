@@ -38,6 +38,7 @@ func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 		fmt.Fprintf(w, "{\"GET\":{},\"PUT\":{},\"POST\":{}}")
 		return

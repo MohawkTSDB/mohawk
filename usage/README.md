@@ -13,7 +13,7 @@ When installed, run using the command line ``mohawk``
 ```bash
 mohawk --version
 
-Mohawk version: 0.20.2
+Mohawk version: 0.21.2
 ```
 
 The `-h` flag will print out a help text, that list the command line arguments.

@@ -35,7 +35,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.20.2"
+const VER = "0.21.2"
 
 // defaults
 const defaultAPI = "0.21.0"
@@ -52,6 +52,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
