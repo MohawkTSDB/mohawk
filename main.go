@@ -50,10 +50,6 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkBackend":"%s"}`
 	res := fmt.Sprintf(resTemplate, defaultAPI, VER, BackendName)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
 }
@@ -143,6 +139,7 @@ func serve(c *cli.Context) error {
 	// deprecated
 	rGauges.Add("GET", ":id/data", h.GetData)
 	rGauges.Add("POST", "data", h.PostData)
+	rGauges.Add("POST", "stats/query", h.PostQuery)
 
 	rCounters := router.Router{
 		Prefix: "/hawkular/metrics/counters/",
@@ -156,6 +153,7 @@ func serve(c *cli.Context) error {
 	// deprecated
 	rCounters.Add("GET", ":id/data", h.GetData)
 	rCounters.Add("POST", "data", h.PostData)
+	rCounters.Add("POST", "stats/query", h.PostQuery)
 
 	rAvailability := router.Router{
 		Prefix: "/hawkular/metrics/availability/",
@@ -183,6 +181,11 @@ func serve(c *cli.Context) error {
 		Token:           c.String("token"),
 	}
 
+	// headers a headers middleware
+	headers := middleware.Headers{
+		Verbose: c.Bool("verbose"),
+	}
+
 	// gzipper a gzip encoding middleware
 	gzipper := middleware.GZipper{
 		UseGzip: c.Bool("gzip"),
@@ -198,6 +201,7 @@ func serve(c *cli.Context) error {
 	middlewareList = []middleware.MiddleWare{
 		&logger,
 		&authorization,
+		&headers,
 		&gzipper,
 		&rGauges,
 		&rCounters,

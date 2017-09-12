@@ -17,31 +17,26 @@
 package middleware
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 )
 
-// BadRequest will be called if no route found
-type BadRequest struct {
+// Headers middleware that will log http requests
+type Headers struct {
 	Verbose bool
+	next    http.Handler
 }
 
 // SetNext set next http serve func
-func (b *BadRequest) SetNext(_h http.Handler) {
+func (l *Headers) SetNext(h http.Handler) {
+	l.next = h
 }
 
 // ServeHTTP http serve func
-func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// we return 200 for any OPTIONS request
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(200)
-		return
-	}
+func (l Headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
 
-	log.Printf("Page not found - 404:\n")
-	log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
-
-	w.WriteHeader(404)
-	fmt.Fprintf(w, "Page not found - 404\n")
+	l.next.ServeHTTP(w, r)
 }
