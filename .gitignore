@@ -33,3 +33,4 @@ _testmain.go
 *.test
 *.prof
 .idea/
+config.yaml

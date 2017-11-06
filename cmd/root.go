@@ -16,6 +16,7 @@ import (
 	"github.com/MohawkTSDB/mohawk/backend/mongo"
 	"github.com/MohawkTSDB/mohawk/backend/example"
 	"github.com/MohawkTSDB/mohawk/router"
+	"github.com/MohawkTSDB/mohawk/alerts"
 )
 
 // VER the server version
@@ -119,6 +120,7 @@ func serve() error {
 
 	// parse options
 	if options, err := url.ParseQuery(options); err == nil {
+		// TODO: add parsing alerts from cli/config file
 		db.Open(options)
 	} else {
 		log.Fatal("Can't parse opetions:", options)
@@ -126,6 +128,15 @@ func serve() error {
 
 	// set global variables
 	BackendName = db.Name()
+
+	// Build Alerts Object and initialize
+	a := alerts.Alerts{
+		Verbose: verbose,
+		Backend:db,
+		AlertsList:[]alerts.Alert{},
+	}
+
+	a.Open([]alerts.Alert{})
 
 	// h common variables to be used for the backend Handler functions
 	// backend the backend to use for metrics source
