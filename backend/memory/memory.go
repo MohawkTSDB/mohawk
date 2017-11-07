@@ -22,7 +22,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/yaacov/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/backend"
 )
 
 type TimeValuePair struct {

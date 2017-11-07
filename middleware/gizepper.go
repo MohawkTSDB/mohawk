@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/yaacov/mohawk/middleware/gzip"
+	"github.com/MohawkTSDB/mohawk/middleware/gzip"
 )
 
 // GZipper middleware that will gzip http requests

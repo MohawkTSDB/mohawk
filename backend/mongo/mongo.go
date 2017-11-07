@@ -23,7 +23,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/yaacov/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/backend"
 )
 
 type Backend struct {

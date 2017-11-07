@@ -21,7 +21,7 @@ import (
 	"math/rand"
 	"net/url"
 
-	"github.com/yaacov/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/backend"
 )
 
 type Backend struct {

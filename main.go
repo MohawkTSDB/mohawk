@@ -25,13 +25,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/yaacov/mohawk/backend"
-	"github.com/yaacov/mohawk/backend/example"
-	"github.com/yaacov/mohawk/backend/memory"
-	"github.com/yaacov/mohawk/backend/mongo"
-	"github.com/yaacov/mohawk/backend/sqlite"
-	"github.com/yaacov/mohawk/middleware"
-	"github.com/yaacov/mohawk/router"
+	"github.com/MohawkTSDB/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/backend/example"
+	"github.com/MohawkTSDB/mohawk/backend/memory"
+	"github.com/MohawkTSDB/mohawk/backend/mongo"
+	"github.com/MohawkTSDB/mohawk/backend/sqlite"
+	"github.com/MohawkTSDB/mohawk/middleware"
+	"github.com/MohawkTSDB/mohawk/router"
 )
 
 // VER the server version
