@@ -13,7 +13,7 @@ Release:        6%{?dist}
 Summary:        Mohawk metric data storage
 License:        Apache
 URL:            https://%{import_path}
-Source0:        https://github.com/yaacov/mohawk/archive/%{version}.tar.gz
+Source0:        https://github.com/MohawkTSDB/mohawk/archive/%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  bzr
@@ -34,8 +34,8 @@ rm -rf vendor
 
 %build
 # set up temporary build gopath, and put our directory there
-mkdir -p ./_build/src/github.com/yaacov
-ln -s $(pwd) ./_build/src/github.com/yaacov/mohawk
+mkdir -p ./_build/src/github.com/MohawkTSDB
+ln -s $(pwd) ./_build/src/github.com/MohawkTSDB/mohawk
 
 export GOPATH=$(pwd)/_build:%{gopath}
 go build -o mohawk .

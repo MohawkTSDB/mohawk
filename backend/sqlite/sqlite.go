@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/yaacov/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/backend"
 )
 
 type Backend struct {

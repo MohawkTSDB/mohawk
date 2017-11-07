@@ -15,7 +15,7 @@ Mohawk is a metric data storage engine, it's fun, fast, light and easy to use.
 
 ## Introduction
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/yaacov/mohawk)](https://goreportcard.com/report/github.com/yaacov/mohawk)
+[![Go Report Card](https://goreportcard.com/badge/github.com/MohawkTSDB/mohawk)](https://goreportcard.com/report/github.com/MohawkTSDB/mohawk)
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
