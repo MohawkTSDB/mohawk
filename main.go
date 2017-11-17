@@ -19,6 +19,7 @@ package main
 import (
 	"fmt"
 	"os"
+
 	"github.com/MohawkTSDB/mohawk/cmd"
 )
 
@@ -28,4 +29,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-
