@@ -4,16 +4,17 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"fmt"
-	"github.com/MohawkTSDB/mohawk/middleware"
 	"net/http"
 	"time"
 	"log"
+	"net/url"
+
+	"github.com/MohawkTSDB/mohawk/middleware"
 	"github.com/MohawkTSDB/mohawk/backend"
 	"github.com/MohawkTSDB/mohawk/backend/sqlite"
 	"github.com/MohawkTSDB/mohawk/backend/memory"
 	"github.com/MohawkTSDB/mohawk/backend/mongo"
 	"github.com/MohawkTSDB/mohawk/backend/example"
-	"net/url"
 	"github.com/MohawkTSDB/mohawk/router"
 )
 
@@ -35,7 +36,7 @@ var RootCmd = &cobra.Command{
 
 var BackendName string
 var cfgFile string
-var driver string
+var plugin string
 var token string
 var media string
 var key string
@@ -48,8 +49,21 @@ var verbose bool
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	// Setting Defaults
+	viper.SetDefault("plugin", "memory")
+	viper.SetDefault("token", "")
+	viper.SetDefault("media", "./mohawk-webui")
+	viper.SetDefault("key", defaultTLSKey)
+	viper.SetDefault("cert", defaultTLSCert)
+	viper.SetDefault("options","")
+	viper.SetDefault("port",8080)
+	viper.SetDefault("tls",false)
+	viper.SetDefault("gzip",false)
+	viper.SetDefault("verbose", false)
+
+	// Flag definition
 	RootCmd.Flags().StringVar(&cfgFile, "config", "","config file (default is $HOME/.cobra.yaml)")
-	RootCmd.Flags().StringVarP(&driver, "driver", "d","memory", "the backend driver to use")
+	RootCmd.Flags().StringVar(&plugin, "plugin","memory", "the backend driver to use")
 	RootCmd.Flags().StringVar(&token, "token", "","authorization token")
 	RootCmd.Flags().StringVar(&media, "media", "./mohawk-webui", "path to media files")
 	RootCmd.Flags().StringVar(&key, "key", defaultTLSKey, "path to TLS key file")
@@ -67,7 +81,7 @@ func initConfig(){
 		if err := viper.ReadInConfig(); err == nil {
 			fmt.Println("Using config file:", viper.ConfigFileUsed()) // debug
 			port = viper.GetInt("port")
-			driver = viper.GetString("driver")
+			plugin = viper.GetString("plugin")
 			key = viper.GetString("key")
 			cert = viper.GetString("cert")
 			tls = viper.GetBool("tls")
@@ -90,7 +104,7 @@ func serve() error {
 	var middlewareList []middleware.MiddleWare
 
 	// Create and init the backend
-	switch driver {
+	switch plugin {
 	case "sqlite":
 		db = &sqlite.Backend{}
 	case "memory":
@@ -100,7 +114,7 @@ func serve() error {
 	case "example":
 		db = &example.Backend{}
 	default:
-		log.Fatal("Can't find backend:", driver)
+		log.Fatal("Can't find backend:", plugin)
 	}
 
 	// parse options
