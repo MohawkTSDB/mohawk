@@ -71,7 +71,7 @@ func (r *Backend) Open(options url.Values) {
 }
 
 func (r Backend) GetTenants() []backend.Tenant {
-	res := make([]backend.Tenant, 0)
+	res := make([]backend.Tenant, 0, len(r.tenant))
 
 	// return a list of tenants
 	for key := range r.tenant {
