@@ -25,8 +25,8 @@ import (
 	"regexp"
 	"strings"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/MohawkTSDB/mohawk/backend"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Backend struct {
