@@ -27,6 +27,8 @@ const defaultAPI = "0.21.0"
 const defaultTLSKey = "server.key"
 const defaultTLSCert = "server.pem"
 
+var BackendName string
+
 var RootCmd = &cobra.Command{
 	Use:    "mohakwk",
 	Short:  "Mohawk is a fast, lightweight time series database.",
@@ -35,58 +37,42 @@ var RootCmd = &cobra.Command{
 	},
 }
 
-var BackendName string
-var cfgFile string
-var plugin string
-var token string
-var media string
-var key string
-var cert string
-var options string
-var port int
-var tls bool
-var gzip bool
-var verbose bool
-
 func init() {
 	cobra.OnInitialize(initConfig)
-	// Setting Defaults
-	viper.SetDefault("plugin", "memory")
-	viper.SetDefault("token", "")
-	viper.SetDefault("media", "./mohawk-webui")
-	viper.SetDefault("key", defaultTLSKey)
-	viper.SetDefault("cert", defaultTLSCert)
-	viper.SetDefault("options","")
-	viper.SetDefault("port",8080)
-	viper.SetDefault("tls",false)
-	viper.SetDefault("gzip",false)
-	viper.SetDefault("verbose", false)
 
 	// Flag definition
-	RootCmd.Flags().StringVar(&cfgFile, "config", "","config file (default is $HOME/.cobra.yaml)")
-	RootCmd.Flags().StringVar(&plugin, "plugin","memory", "the backend driver to use")
-	RootCmd.Flags().StringVar(&token, "token", "","authorization token")
-	RootCmd.Flags().StringVar(&media, "media", "./mohawk-webui", "path to media files")
-	RootCmd.Flags().StringVar(&key, "key", defaultTLSKey, "path to TLS key file")
-	RootCmd.Flags().StringVar(&cert, "cert", defaultTLSCert, "path to TLS cert file")
-	RootCmd.Flags().StringVar(&options, "options", "", "specific backend options [e.g. db-dirname, db-url]")
-	RootCmd.Flags().IntVarP(&port, "port","p", 8080, "server port")
-	RootCmd.Flags().BoolVarP(&tls, "tls","t",false, "use TLS server")
-	RootCmd.Flags().BoolVarP(&gzip, "gzip","g",false, "use gzip encoding")
-	RootCmd.Flags().BoolVarP(&verbose, "verbose","v", false, "more debug output")
+	RootCmd.Flags().BoolP("version","V",false,"display mohawk version number")
+	RootCmd.Flags().StringP("config", "c","","config file (default is $HOME/.cobra.yaml)")
+	RootCmd.Flags().String("backend","memory", "the backend driver to use")
+	RootCmd.Flags().String("token", "","authorization token")
+	RootCmd.Flags().String("media", "./mohawk-webui", "path to media files")
+	RootCmd.Flags().String("key", defaultTLSKey, "path to TLS key file")
+	RootCmd.Flags().String("cert", defaultTLSCert, "path to TLS cert file")
+	RootCmd.Flags().String("options", "", "specific backend options [e.g. db-dirname, db-url]")
+	RootCmd.Flags().IntP("port","p", 8080, "server port")
+	RootCmd.Flags().BoolP("tls","t",false, "use TLS server")
+	RootCmd.Flags().BoolP("gzip","g",false, "use gzip encoding")
+	RootCmd.Flags().BoolP("verbose","v", false, "more debug output")
+
+	// Viper Binding
+	viper.BindPFlag("version", RootCmd.Flags().Lookup("version"))
+	viper.BindPFlag("config", RootCmd.Flags().Lookup("config"))
+	viper.BindPFlag("backend", RootCmd.Flags().Lookup("backend"))
+	viper.BindPFlag("token", RootCmd.Flags().Lookup("token"))
+	viper.BindPFlag("media", RootCmd.Flags().Lookup("media"))
+	viper.BindPFlag("key", RootCmd.Flags().Lookup("key"))
+	viper.BindPFlag("cert", RootCmd.Flags().Lookup("cert"))
+	viper.BindPFlag("port", RootCmd.Flags().Lookup("port"))
+	viper.BindPFlag("tls", RootCmd.Flags().Lookup("tls"))
+	viper.BindPFlag("gzip", RootCmd.Flags().Lookup("gzip"))
+	viper.BindPFlag("verbose", RootCmd.Flags().Lookup("verbose"))
 }
 
 func initConfig(){
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-		if err := viper.ReadInConfig(); err == nil {
-			fmt.Println("Using config file:", viper.ConfigFileUsed()) // debug
-			port = viper.GetInt("port")
-			plugin = viper.GetString("plugin")
-			key = viper.GetString("key")
-			cert = viper.GetString("cert")
-			tls = viper.GetBool("tls")
-			gzip = viper.GetBool("gzip")
+	if viper.GetString("config") != "" {
+		viper.SetConfigFile(viper.GetString("config"))
+		if err := viper.ReadInConfig(); err != nil {
+			fmt.Println("Error reading config file:", err) 
 		}
 	}
 }
@@ -103,9 +89,21 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 func serve() error {
 	var db backend.Backend
 	var middlewareList []middleware.MiddleWare
+	var verbose = viper.GetBool("verbose")
+	var tls = viper.GetBool("tls")
+	var gzip = viper.GetBool("gzip")
+	var token = viper.GetString("token")
+	var port = viper.GetInt("port")
+	var cert = viper.GetString("cert")
+	var key = viper.GetString("key")
+
+	if viper.GetBool("version") {
+		fmt.Printf("Mohawk version: %s\n\n", VER)
+		return nil
+	}
 
 	// Create and init the backend
-	switch plugin {
+	switch viper.GetString("backend") {
 	case "sqlite":
 		db = &sqlite.Backend{}
 	case "memory":
@@ -115,11 +113,11 @@ func serve() error {
 	case "example":
 		db = &example.Backend{}
 	default:
-		log.Fatal("Can't find backend:", plugin)
+		log.Fatal("Can't find backend:", viper.GetString("backend"))
 	}
 
 	// parse options
-	if options, err := url.ParseQuery(options); err == nil {
+	if options, err := url.ParseQuery(viper.GetString("options")); err == nil {
 		// TODO: add parsing alerts from cli/config file
 		db.Open(options)
 	} else {
@@ -202,7 +200,7 @@ func serve() error {
 	// static a file server middleware
 	static := middleware.Static{
 		Verbose:   verbose,
-		MediaPath: media,
+		MediaPath: viper.GetString("media"),
 	}
 
 	// authorization middleware
