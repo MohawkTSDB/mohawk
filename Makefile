@@ -35,3 +35,8 @@ container:
 .PHONY: install
 install: fmt mohawk
 	install -D -m0755 mohawk $(DESTDIR)$(BINDIR)/mohawk
+
+.PHONY: vendor
+vendor:
+	[ -d ${GOPATH}/src/github.com/LK4D4/vndr ] || go get -u -v github.com/LK4D4/vndr
+	${GOPATH}/bin/vndr
