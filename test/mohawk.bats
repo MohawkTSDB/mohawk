@@ -22,7 +22,7 @@ kill_mohawk() {
 }
 
 @test "Mohawk is installed in version 0.21.4" {
-  run mohawk -version
+  run mohawk --version
 
   [[ "$output" =~ "0.21.4"  ]]
 }
