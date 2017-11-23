@@ -48,6 +48,16 @@ docker run -v [PATH TO KEY AND CERT FILES]:/root/ssh:Z yaacov/mohawk
 
 Jump to the [usage](/usage) docs to get started.
 
+### Building from source
+
+```
+mkdir -p ${GOPATH}/src/github.com/MohawkTSDB && cd ${GOPATH}/src/github.com/MohawkTSDB
+git clone https://github.com/MohawkTSDB/mohawk.git
+cd mohawk
+make vendor && make all
+cp mohawk /usr/local/bin
+```
+
 #### Storage Plugins
 
 Mohawk architecture makes it easy to implement and set up [plugins](/backend) for new data storage. The backend directory include documentation, examples and a template for plugin develpment.
