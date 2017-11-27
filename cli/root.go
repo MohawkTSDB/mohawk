@@ -62,12 +62,12 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	// Flag definition
-	RootCmd.Flags().StringP("backend", "b", "memory", "the backend plugin to use")
+	RootCmd.Flags().StringP("storage", "b", "memory", "the storage plugin to use")
 	RootCmd.Flags().String("token", "", "authorization token")
 	RootCmd.Flags().String("media", "./mohawk-webui", "path to media files")
 	RootCmd.Flags().String("key", defaultTLSKey, "path to TLS key file")
 	RootCmd.Flags().String("cert", defaultTLSCert, "path to TLS cert file")
-	RootCmd.Flags().String("options", "", "specific backend options [e.g. db-dirname, db-url]")
+	RootCmd.Flags().String("options", "", "specific storage options [e.g. db-dirname, db-url]")
 	RootCmd.Flags().IntP("port", "p", 8080, "server port")
 	RootCmd.Flags().BoolP("tls", "t", false, "use TLS server")
 	RootCmd.Flags().BoolP("gzip", "g", false, "use gzip encoding")
@@ -76,7 +76,7 @@ func init() {
 	RootCmd.Flags().StringP("config", "c", "", "config file (default is $HOME/.cobra.yaml)")
 
 	// Viper Binding
-	viper.BindPFlag("backend", RootCmd.Flags().Lookup("backend"))
+	viper.BindPFlag("storage", RootCmd.Flags().Lookup("storage"))
 	viper.BindPFlag("token", RootCmd.Flags().Lookup("token"))
 	viper.BindPFlag("media", RootCmd.Flags().Lookup("media"))
 	viper.BindPFlag("key", RootCmd.Flags().Lookup("key"))

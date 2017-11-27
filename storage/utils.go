@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package backend
-package backend
+// Package storage
+package storage
 
 func FilterItems(vs []Item, f func(Item) bool) []Item {
 	vsf := make([]Item, 0)

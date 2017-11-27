@@ -19,17 +19,17 @@ Mohawk is a metric data storage engine, it's fun, fast, light and easy to use.
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
-Mohawk can use different storage [plugins](/backend) for different use cases. Different storage plugins may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/usage/REST.md), inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different storage [plugins](/storage) for different use cases. Different storage plugins may vary in speed, persistence and scale ability. Mohawk use a subset of Hawkular's [REST API](/usage/REST.md), inheriting Hawkular's ecosystem of clients and plugins.
 
-Different use cases may have conflicting requirements for the metric engein, some use cases may require fast data transfer, while others may depend on long term, high availabilty data retention that inherently makes the system slower.
+Different use cases may have conflicting requirements for the metric engine, some use cases may require fast data transfer, while others may depend on long term, high availability data retention that inherently makes the system slower.
 
-Mohowk exposes the same simple REST API for different backend storage options, consumer application can use the same REST API with a lean low footprint stroage and with a resource-intensive high availabilty storage. Mohowk makes hierarchical data storage using short, middle and long term data retention tiers easy to set up and consume.     
+Mohowk exposes the same simple REST API for different storage options, consumer application can use the same REST API with a lean low footprint stroage and with a resource-intensive high availability storage. Mohowk makes hierarchical data storage using short, middle and long term data retention tiers easy to set up and consume.     
 
 #### Compatibility
 
 Mohawk is tested(2) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster) to automagically scrape metrics from Kubernetes/OpenShift clusters.
 
-(2) Mohawk implement only part of Hawkular's API, some functionalty may be missing.
+(2) Mohawk implement only part of Hawkular's API, some functionality may be missing.
 
 ## Installation
 
@@ -70,7 +70,7 @@ make install
 
 #### Storage Plugins
 
-Mohawk architecture makes it easy to implement and set up [plugins](/backend) for new data storage. The backend directory include documentation, examples and a template for plugin develpment.
+Mohawk architecture makes it easy to implement and set up [plugins](/storage) for new data storage. The storage directory include documentation, examples and a template for plugin development.
 
 ###### Current storage plugin list include:
 
@@ -80,15 +80,15 @@ Mohawk architecture makes it easy to implement and set up [plugins](/backend) fo
 | sqlite            | Local File        | No data loss on network outages             | Persistence data, W/O external data base |
 | mongo             | Mongo DB          | High availabilty, High volume storage       | Long term H.A. storage                   |
 
-A template plugin named [example](/backend/example) is also available.
+A template plugin named [example](/storage/example) is also available.
 
 #### Benchmarks
 
 ###### Name: Run time, real
 ###### Description: 1000 writes + 1000 reads ( [benchmark.py](/benchmark/benchmark.py) ) less is better.
 
-Benchmark results depend on system resurcses, current work load and network.
-For more information on tests and run enviroments, see the [benchmark](/benchmark) directory.
+Benchmark results depend on system resources, current work load and network.
+For more information on tests and run environments, see the [benchmark](/benchmark) directory.
 
 ###### Mohawk with different Plugins running on a desktop machine.
 
@@ -162,11 +162,11 @@ mohawk
 2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
 ```
 
-Running the server with ``tls``, ``gzip`` encoding support and using the ``memory`` backend,
-**Remmeber to set up the ``server.key`` and ``server.pem`` files in your path**.
+Running the server with ``tls``, ``gzip`` encoding support and using the ``memory`` storage,
+**Remember to set up the ``server.key`` and ``server.pem`` files in your path**.
 
 ```bash
-mohawk --backend memory --tls --gzip --port 8443
+mohawk --storage memory --tls --gzip --port 8443
 2016/12/01 14:23:48 Start server, listen on https://0.0.0.0:8443
 ```
 

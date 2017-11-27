@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package backend
+// Package storage
 package memory
 
 import (
@@ -22,7 +22,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/MohawkTSDB/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/storage"
 )
 
 type TimeValuePair struct {
@@ -49,7 +49,7 @@ type Backend struct {
 }
 
 // Backend functions
-// Required by backend interface
+// Required by storage interface
 
 func (r Backend) Name() string {
 	return "Backend-Memory"
@@ -70,19 +70,19 @@ func (r *Backend) Open(options url.Values) {
 	go r.maintenance()
 }
 
-func (r Backend) GetTenants() []backend.Tenant {
-	res := make([]backend.Tenant, 0, len(r.tenant))
+func (r Backend) GetTenants() []storage.Tenant {
+	res := make([]storage.Tenant, 0, len(r.tenant))
 
 	// return a list of tenants
 	for key := range r.tenant {
-		res = append(res, backend.Tenant{Id: key})
+		res = append(res, storage.Tenant{Id: key})
 	}
 
 	return res
 }
 
-func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
-	res := make([]backend.Item, 0)
+func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.Item {
+	res := make([]storage.Item, 0)
 	t, ok := r.tenant[tenant]
 
 	// check tenant
@@ -92,16 +92,16 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 
 	for key, ts := range t.ts {
 		if hasMatchingTag(tags, ts.tags) {
-			lastValue := backend.DataItem{
+			lastValue := storage.DataItem{
 				Timestamp: ts.lastValue.timeStamp,
 				Value:     ts.lastValue.value,
 			}
 
-			res = append(res, backend.Item{
+			res = append(res, storage.Item{
 				Id:         key,
 				Type:       "gauge",
 				Tags:       ts.tags,
-				LastValues: []backend.DataItem{lastValue},
+				LastValues: []storage.DataItem{lastValue},
 			})
 		}
 	}
@@ -111,7 +111,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 	// 	if the list is already filtered, we do not need to re-filter it
 	if len(tags) > 0 {
 		for key, value := range tags {
-			res = backend.FilterItems(res, func(i backend.Item) bool {
+			res = storage.FilterItems(res, func(i storage.Item) bool {
 				r, _ := regexp.Compile("^" + value + "$")
 				return r.MatchString(i.Tags[key])
 			})
@@ -121,8 +121,8 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 	return res
 }
 
-func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
-	res := make([]backend.DataItem, 0)
+func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+	res := make([]storage.DataItem, 0)
 
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	pStart := r.getPosForTimestamp(start)
@@ -147,7 +147,7 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 		// if this is a valid point
 		if d.timeStamp < end && d.timeStamp >= start {
 			count++
-			res = append(res, backend.DataItem{
+			res = append(res, storage.DataItem{
 				Timestamp: d.timeStamp,
 				Value:     d.value,
 			})
@@ -165,8 +165,8 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
-func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
-	res := make([]backend.StatItem, 0)
+func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+	res := make([]storage.StatItem, 0)
 
 	// make sure start and end times is in the retention time
 	start, end = r.checkTimespan(start, end)
@@ -229,7 +229,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 
 		// all points are valid
 		if samples > 0 {
-			res = append(res, backend.StatItem{
+			res = append(res, storage.StatItem{
 				Start:   startTimestamp,
 				End:     startTimestamp + stepMillisec,
 				Empty:   false,
@@ -240,7 +240,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 			})
 		} else {
 			count++
-			res = append(res, backend.StatItem{
+			res = append(res, storage.StatItem{
 				Start: startTimestamp,
 				End:   startTimestamp + stepMillisec,
 				Empty: true,
@@ -305,7 +305,7 @@ func (r *Backend) DeleteTags(tenant string, id string, tags []string) bool {
 }
 
 // Helper functions
-// Not required by backend interface
+// Not required by storage interface
 
 func (r *Backend) checkTimespan(start int64, end int64) (int64, int64) {
 	memFirstTime := (r.timeLastSec - r.timeRetentionSec) * 1000

@@ -1,7 +1,7 @@
 package alerts
 
 import (
-	"github.com/MohawkTSDB/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/storage"
 )
 
 const (
@@ -25,12 +25,12 @@ type Alert struct {
 }
 
 type AlertList struct {
-	Tenant  backend.Tenant `mapstructure:"tenant"`
+	Tenant  storage.Tenant `mapstructure:"tenant"`
 	List []Alert 		   `mapstructure:"alert_list"`
 }
 
 type Alerts struct{
-	Backend backend.Backend `mapstrcuture: "backend"`
+	Backend storage.Backend `mapstrcuture: "storage"`
 	Verbose bool			`mapstrcuture: "verbose"`
 	AlertLists []AlertList  `mapstructure: "alerts"`
 }

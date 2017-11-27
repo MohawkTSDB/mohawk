@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package backend
+// Package storage
 package example
 
 import (
@@ -21,14 +21,14 @@ import (
 	"math/rand"
 	"net/url"
 
-	"github.com/MohawkTSDB/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/storage"
 )
 
 type Backend struct {
 }
 
 // Backend functions
-// Required by backend interface
+// Required by storage interface
 
 func (r Backend) Name() string {
 	return "Backend-Example"
@@ -38,21 +38,21 @@ func (r *Backend) Open(options url.Values) {
 	// open db connection
 }
 
-func (r Backend) GetTenants() []backend.Tenant {
-	res := make([]backend.Tenant, 0)
+func (r Backend) GetTenants() []storage.Tenant {
+	res := make([]storage.Tenant, 0)
 
 	// return a list of tenants
-	res = append(res, backend.Tenant{Id: "Example tenant"})
+	res = append(res, storage.Tenant{Id: "Example tenant"})
 
 	return res
 }
 
-func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
-	res := make([]backend.Item, 0)
+func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.Item {
+	res := make([]storage.Item, 0)
 	maxSize := 42
 
 	for i := 0; i < maxSize; i++ {
-		res = append(res, backend.Item{
+		res = append(res, storage.Item{
 			Id:   fmt.Sprintf("container/%08d/example/gouge", i),
 			Type: "gauge",
 			Tags: map[string]string{"name": "example/gouge", "units": "byte"},
@@ -65,7 +65,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 	/*
 		if len(tags) > 0 {
 			for key, value := range tags {
-				res = backend.FilterItems(res, func(i backend.Item) bool {
+				res = storage.FilterItems(res, func(i storage.Item) bool {
 					r, _ := regexp.Compile("^" + value + "$")
 					return r.MatchString(i.Tags[key])
 				})
@@ -76,8 +76,8 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 	return res
 }
 
-func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
-	res := make([]backend.DataItem, 0)
+func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+	res := make([]storage.DataItem, 0)
 	var sampleDuration int64
 	var l int64
 	var i int64
@@ -89,7 +89,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 	}
 
 	for i = 0; i < l; i++ {
-		res = append(res, backend.DataItem{
+		res = append(res, storage.DataItem{
 			Timestamp: end - sampleDuration*1000*i,
 			Value:     124 + float64(rand.Intn(42)),
 		})
@@ -98,8 +98,8 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 	return res
 }
 
-func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
-	res := make([]backend.StatItem, 0)
+func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+	res := make([]storage.StatItem, 0)
 	var l int64
 	var i int64
 
@@ -109,7 +109,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	}
 
 	for i = 0; i < l; i++ {
-		res = append(res, backend.StatItem{
+		res = append(res, storage.StatItem{
 			Start:   end - bucketDuration*1000*(i+1),
 			End:     end - bucketDuration*1000*i,
 			Empty:   false,
@@ -147,4 +147,4 @@ func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 }
 
 // Helper functions
-// Not required by backend interface
+// Not required by storage interface

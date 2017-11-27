@@ -1,6 +1,6 @@
 
 
-# mohawk/backend
+# mohawk/storage
 
 ![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
 
@@ -8,24 +8,24 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 ## Storage Plugins
 
-Mohawk can use different storage [plugins](/backend) for different use cases. Different storage backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/usage/REST.md), inheriting Hawkular's echosystem of clients and plugins.
+Mohawk can use different storage [plugins](/storage) for different use cases. Different storage backends may vary in speed, persistancy and scalability. Mohawk use a subset of Hawkular's [REST API](/usage/REST.md), inheriting Hawkular's echosystem of clients and plugins.
 
 ## Plugin Development
 
-A storage plugin should implement the [backend interface](/backend/backend.go). Each storage plugin is built for specific use case, with features that best suite this use case.
+A storage plugin should implement the [storage interface](/storage/storage.go). Each storage plugin is built for specific use case, with features that best suite this use case.
 
 Implementation of a feature should not interfere with the storage plugin functionality, for example, a plugin built for speed may choose not to implement a feature that may slow it down.
 
 Plugins that implement a subset of the interface, must fail silently for unimplemented requests.
 
-For a starting template of a storage plugin, look at the [backend example](/backend/example) directory.
+For a starting template of a storage plugin, look at the [storage example](/storage/example) directory.
 
 ## Plugins Comparison
 
-  - Example - a backend template.
-  - Sqlite  - a file storage based backend.
-  - Memory  - a memory storage based backend.
-  - Mongo   - a cluster based backend.
+  - Example - a storage template.
+  - Sqlite  - a file storage based storage.
+  - Memory  - a memory storage based storage.
+  - Mongo   - a cluster based storage.
 
 #### Features
 

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package backend
+// Package storage
 package sqlite
 
 import (
@@ -25,7 +25,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/MohawkTSDB/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/storage"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -35,14 +35,14 @@ type Backend struct {
 }
 
 // Backend functions
-// Required by backend interface
+// Required by storage interface
 
 func (r Backend) Name() string {
 	return "Backend-Sqlite3"
 }
 
 func (r *Backend) Open(options url.Values) {
-	// get backend options
+	// get storage options
 	r.dbDirName = options.Get("db-dirname")
 	if r.dbDirName == "" {
 		r.dbDirName = "./"
@@ -51,22 +51,22 @@ func (r *Backend) Open(options url.Values) {
 	r.tenant = make(map[string]*sql.DB)
 }
 
-func (r Backend) GetTenants() []backend.Tenant {
-	res := make([]backend.Tenant, 0)
+func (r Backend) GetTenants() []storage.Tenant {
+	res := make([]storage.Tenant, 0)
 
 	files, _ := ioutil.ReadDir(r.dbDirName)
 	for _, f := range files {
 		// take only sqlite db files as tenant names
 		if p := strings.Split(f.Name(), "."); len(p) == 2 && p[1] == "db" {
-			res = append(res, backend.Tenant{Id: p[0]})
+			res = append(res, storage.Tenant{Id: p[0]})
 		}
 	}
 
 	return res
 }
 
-func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.Item {
-	res := make([]backend.Item, 0)
+func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.Item {
+	res := make([]storage.Item, 0)
 	db, _ := r.GetTenant(tenant)
 
 	// create one item per id
@@ -83,7 +83,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 		if err != nil {
 			log.Printf("%q\n", err)
 		}
-		res = append(res, backend.Item{
+		res = append(res, storage.Item{
 			Id:   id,
 			Type: "gauge",
 			Tags: map[string]string{},
@@ -119,7 +119,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 	// filter using tags
 	if len(tags) > 0 {
 		for key, value := range tags {
-			res = backend.FilterItems(res, func(i backend.Item) bool {
+			res = storage.FilterItems(res, func(i storage.Item) bool {
 				r, _ := regexp.Compile("^" + value + "$")
 				return r.MatchString(i.Tags[key])
 			})
@@ -129,8 +129,8 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []backend.It
 	return res
 }
 
-func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []backend.DataItem {
-	res := make([]backend.DataItem, 0)
+func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+	res := make([]storage.DataItem, 0)
 	db, _ := r.GetTenant(tenant)
 
 	// check if id exist
@@ -157,7 +157,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 		if err != nil {
 			log.Printf("%q\n", err)
 		}
-		res = append(res, backend.DataItem{
+		res = append(res, storage.DataItem{
 			Timestamp: timestamp,
 			Value:     value,
 		})
@@ -170,10 +170,10 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 	return res
 }
 
-func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []backend.StatItem {
+func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
 	var t int64
 	count := int64(0)
-	res := make([]backend.StatItem, 0)
+	res := make([]storage.StatItem, 0)
 	db, _ := r.GetTenant(tenant)
 
 	timeStep := bucketDuration * 1000
@@ -217,7 +217,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 		// append missing
 		for t >= (endT+timeStep) && count < limit {
 			count++
-			res = append(res, backend.StatItem{
+			res = append(res, storage.StatItem{
 				Start: t,
 				End:   t + timeStep,
 				Empty: true,
@@ -227,7 +227,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 
 		// add data
 		count++
-		res = append(res, backend.StatItem{
+		res = append(res, storage.StatItem{
 			Start:   startT,
 			End:     startT + timeStep,
 			Empty:   false,
@@ -247,7 +247,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	// append missing
 	for t >= (startTime+timeStep) && count < limit {
 		count++
-		res = append(res, backend.StatItem{
+		res = append(res, storage.StatItem{
 			Start: t,
 			End:   t + timeStep,
 			Empty: true,
@@ -311,7 +311,7 @@ func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 }
 
 // Helper functions
-// Not required by backend interface
+// Not required by storage interface
 
 func (r *Backend) GetTenant(name string) (*sql.DB, error) {
 	var filename string
@@ -425,7 +425,7 @@ func (r Backend) createId(tenant string, id string) bool {
 	return true
 }
 
-func (r Backend) UpdateTag(items []backend.Item, tenant string, id string, tag string, value string) []backend.Item {
+func (r Backend) UpdateTag(items []storage.Item, tenant string, id string, tag string, value string) []storage.Item {
 	// try to update tag if item exist
 	for i, item := range items {
 		if item.Id == id {
@@ -435,7 +435,7 @@ func (r Backend) UpdateTag(items []backend.Item, tenant string, id string, tag s
 	}
 
 	// if here we did not find a matching item
-	items = append(items, backend.Item{
+	items = append(items, storage.Item{
 		Id:   id,
 		Tags: map[string]string{tag: value},
 	})
