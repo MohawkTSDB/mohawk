@@ -12,26 +12,19 @@ const (
 
 type RangeIntervalType int
 
-type Range struct {
-	From float64		   `mapstructure:"from"`
-	To   float64           `mapstructure:"to"`
-	Type RangeIntervalType `mapstructure:"type"`
-}
-
 type Alert struct {
 	Id      string         `mapstructure:"id"`
-	Range   Range		   `mapstructure:"range"`
+	Metric  string 		   `mapstructure:"metric"`
+	Tenant  string         `mapstructure:"tenant"`
 	State   bool		   `mapstructure:"state"`
-}
-
-type AlertList struct {
-	Tenant  storage.Tenant `mapstructure:"tenant"`
-	List []Alert 		   `mapstructure:"alert_list"`
+	From    float64 	   `mapstructure:"from"`
+	To      float64        `mapstructure:"to"`
+	Type RangeIntervalType `mapstructure:"type"`
 }
 
 type Alerts struct{
 	Backend storage.Backend `mapstrcuture: "storage"`
 	Verbose bool			`mapstrcuture: "verbose"`
-	AlertLists []AlertList  `mapstructure: "alerts"`
+	Alerts  []*Alert        `mapstructure: "alerts"`
 }
 

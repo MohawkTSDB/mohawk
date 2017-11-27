@@ -96,14 +96,14 @@ func Serve() error {
 	// Create alerts runner
 	if configAlerts {
 		// parse alert list from config yaml
-		l := []alerts.AlertList{}
+		l := []*alerts.Alert{}
 		viper.UnmarshalKey("alerts", &l)
 
 		// creat and start the alert handler
-		a := alerts.Alerts{
-			Backend:    db,
-			Verbose:    verbose,
-			AlertLists: l,
+		a := &alerts.Alerts{
+			Backend: db,
+			Verbose: verbose,
+			Alerts:  l,
 		}
 		a.Open()
 	}

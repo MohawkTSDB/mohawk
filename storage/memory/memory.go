@@ -143,7 +143,6 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 	count := int64(0)
 	for i := pEnd; count < limit && i >= pStart; i-- {
 		d := r.tenant[tenant].ts[id].data[i%arraySize]
-
 		// if this is a valid point
 		if d.timeStamp < end && d.timeStamp >= start {
 			count++
