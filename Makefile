@@ -16,7 +16,7 @@ clean:
 	$(RM) mohawk
 
 .PHONY: test
-test:
+test: clean all install
 	bats test/mohawk.bats
 
 .PHONY: secret
