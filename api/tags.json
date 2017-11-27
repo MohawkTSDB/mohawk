@@ -1,0 +1,9 @@
+[
+  {
+    "id": "free_memory",
+    "tags": {
+      "datacenter": "dc2",
+      "hostname": "server1"
+    }
+  }
+]
