@@ -25,7 +25,7 @@ openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 ```
 
 #### JSON + REST API
-JSON over [REST API](/storage/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
+JSON over [REST API](/api/REST.md) is the primary interface of Mohawk Metrics. This makes it easier for users to get started and also makes integration easier since REST+JSON is widely used and easily understood. a rich, growing set of features that includes:
 
 #### Multi Tenancy
 Mohawk Metrics provides virtual multi tenancy. All data is mapped to a tenant. Everything is partitioned by tenant. All requests, both reads and writes, can include a tenant id, default tenant id is `_ops`.
