@@ -7,4 +7,6 @@ addons:
     packages:
     - bats
     - bc
-script: make test
+script:
+  - make test-unit
+  - make test

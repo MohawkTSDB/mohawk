@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 )
 
-// Logger middleware that will log http requests
+// Static middleware serves static files
 type Static struct {
 	Verbose   bool
 	MediaPath string

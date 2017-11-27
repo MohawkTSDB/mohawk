@@ -20,6 +20,14 @@ import (
 	"net/http"
 )
 
+// HandlerFunc implements ServeHTTP and it's actually a function that its
+// signature is similar to http.HandlerFunc
+type HandlerFunc func(w http.ResponseWriter, r *http.Request)
+
+func (hf HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	hf(w, r)
+}
+
 type MiddleWare interface {
 	SetNext(http.Handler)
 	ServeHTTP(http.ResponseWriter, *http.Request)

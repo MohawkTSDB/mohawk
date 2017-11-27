@@ -19,6 +19,10 @@ clean:
 test: clean vendor all install
 	bats test/mohawk.bats
 
+.PHONY: test-unit
+test-unit: clean vendor
+	@go test $(shell go list ./... | grep -v vendor)
+
 .PHONY: secret
 secret:
 	openssl ecparam -genkey -name secp384r1 -out server.key
