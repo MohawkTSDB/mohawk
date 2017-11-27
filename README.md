@@ -103,6 +103,7 @@ Request usage message.
 mohawk -h
 Usage of mohawk:
 ...
+```
 
 Running ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
 
@@ -117,7 +118,7 @@ Running the server with ``tls``, ``gzip`` encoding support and using the ``memor
 ```bash
 mohawk --storage memory --tls --gzip --port 8443
 2016/12/01 14:23:48 Start server, listen on https://0.0.0.0:8443
-`
+```
 
 #### Running the server for this examples
 
