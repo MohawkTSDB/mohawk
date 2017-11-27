@@ -51,11 +51,17 @@ Jump to the [usage](/usage) docs to get started.
 ### Building from source
 
 ```
+# Create a directory for sources
 mkdir -p ${GOPATH}/src/github.com/MohawkTSDB && cd ${GOPATH}/src/github.com/MohawkTSDB
+
+# Clone the sources from the git repository
 git clone https://github.com/MohawkTSDB/mohawk.git
 cd mohawk
-make vendor && make all
-cp mohawk /usr/local/bin
+
+#
+make vendor
+make all
+make install
 ```
 
 #### Storage Plugins
