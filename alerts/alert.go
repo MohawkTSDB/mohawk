@@ -19,15 +19,19 @@ type Range struct {
 }
 
 type Alert struct {
-	tenant  backend.Tenant
 	id      string
 	r       Range
 	state   bool
 }
 
-type Alerts struct {
-	Verbose bool
+type AlertList struct {
+	tenant  backend.Tenant
+	list []Alert `mapstructure:"alert_list`
+}
+
+type Alerts struct{
 	Backend backend.Backend
-	AlertsList []Alert
+	Verbose bool
+	AlertLists []AlertList `mapstructure:"alerts`
 }
 
