@@ -19,7 +19,7 @@ Mohawk is a metric data storage engine, it's fun, fast, light and easy to use.
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
-Mohawk can use different storage [plugins](/storage) for different use cases. Different storage plugins may vary in speed, persistence and scale ability. Mohawk use a subset of Hawkular's [REST API](/usage/REST.md), inheriting Hawkular's ecosystem of clients and plugins.
+Mohawk can use different storage plugins for different use cases. Different storage plugins may vary in speed, persistence and scale ability. Mohawk use a subset of Hawkular's REST API inheriting Hawkular's ecosystem of clients and plugins.
 
 Different use cases may have conflicting requirements for the metric engine, some use cases may require fast data transfer, while others may depend on long term, high availability data retention that inherently makes the system slower.
 
@@ -82,53 +82,6 @@ Mohawk architecture makes it easy to implement and set up [plugins](/storage) fo
 
 A template plugin named [example](/storage/example) is also available.
 
-#### Benchmarks
-
-###### Name: Run time, real
-###### Description: 1000 writes + 1000 reads ( [benchmark.py](/benchmark/benchmark.py) ) less is better.
-
-Benchmark results depend on system resources, current work load and network.
-For more information on tests and run environments, see the [benchmark](/benchmark) directory.
-
-###### Mohawk with different Plugins running on a desktop machine.
-
-| Plugin   | Time       | %CPU      | RSS byte      |
-|----------|------------|-----------|---------------|
-|memory    |  0m2.011s  | 0.2 - 5.5 | 7456 - 11028  |
-|mongo (1) |  0m4.885s  | 0.5 - 0.8 | 11892 - 11892 |
-|sqlite3   |  0m14.471s | 0.2 - 7.4 | 8416 - 12560  |
-
-(1) the mongo usage metrics does not include usage of the mongodb server.
-
-###### Chart: different Plugins vs. Run Time
-
-![Time chart](/benchmark/time.png?raw=true "benchmark time vm")
-
-###### Mohawk vs. Hawkular running on a vm under same load.
-
-| DB/Plugin          | Time        |
-|---------------------|-------------|
-|Hawkular/Casandra    |  2m8.783s   |
-|Mohawk/Memory        |  0m22.833s  |
-
-###### Chart: DB/Plugin vs. Run Time
-
-![Time chart](/benchmark/time-vm.png?raw=true "benchmark time vm")
-
-#### Performance
-
-Moahawk cpu and memory usage is lower than Hawkular and comparable to Prometheus, for more details see [Performance](/benchmark/PERF.md) doc.
-
-###### Mohawk vs. Prometheus CPU (Pod name is hawkular-metrics, but actually running mohawk)
-
-![CPU chart](/benchmark/mohawk-cpu.png?raw=true "benchmark cpu vm")
-![CPU chart](/benchmark/prometheus-cpu.png?raw=true "benchmark cpu vm")
-
-###### Mohawk vs. Prometheus Memory (Pod name is hawkular-metrics, but actually running mohawk)
-
-![CPU chart](/benchmark/mohawk-mem.png?raw=true "benchmark cpu vm")
-![CPU chart](/benchmark/prometheus-mem.png?raw=true "benchmark cpu vm")
-
 ## Running the server
 
 #### Mock Certifications
@@ -168,19 +121,7 @@ Running the server with ``tls``, ``gzip`` encoding support and using the ``memor
 ```bash
 mohawk --storage memory --tls --gzip --port 8443
 2016/12/01 14:23:48 Start server, listen on https://0.0.0.0:8443
-```
-
-#### Syndication and hierarchical server setup
-
-It is easy to scrape data from one server to another, creating a hierarchy of servers
-with a central server collecting specific data from the peripheral servers.
-
-The [syndication.sh](/usage/syndication.sh) script is an example of a script that scrape
-data from one server to another. Scraping scripts can be simple or complicated as needed.
-
-## Usage
-
-For more in-depth usage information look at the [usage](/usage) directory.
+`
 
 #### Running the server for this examples
 
