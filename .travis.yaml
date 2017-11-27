@@ -1,5 +1,5 @@
 sudo: false
-language: bash
+language: go
 addons:
   apt:
     sources:
