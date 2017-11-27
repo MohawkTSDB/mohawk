@@ -46,8 +46,6 @@ Using Dockerhub repository:
 docker run -v [PATH TO KEY AND CERT FILES]:/root/ssh:Z yaacov/mohawk
 ```
 
-Jump to the [usage](/usage) docs to get started.
-
 ### Building from source
 
 ```
