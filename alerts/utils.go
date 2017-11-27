@@ -2,21 +2,21 @@ package alerts
 
 func (alert *Alert) checkOutOfRange(value float64) bool {
 	var res bool
-	switch alert.r.t {
+	switch alert.Range.Type {
 	case BETWEEN:
-		if (value < alert.r.from || value > alert.r.to) {
+		if (value < alert.Range.From || value > alert.Range.To) {
 			res = true
 		} else {
 			res = false
 		}
 	case LOWER_THAN:
-		if (value > alert.r.to) {
+		if (value > alert.Range.To) {
 			res = true
 		} else {
 			res =  false
 		}
 	case HIGHER_THAN:
-		if (value < alert.r.from) {
+		if (value < alert.Range.From) {
 			res = true
 		} else {
 			res = false
@@ -26,13 +26,9 @@ func (alert *Alert) checkOutOfRange(value float64) bool {
 }
 
 func (alert *Alert) setStatus(status bool){
-	alert.state = status
+	alert.State = status
 }
 
-func (alert *Alert) getAlertId() string {
-	return alert.id
-}
-
-func (Alerts Alerts) Open(alertList []Alert) {}
+func (Alerts Alerts) Open() {}
 
 

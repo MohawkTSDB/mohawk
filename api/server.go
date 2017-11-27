@@ -25,6 +25,7 @@ import (
 
 	"github.com/spf13/viper"
 
+	"github.com/MohawkTSDB/mohawk/alerts"
 	"github.com/MohawkTSDB/mohawk/backend"
 	"github.com/MohawkTSDB/mohawk/backend/example"
 	"github.com/MohawkTSDB/mohawk/backend/memory"
@@ -91,6 +92,18 @@ func Serve() error {
 
 	// set global variables
 	BackendName = db.Name()
+
+	if viper.ConfigFileUsed() != "" && viper.Get("alerts") != "" {
+		// create alerts object.
+		a := []alerts.AlertList{}
+		viper.UnmarshalKey("alerts", &a)
+		alertsObj := alerts.Alerts{
+			Backend:    db,
+			Verbose:    verbose,
+			AlertLists: a,
+		}
+		alertsObj.Open()
+	}
 
 	// h common variables to be used for the backend Handler functions
 	// backend the backend to use for metrics source

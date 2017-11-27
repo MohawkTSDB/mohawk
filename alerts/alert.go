@@ -13,25 +13,25 @@ const (
 type RangeIntervalType int
 
 type Range struct {
-	from float64
-	to   float64
-	t    RangeIntervalType
+	From float64		   `mapstructure:"from"`
+	To   float64           `mapstructure:"to"`
+	Type RangeIntervalType `mapstructure:"type"`
 }
 
 type Alert struct {
-	id      string
-	r       Range
-	state   bool
+	Id      string         `mapstructure:"id"`
+	Range   Range		   `mapstructure:"range"`
+	State   bool		   `mapstructure:"state"`
 }
 
 type AlertList struct {
-	tenant  backend.Tenant
-	list []Alert `mapstructure:"alert_list`
+	Tenant  backend.Tenant `mapstructure:"tenant"`
+	List []Alert 		   `mapstructure:"alert_list"`
 }
 
 type Alerts struct{
-	Backend backend.Backend
-	Verbose bool
-	AlertLists []AlertList `mapstructure:"alerts`
+	Backend backend.Backend `mapstrcuture: "backend"`
+	Verbose bool			`mapstrcuture: "verbose"`
+	AlertLists []AlertList  `mapstructure: "alerts"`
 }
 
