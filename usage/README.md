@@ -37,11 +37,11 @@ COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --backend value, -b value  the backend plugin to use (default: "memory")
+   --storage value, -b value  the storage plugin to use (default: "memory")
    --token value              authorization token
    --key value                path to TLS key file (default: "server.key")
    --cert value               path to TLS cert file (default: "server.pem")
-   --options value            specific backend options [e.g. db-dirname, db-url]
+   --options value            specific storage options [e.g. db-dirname, db-url]
    --port value, -p value     server port (default: 8080)
    --tls, -t                  use TLS server
    --gzip, -g                 enable gzip encoding
@@ -53,11 +53,11 @@ GLOBAL OPTIONS:
 Running ``mohawk`` with ``tls`` and using the ``memory`` back end.
 
 ```
-mohawk --tls --gzip --port 8443 --backend memory
+mohawk --tls --gzip --port 8443 --storage memory
 2017/06/30 11:37:08 Start server, listen on https://0.0.0.0:8443
 ```
 
-###### Examples below use this server configuration, since each backend may implement different feature set, responses may be a little different for different plugins.
+###### Examples below use this server configuration, since each storage may implement different feature set, responses may be a little different for different plugins.
 
 ###### Running with tls on, we need .key and .pem files:
 

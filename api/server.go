@@ -26,13 +26,13 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/MohawkTSDB/mohawk/alerts"
-	"github.com/MohawkTSDB/mohawk/backend"
-	"github.com/MohawkTSDB/mohawk/backend/example"
-	"github.com/MohawkTSDB/mohawk/backend/memory"
-	"github.com/MohawkTSDB/mohawk/backend/mongo"
-	"github.com/MohawkTSDB/mohawk/backend/sqlite"
 	"github.com/MohawkTSDB/mohawk/middleware"
 	"github.com/MohawkTSDB/mohawk/router"
+	"github.com/MohawkTSDB/mohawk/storage"
+	"github.com/MohawkTSDB/mohawk/storage/example"
+	"github.com/MohawkTSDB/mohawk/storage/memory"
+	"github.com/MohawkTSDB/mohawk/storage/mongo"
+	"github.com/MohawkTSDB/mohawk/storage/sqlite"
 )
 
 // VER the server version
@@ -41,7 +41,7 @@ const VER = "0.22.1"
 // defaults
 const defaultAPI = "0.21.0"
 
-// BackendName Mohawk active backend
+// BackendName Mohawk active storage
 var BackendName string
 
 // GetStatus return a json status struct
@@ -55,10 +55,10 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 
 // Serve run the REST API server
 func Serve() error {
-	var db backend.Backend
+	var db storage.Backend
 	var middlewareList []middleware.MiddleWare
 
-	var backendQuery = viper.GetString("backend")
+	var backendQuery = viper.GetString("storage")
 	var optionsQuery = viper.GetString("options")
 	var verbose = viper.GetBool("verbose")
 	var media = viper.GetString("media")
@@ -69,7 +69,7 @@ func Serve() error {
 	var cert = viper.GetString("cert")
 	var key = viper.GetString("key")
 
-	// Create and init the backend
+	// Create and init the storage
 	switch backendQuery {
 	case "sqlite":
 		db = &sqlite.Backend{}
@@ -80,7 +80,7 @@ func Serve() error {
 	case "example":
 		db = &example.Backend{}
 	default:
-		log.Fatal("Can't find backend:", backendQuery)
+		log.Fatal("Can't find storage:", backendQuery)
 	}
 
 	// parse options
@@ -105,8 +105,8 @@ func Serve() error {
 		alertsObj.Open()
 	}
 
-	// h common variables to be used for the backend Handler functions
-	// backend the backend to use for metrics source
+	// h common variables to be used for the storage Handler functions
+	// storage the storage to use for metrics source
 	h := Handler{
 		Verbose: verbose,
 		Backend: db,

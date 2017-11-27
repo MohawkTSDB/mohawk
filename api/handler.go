@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MohawkTSDB/mohawk/backend"
+	"github.com/MohawkTSDB/mohawk/storage"
 )
 
 const DEFAULT_ORDER = "DESC"
@@ -33,15 +33,15 @@ const SECONDARY_ORDER = "ASC"
 
 // Handler common variables to be used by all Handler functions
 // 	version the version of the Hawkular server we are mocking
-// 	backend the backend to be used by the Handler functions
+// 	storage the storage to be used by the Handler functions
 type Handler struct {
 	Verbose bool
-	Backend backend.Backend
+	Backend storage.Backend
 }
 
 // GetTenants return a list of metrics tenants
 func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	var res []backend.Tenant
+	var res []storage.Tenant
 
 	res = h.Backend.GetTenants()
 	resJSON, _ := json.Marshal(res)
@@ -52,7 +52,7 @@ func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[str
 
 // GetMetrics return a list of metrics definitions
 func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	var res []backend.Item
+	var res []storage.Item
 
 	r.ParseForm()
 
@@ -122,7 +122,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 		log.Printf("ID: %s@%s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", tenant, id, end, start, limit, order, bucketDuration)
 	}
 
-	// call backend for data
+	// call storage for data
 	resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
 
 	// output to client
@@ -152,7 +152,7 @@ func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[str
 		log.Printf("ID: %s@%s, End: %d, Start: %d", tenant, id, end, start)
 	}
 
-	// call backend for data
+	// call storage for data
 	if start < end {
 		h.Backend.DeleteData(tenant, id, end, start)
 
@@ -166,7 +166,7 @@ func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[str
 	fmt.Fprintf(w, "504 - Can't delete time rage")
 }
 
-// PostQuery send timestamp, value to the backend
+// PostQuery send timestamp, value to the storage
 func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u dataQuery
 	var end int64
@@ -223,7 +223,7 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	fmt.Fprintf(w, "[")
 
 	for i, id := range u.IDs {
-		// call backend for data
+		// call storage for data
 		resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
 
 		// write data
@@ -236,7 +236,7 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 	fmt.Fprintf(w, "]")
 }
 
-// PostData send timestamp, value to the backend
+// PostData send timestamp, value to the storage
 func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u []postDataItems
 	json.NewDecoder(r.Body).Decode(&u)
@@ -267,7 +267,7 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 	fmt.Fprintln(w, "{}")
 }
 
-// PutTags send tag, value pairs to the backend
+// PutTags send tag, value pairs to the storage
 func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var tags map[string]string
 	json.NewDecoder(r.Body).Decode(&tags)
@@ -288,7 +288,7 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 	fmt.Fprintln(w, "{}")
 }
 
-// PutMultiTags send tags pet dataItem - tag, value pairs to the backend
+// PutMultiTags send tags pet dataItem - tag, value pairs to the storage
 func (h Handler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u []putTags
 	json.NewDecoder(r.Body).Decode(&u)
@@ -335,11 +335,11 @@ func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[str
 	fmt.Fprintln(w, "{}")
 }
 
-// getData querys data from the backend, and return a json string
+// getData querys data from the storage, and return a json string
 func getData(h Handler, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
 	var resStr string
 
-	// call backend for data
+	// call storage for data
 	if bucketDuration == 0 {
 		res := h.Backend.GetRawData(tenant, id, end, start, limit, order)
 		resJSON, _ := json.Marshal(res)

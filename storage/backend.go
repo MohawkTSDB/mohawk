@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package backend
-package backend
+// Package storage
+package storage
 
 import (
 	"net/url"
