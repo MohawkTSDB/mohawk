@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package backend define the Backend interface
-package backend
+// Package api API REST server
+package api
 
 import (
 	"encoding/json"
@@ -24,6 +24,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/MohawkTSDB/mohawk/backend"
 )
 
 const DEFAULT_ORDER = "DESC"
@@ -34,12 +36,12 @@ const SECONDARY_ORDER = "ASC"
 // 	backend the backend to be used by the Handler functions
 type Handler struct {
 	Verbose bool
-	Backend Backend
+	Backend backend.Backend
 }
 
 // GetTenants return a list of metrics tenants
 func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	var res []Tenant
+	var res []backend.Tenant
 
 	res = h.Backend.GetTenants()
 	resJSON, _ := json.Marshal(res)
@@ -50,7 +52,7 @@ func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[str
 
 // GetMetrics return a list of metrics definitions
 func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	var res []Item
+	var res []backend.Item
 
 	r.ParseForm()
 
@@ -331,4 +333,22 @@ func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[str
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
+}
+
+// getData querys data from the backend, and return a json string
+func getData(h Handler, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
+	var resStr string
+
+	// call backend for data
+	if bucketDuration == 0 {
+		res := h.Backend.GetRawData(tenant, id, end, start, limit, order)
+		resJSON, _ := json.Marshal(res)
+		resStr = string(resJSON)
+	} else {
+		res := h.Backend.GetStatData(tenant, id, end, start, limit, order, bucketDuration)
+		resJSON, _ := json.Marshal(res)
+		resStr = string(resJSON)
+	}
+
+	return resStr
 }

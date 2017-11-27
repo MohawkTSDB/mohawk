@@ -20,4 +20,4 @@ for i in xrange(1, 1000):
 for i in xrange(1, 1000):
     t = tmilli - i * 1000 * 60
     v = client.query_metric(MetricType.Gauge, 'example.doc.1', start=t - 1000 * 90, end=t)
-    #print t - 1000 * 61, t, v
+    print t - 1000 * 61, t, v

@@ -94,7 +94,7 @@ func Serve() error {
 
 	// h common variables to be used for the backend Handler functions
 	// backend the backend to use for metrics source
-	h := backend.Handler{
+	h := Handler{
 		Verbose: verbose,
 		Backend: db,
 	}
