@@ -6,10 +6,6 @@
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
-## Examples
-
-For usage information look at the [usage](/usage) directory.
-
 ## REST API
 
 #### Prefix: "/hawkular/metrics/"
