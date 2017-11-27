@@ -103,7 +103,6 @@ Request usage message.
 mohawk -h
 Usage of mohawk:
 ...
-```
 
 Running ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
 
