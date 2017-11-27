@@ -21,9 +21,12 @@ import (
 	"net/http"
 )
 
+type logFunc func(format string, v ...interface{})
+
 // Logger middleware that will log http requests
 type Logger struct {
 	Verbose bool
+	logFunc logFunc
 	next    http.Handler
 }
 
@@ -34,7 +37,10 @@ func (l *Logger) SetNext(h http.Handler) {
 
 // ServeHTTP http serve func
 func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
+	if l.logFunc == nil {
+		l.logFunc = log.Printf
+	}
+	l.logFunc("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
 
 	l.next.ServeHTTP(w, r)
 }
