@@ -62,6 +62,7 @@ cd mohawk
 make vendor
 
 # Build, test and install
+make clean
 make
 make test
 make install
@@ -138,6 +139,10 @@ To create a self signed credentials use this bash commands:
 ```
 openssl ecparam -genkey -name secp384r1 -out server.key
 openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
+```
+or
+```
+make secret
 ```
 
 #### Running the server
