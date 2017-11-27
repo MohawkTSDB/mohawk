@@ -58,9 +58,12 @@ mkdir -p ${GOPATH}/src/github.com/MohawkTSDB && cd ${GOPATH}/src/github.com/Moha
 git clone https://github.com/MohawkTSDB/mohawk.git
 cd mohawk
 
-#
+# Update vedor sources
 make vendor
-make all
+
+# Build, test and install
+make
+make test
 make install
 ```
 
