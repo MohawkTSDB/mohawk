@@ -67,6 +67,7 @@ func Serve() error {
 	var port = viper.GetInt("port")
 	var cert = viper.GetString("cert")
 	var key = viper.GetString("key")
+	var configAlerts = viper.ConfigFileUsed() != "" && viper.Get("alerts") != ""
 
 	// Create and init the storage
 	switch backendQuery {
@@ -92,20 +93,25 @@ func Serve() error {
 	// set global variables
 	BackendName = db.Name()
 
-	if viper.ConfigFileUsed() != "" && viper.Get("alerts") != "" {
-		// create alerts object.
-		a := []alerts.AlertList{}
-		viper.UnmarshalKey("alerts", &a)
-		alertsObj := alerts.Alerts{
+	// Create alerts runner
+	if configAlerts {
+		// parse alert list from config yaml
+		l := []alerts.AlertList{}
+		viper.UnmarshalKey("alerts", &l)
+
+		// creat and start the alert handler
+		a := alerts.Alerts{
 			Backend:    db,
 			Verbose:    verbose,
-			AlertLists: a,
+			AlertLists: l,
 		}
-		alertsObj.Open()
+
+		// start running the alert loop
+		a.Open()
 	}
 
 	// h common variables to be used for the storage Handler functions
-	// storage the storage to use for metrics source
+	// Backend the storage to use for metrics source
 	h := Handler{
 		Verbose: verbose,
 		Backend: db,
