@@ -10,16 +10,11 @@ import (
 )
 
 func TestAuthServeHTTP(t *testing.T) {
+	token := "mytoken"
 	OkBody := "DONE"
-	a := Authorization{
-		UseToken:        true,
-		PublicPathRegex: "^/bla/boy",
-		Token:           "ninja",
-		next: HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintln(w, OkBody)
-		}),
-	}
-
+	a := AuthDecorator(token, "^/bla/boy")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, OkBody)
+	}))
 	testcases := []struct {
 		path    string
 		token   string
@@ -28,8 +23,8 @@ func TestAuthServeHTTP(t *testing.T) {
 	}{
 		{"/bla/boy/1", "", http.StatusOK, OkBody},
 		{"/hello/world", "", http.StatusUnauthorized, "Unauthorized - 401"},
-		{"/hello/world", a.Token, http.StatusOK, OkBody},
-		{"/bla/boy/2", a.Token, http.StatusOK, OkBody},
+		{"/hello/world", token, http.StatusOK, OkBody},
+		{"/bla/boy/2", token, http.StatusOK, OkBody},
 	}
 
 	var (

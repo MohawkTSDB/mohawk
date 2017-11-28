@@ -24,43 +24,37 @@ import (
 	"path/filepath"
 )
 
-// Static middleware serves static files
-type Static struct {
-	Verbose   bool
-	MediaPath string
-	next      http.Handler
+type readFile func(string) ([]byte, error)
+type fileStat func(string) (os.FileInfo, error)
+
+func fileServeDecorator(mediaPath string, readFile readFile, fileStat fileStat) Decorator {
+	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			path := mediaPath + r.URL.EscapedPath()
+
+			// Add index.html to path if it ends with /
+			if path[len(path)-1:] == "/" {
+				path = path + "index.html"
+			}
+
+			// Add /index.html to path if a directory
+			if fi, err := fileStat(path); err == nil && fi.IsDir() {
+				path = path + "/index.html"
+			}
+
+			// If file exist serve it
+			if file, err := ioutil.ReadFile(path); err == nil {
+				ext := filepath.Ext(path)
+				w.Header().Set("Content-Type", mime.TypeByExtension(ext))
+				w.WriteHeader(200)
+				w.Write(file)
+				return
+			}
+			h(w, r)
+		})
+	})
 }
 
-// SetNext set next http serve func
-func (s *Static) SetNext(h http.Handler) {
-	s.next = h
-}
-
-// ServeHTTP http serve func
-func (s Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path := s.MediaPath + r.URL.EscapedPath()
-
-	// Add index.html to path if it ends with /
-	if path[len(path)-1:] == "/" {
-		path = path + "index.html"
-	}
-
-	// Add /index.html to path if a directory
-	if fi, err := os.Stat(path); err == nil && fi.IsDir() {
-		path = path + "/index.html"
-	}
-
-	// If file exist serve it
-	if file, err := ioutil.ReadFile(path); err == nil {
-		ext := filepath.Ext(path)
-
-		w.Header().Set("Content-Type", mime.TypeByExtension(ext))
-		w.WriteHeader(200)
-		w.Write(file)
-
-		return
-	}
-
-	// If we can not show file, continue
-	s.next.ServeHTTP(w, r)
+func FileServeDecorator(mediaPath string) Decorator {
+	return fileServeDecorator(mediaPath, ioutil.ReadFile, os.Stat)
 }

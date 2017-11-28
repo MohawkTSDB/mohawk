@@ -9,12 +9,9 @@ import (
 )
 
 func TestStaticServeHTTP(t *testing.T) {
-	a := Static{
-		MediaPath: "./tests",
-		next: HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, "OK")
-		}),
-	}
+	a := FileServeDecorator("./tests")(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "OK")
+	})
 	var (
 		req  *http.Request
 		err  error

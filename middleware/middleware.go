@@ -20,28 +20,13 @@ import (
 	"net/http"
 )
 
-// HandlerFunc implements ServeHTTP and it's actually a function that its
-// signature is similar to http.HandlerFunc
-type HandlerFunc func(w http.ResponseWriter, r *http.Request)
-
-func (hf HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	hf(w, r)
-}
-
-type MiddleWare interface {
-	SetNext(http.Handler)
-	ServeHTTP(http.ResponseWriter, *http.Request)
-}
+type Decorator func(h http.HandlerFunc) http.HandlerFunc
 
 // append concat a list of MiddleWares into the router routing table
-func Append(handlers []MiddleWare) {
-	switch len(handlers) {
-	case 0:
-		fallthrough
-	case 1:
-		return
-	default:
-		handlers[0].SetNext(handlers[1])
-		Append(handlers[1:])
+func Append(core http.HandlerFunc, handlers ...Decorator) http.HandlerFunc {
+	c := core
+	for _, h := range handlers[1:] {
+		c = h(c)
 	}
+	return c
 }

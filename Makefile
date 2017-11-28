@@ -20,7 +20,8 @@ test: clean vendor all install
 	bats test/mohawk.bats
 
 .PHONY: test-unit
-test-unit: clean vendor
+test-unit: vendor
+	@echo "running unit tests"
 	@go test $(shell go list ./... | grep -v vendor)
 
 .PHONY: secret
@@ -43,4 +44,4 @@ install: fmt mohawk
 .PHONY: vendor
 vendor:
 	[ -d ${GOPATH}/src/github.com/LK4D4/vndr ] || go get -u -v github.com/LK4D4/vndr
-	${GOPATH}/bin/vndr
+	[ -d ${GOPATH}/src/github.com/MohawkTSDB/mohawk/vendor ] || ${GOPATH}/bin/vndr
