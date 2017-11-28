@@ -20,23 +20,22 @@ import (
 	"net/http"
 )
 
-// Headers middleware that will log http requests
-type Headers struct {
-	Verbose bool
-	next    http.Handler
+func DefaultHeadersDecorator() Decorator {
+	return HeadersDecorator(map[string]string{
+		"Content-Type":                 "application/json",
+		"Access-Control-Allow-Origin":  "*",
+		"Access-Control-Allow-Headers": "authorization,content-type,hawkular-tenant",
+		"Access-Control-Allow-Methods": "GET, POST, DELETE, PUT",
+	})
 }
 
-// SetNext set next http serve func
-func (l *Headers) SetNext(h http.Handler) {
-	l.next = h
-}
-
-// ServeHTTP http serve func
-func (l Headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
-
-	l.next.ServeHTTP(w, r)
+func HeadersDecorator(headers map[string]string) Decorator {
+	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			for k, v := range headers {
+				w.Header().Set(k, v)
+			}
+			h(w, r)
+		})
+	})
 }

@@ -17,30 +17,14 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 )
 
-type logFunc func(format string, v ...interface{})
-
-// Logger middleware that will log http requests
-type Logger struct {
-	Verbose bool
-	logFunc logFunc
-	next    http.Handler
-}
-
-// SetNext set next http serve func
-func (l *Logger) SetNext(h http.Handler) {
-	l.next = h
-}
-
-// ServeHTTP http serve func
-func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if l.logFunc == nil {
-		l.logFunc = log.Printf
-	}
-	l.logFunc("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
-
-	l.next.ServeHTTP(w, r)
+func LoggingDecorator(logFunc func(format string, v ...interface{})) Decorator {
+	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logFunc("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
+			h(w, r)
+		})
+	})
 }

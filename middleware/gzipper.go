@@ -17,35 +17,63 @@
 package middleware
 
 import (
+	"io"
 	"net/http"
 	"strings"
 
-	"github.com/MohawkTSDB/mohawk/middleware/gzip"
+	"compress/gzip"
 )
 
-// GZipper middleware that will gzip http requests
-type GZipper struct {
-	UseGzip bool
-	Verbose bool
-	next    http.Handler
+type gzBody struct {
+	*gzip.Reader
+	io.ReadCloser
 }
 
-// SetNext set next http serve func
-func (g *GZipper) SetNext(h http.Handler) {
-	g.next = h
+func (r gzBody) Read(p []byte) (n int, err error) {
+	return r.Reader.Read(p)
 }
 
-// ServeHTTP http serve func
-func (g *GZipper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// if Content-Encoding: gzip, unzip request body
-	if g.UseGzip && r.Header.Get("Content-Encoding") == "gzip" {
-		r.Body = gzip.ReqBody(r)
-	}
+func (r gzBody) Close() error {
+	return r.ReadCloser.Close()
+}
 
-	// if Accept-Encoding: gzip, zip response
-	if g.UseGzip && strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
-		gzip.Decorator(g.next.ServeHTTP)(w, r)
-	} else {
-		g.next.ServeHTTP(w, r)
-	}
+type gzRespWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+func (w gzRespWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
+}
+
+func GzipDecodeDecorator() Decorator {
+	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Header.Get("Content-Encoding") == "gzip" {
+				// TODO: I personally think it's a good idea to return
+				// 		 http.StatusBadRequest if err != nil
+				gzReader, err := gzip.NewReader(r.Body)
+				if err == nil {
+					r.Body = gzBody{gzReader, r.Body}
+				}
+			}
+			h(w, r)
+		})
+	})
+}
+
+func GzipEncodeDecorator() Decorator {
+	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+				w.Header().Set("Content-Encoding", "gzip")
+
+				gz := gzip.NewWriter(w)
+				defer gz.Close()
+
+				w = gzRespWriter{Writer: gz, ResponseWriter: w}
+			}
+			h(w, r)
+		})
+	})
 }

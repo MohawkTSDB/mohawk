@@ -18,30 +18,20 @@ package middleware
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 )
 
-// BadRequest will be called if no route found
-type BadRequest struct {
-	Verbose bool
-}
-
-// SetNext set next http serve func
-func (b *BadRequest) SetNext(_h http.Handler) {
-}
-
-// ServeHTTP http serve func
-func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// we return 200 for any OPTIONS request
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(200)
-		return
-	}
-
-	log.Printf("Page not found - 404:\n")
-	log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
-
-	w.WriteHeader(404)
-	fmt.Fprintf(w, "Page not found - 404\n")
+func BadRequestDecorator(logFunc func(string, ...interface{})) Decorator {
+	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			// we return 200 for any OPTIONS request
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(200)
+				return
+			}
+			logFunc("Page not found - 404:\n")
+			w.WriteHeader(404)
+			fmt.Fprintf(w, "Page not found - 404\n")
+		}
+	})
 }

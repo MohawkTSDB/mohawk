@@ -13,18 +13,16 @@ import (
 )
 
 func TestGzipServeHTTP(t *testing.T) {
-	a := GZipper{
-		next: HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Body == nil {
-				t.Error("body was not supposed to be nil")
-			}
-			body, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				t.Error(err)
-			}
-			fmt.Fprintf(w, string(body))
-		}),
-	}
+	a := GzipDecodeDecorator()(GzipEncodeDecorator()(func(w http.ResponseWriter, r *http.Request) {
+		if r.Body == nil {
+			t.Error("body was not supposed to be nil")
+		}
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Error(err)
+		}
+		fmt.Fprintf(w, string(body))
+	}))
 	var (
 		req  *http.Request
 		err  error
@@ -47,7 +45,7 @@ func TestGzipServeHTTP(t *testing.T) {
 	}
 	var reader io.Reader
 	for _, tc := range testcases {
-		a.UseGzip = tc.useGzip
+		//a.UseGzip = tc.useGzip
 		reader = bytes.NewBufferString(tc.bodyStr)
 		if tc.toGzip {
 			buff := bytes.NewBuffer(nil)

@@ -31,28 +31,18 @@ type Authorization struct {
 	next            http.Handler
 }
 
-// SetNext set next http serve func
-func (a *Authorization) SetNext(h http.Handler) {
-	a.next = h
-}
+func AuthDecorator(token, publicPathRegex string) Decorator {
+	publicPath := regexp.MustCompile(publicPathRegex)
+	authToken := "Bearer " + token
+	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			fmt.Println(r.Header.Get("Authorization"), authToken, r.Header.Get("Authorization") == authToken)
+			if r.Header.Get("Authorization") == authToken || publicPath.MatchString(r.URL.EscapedPath()) {
+				h(w, r)
+			}
 
-// ServeHTTP http serve func
-func (a *Authorization) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// check authorization
-	if !a.UseToken || r.Header.Get("Authorization") == "Bearer "+a.Token {
-		a.next.ServeHTTP(w, r)
-		return
-	}
-
-	// check for public path
-	path := r.URL.EscapedPath()
-	validRegex := regexp.MustCompile(a.PublicPathRegex)
-	if validRegex.MatchString(path) {
-		a.next.ServeHTTP(w, r)
-		return
-	}
-
-	// this is an none uthorized request
-	w.WriteHeader(401)
-	fmt.Fprintf(w, "Unauthorized - 401\n")
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprintf(w, "Unauthorized - 401\n")
+		})
+	})
 }

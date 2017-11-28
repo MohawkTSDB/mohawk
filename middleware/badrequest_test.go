@@ -1,13 +1,14 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestBadRequestServeHTTP(t *testing.T) {
-	a := BadRequest{}
+	a := BadRequestDecorator(log.Printf)(func(w http.ResponseWriter, r *http.Request) {})
 	var (
 		req *http.Request
 		err error

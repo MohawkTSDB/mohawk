@@ -56,7 +56,6 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 // Serve run the REST API server
 func Serve() error {
 	var db storage.Backend
-	var middlewareList []middleware.MiddleWare
 
 	var backendQuery = viper.GetString("storage")
 	var optionsQuery = viper.GetString("options")
@@ -160,61 +159,26 @@ func Serve() error {
 	rAvailability.Add("GET", ":id/raw", h.GetData)
 	rAvailability.Add("GET", ":id/stats", h.GetData)
 
-	// Create the middlewares
-	// logger a logging middleware
-	logger := middleware.Logger{
-		Verbose: verbose,
+	routers := append([]*router.Router{}, &rGauges, &rCounters, &rAvailability, &rRoot)
+	for ix, r := range routers[:len(routers)-1] {
+		r.SetNext(routers[ix+1])
 	}
+	routers[len(routers)-1].SetNext(middleware.FileServeDecorator(media)(middleware.BadRequestDecorator(log.Printf)(func(w http.ResponseWriter, r *http.Request) {})))
 
-	// static a file server middleware
-	static := middleware.Static{
-		Verbose:   verbose,
-		MediaPath: media,
+	decorators := []middleware.Decorator{}
+	decorators = append(decorators, middleware.LoggingDecorator(log.Printf), middleware.DefaultHeadersDecorator())
+	if token != "" {
+		decorators = append(decorators, middleware.AuthDecorator(token, "^/hawkular/metrics/status$"))
 	}
-
-	// authorization middleware
-	authorization := middleware.Authorization{
-		Verbose:         verbose,
-		UseToken:        token != "",
-		PublicPathRegex: "^/hawkular/metrics/status$",
-		Token:           token,
+	if gzip {
+		decorators = append(decorators, middleware.GzipDecodeDecorator(), middleware.GzipEncodeDecorator())
 	}
-
-	// headers a headers middleware
-	headers := middleware.Headers{
-		Verbose: verbose,
-	}
-
-	// gzipper a gzip encoding middleware
-	gzipper := middleware.GZipper{
-		UseGzip: gzip,
-		Verbose: verbose,
-	}
-
-	// badrequest a BadRequest middleware
-	badrequest := middleware.BadRequest{
-		Verbose: verbose,
-	}
-
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	middlewareList = []middleware.MiddleWare{
-		&logger,
-		&authorization,
-		&headers,
-		&gzipper,
-		&rGauges,
-		&rCounters,
-		&rAvailability,
-		&rRoot,
-		&static,
-		&badrequest,
-	}
-	middleware.Append(middlewareList)
-
+	handler := middleware.Append(routers[0].ServeHTTP, decorators...)
 	// Run the server
 	srv := &http.Server{
 		Addr:           fmt.Sprintf("0.0.0.0:%d", port),
-		Handler:        logger,
+		Handler:        handler,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
