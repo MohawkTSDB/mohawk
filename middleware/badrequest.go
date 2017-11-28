@@ -29,7 +29,7 @@ func BadRequestHandler(logFunc func(string, ...interface{})) http.HandlerFunc {
 			w.WriteHeader(200)
 			return
 		}
-		logFunc("Page not found - 404:\n")
+		logFunc("Page not found - 404\n")
 		w.WriteHeader(404)
 		fmt.Fprintf(w, "Page not found - 404\n")
 	}
