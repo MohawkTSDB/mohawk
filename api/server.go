@@ -167,10 +167,10 @@ func Serve() error {
 	routers := []*router.Router{}
 	routers = append(routers, &rGauges, &rCounters, &rAvailability, &rRoot)
 
-	// fallback handler, static handler + bad request handler
+	// fallback handler, static decorator + bad request handler
 	staticDecorator := middleware.FileServeDecorator(media)
-	badRequestDecorator := middleware.BadRequestDecorator(log.Printf)
-	fallback := staticDecorator(badRequestDecorator(func(w http.ResponseWriter, r *http.Request) {}))
+	badRequestHandler := middleware.BadRequestHandler(log.Printf)
+	fallback := staticDecorator(badRequestHandler)
 
 	// concat all routers and add fallback handler
 	core := router.Append(fallback, routers...)

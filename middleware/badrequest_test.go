@@ -8,7 +8,7 @@ import (
 )
 
 func TestBadRequestServeHTTP(t *testing.T) {
-	a := BadRequestDecorator(log.Printf)(func(w http.ResponseWriter, r *http.Request) {})
+	a := BadRequestHandler(log.Printf)
 	var (
 		req *http.Request
 		err error

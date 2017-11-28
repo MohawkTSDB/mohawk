@@ -21,17 +21,16 @@ import (
 	"net/http"
 )
 
-func BadRequestDecorator(logFunc func(string, ...interface{})) Decorator {
-	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			// we return 200 for any OPTIONS request
-			if r.Method == "OPTIONS" {
-				w.WriteHeader(200)
-				return
-			}
-			logFunc("Page not found - 404:\n")
-			w.WriteHeader(404)
-			fmt.Fprintf(w, "Page not found - 404\n")
+// BadRequestHandler handler
+func BadRequestHandler(logFunc func(string, ...interface{})) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// we return 200 for any OPTIONS request
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(200)
+			return
 		}
-	})
+		logFunc("Page not found - 404:\n")
+		w.WriteHeader(404)
+		fmt.Fprintf(w, "Page not found - 404\n")
+	}
 }
