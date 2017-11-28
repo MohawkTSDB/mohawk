@@ -26,7 +26,7 @@ type Decorator func(h http.HandlerFunc) http.HandlerFunc
 // Append concat a list of MiddleWares into the router routing table
 func Append(core http.HandlerFunc, handlers ...Decorator) http.HandlerFunc {
 	c := core
-	for _, h := range handlers[1:] {
+	for _, h := range handlers {
 		c = h(c)
 	}
 	return c
