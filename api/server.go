@@ -105,8 +105,6 @@ func Serve() error {
 			Verbose:    verbose,
 			AlertLists: l,
 		}
-
-		// start running the alert loop
 		a.Open()
 	}
 
