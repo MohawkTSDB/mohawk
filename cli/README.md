@@ -37,7 +37,7 @@ Usage:
 
 Flags:
       --cert string      path to TLS cert file (default "server.pem")
-  -c, --config string    config file (default is $HOME/.cobra.yaml)
+  -c, --config string    config file
   -g, --gzip             use gzip encoding
   -h, --help             help for mohawk
       --key string       path to TLS key file (default "server.key")
