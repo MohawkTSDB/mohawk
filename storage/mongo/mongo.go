@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"time"
 
+	"fmt"
 	"github.com/MohawkTSDB/mohawk/storage"
 )
 
@@ -63,6 +64,20 @@ func (r *Backend) Open(options url.Values) {
 	}
 
 	r.mongoSession.SetMode(mgo.Monotonic, true)
+}
+
+func (r Backend) GetLastDataItems(tenant string, id string, numOfItems int) ([]storage.DataItem, error) {
+	res := make([]storage.DataItem, numOfItems)
+	sessionCopy := r.mongoSession.Copy()
+	defer sessionCopy.Close()
+
+	c := sessionCopy.DB(tenant).C(id)
+	// If number of items is smaller than limit ==> get all the items in the database.
+	if count, _ := c.Count(); count < numOfItems {
+		count = numOfItems
+	}
+	err := c.Find(nil).Sort("timestamp").Limit(numOfItems).All(&res)
+	return res, err
 }
 
 func (r Backend) GetTenants() []storage.Tenant {

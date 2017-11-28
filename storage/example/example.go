@@ -38,6 +38,10 @@ func (r *Backend) Open(options url.Values) {
 	// open db connection
 }
 
+func (r Backend) GetLastDataItems(tenant string, id string, numOfItems int) ([]storage.DataItem, error) {
+	return nil, nil
+}
+
 func (r Backend) GetTenants() []storage.Tenant {
 	res := make([]storage.Tenant, 0)
 

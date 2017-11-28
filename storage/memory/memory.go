@@ -70,6 +70,25 @@ func (r *Backend) Open(options url.Values) {
 	go r.maintenance()
 }
 
+func (r Backend) GetLastDataItems(tenant string, id string, numOfItems int) ([]storage.DataItem, error) {
+	res := make([]storage.DataItem, 0)
+	r.checkID(tenant, id)
+	t, _ := r.tenant[tenant]
+	ts, _ := t.ts[id]
+	// If number of items is smaller than limit ==> get all the items in the database.
+	if len(ts.data) < numOfItems {
+		numOfItems = len(ts.data)
+	}
+	position := int(r.getPosForTimestamp(ts.lastValue.timeStamp)) + 1
+	for _, item := range ts.data[position-numOfItems:position] {
+		res = append(res, storage.DataItem{
+			item.timeStamp,
+			item.value,
+		})
+	}
+	return res, nil
+}
+
 func (r Backend) GetTenants() []storage.Tenant {
 	res := make([]storage.Tenant, 0, len(r.tenant))
 
