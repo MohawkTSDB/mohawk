@@ -8,5 +8,6 @@ addons:
     - bats
     - bc
 script:
-  - make test-unit
+  - make clean vendor all install
   - make test
+  - make test-unit
