@@ -1,6 +1,6 @@
 
 
-# mohawk/usage/rest
+# mohawk/api/rest
 
 ![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
 
