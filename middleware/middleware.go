@@ -13,16 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package middleware
+// Package middleware http decorators
 package middleware
 
 import (
 	"net/http"
 )
 
+// Decorator takes a http handler and wrap it with added functionality
 type Decorator func(h http.HandlerFunc) http.HandlerFunc
 
-// append concat a list of MiddleWares into the router routing table
+// Append concat a list of MiddleWares into the router routing table
 func Append(core http.HandlerFunc, handlers ...Decorator) http.HandlerFunc {
 	c := core
 	for _, h := range handlers[1:] {

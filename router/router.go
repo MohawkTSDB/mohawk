@@ -35,6 +35,19 @@ type Router struct {
 	next   http.Handler
 }
 
+// Append concat a list of Routers into the router routing table
+func Append(fallback http.HandlerFunc, routers ...*Router) http.HandlerFunc {
+	listSize := len(routers)
+
+	// concat all routes, and add the fallback function last
+	for ix, r := range routers[:listSize-1] {
+		r.SetNext(routers[ix+1])
+	}
+	routers[listSize-1].SetNext(fallback)
+
+	return routers[0].ServeHTTP
+}
+
 // Add add a new route into the router routing table
 func (r *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request, map[string]string)) {
 	r.Routes = append(r.Routes, route{method, strings.Split(path, "/"), handler})
