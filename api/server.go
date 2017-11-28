@@ -159,14 +159,16 @@ func Serve() error {
 	rAvailability.Add("GET", ":id/raw", h.GetData)
 	rAvailability.Add("GET", ":id/stats", h.GetData)
 
-	// if no route found, search for static file, if no file found this is a bad request
-	fallback := middleware.FileServeDecorator(media)(middleware.BadRequestDecorator(log.Printf)(func(w http.ResponseWriter, r *http.Request) {}))
-
 	// create a list of routes
 	routers := []*router.Router{}
 	routers = append(routers, &rGauges, &rCounters, &rAvailability, &rRoot)
 
-	// concat all routers
+	// fallback handler, static handler + bad request handler
+	staticDecorator := middleware.FileServeDecorator(media)
+	badRequestDecorator := middleware.BadRequestDecorator(log.Printf)
+	fallback := staticDecorator(badRequestDecorator(func(w http.ResponseWriter, r *http.Request) {}))
+
+	// concat all routers and add fallback handler
 	core := router.Append(fallback, routers...)
 
 	// create a list of middlwares

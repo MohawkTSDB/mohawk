@@ -36,6 +36,8 @@ type Router struct {
 }
 
 // Append concat a list of Routers into the router routing table
+// returns
+// 	http.HandlerFunc - the first http handler function to call
 func Append(fallback http.HandlerFunc, routers ...*Router) http.HandlerFunc {
 	listSize := len(routers)
 
