@@ -64,7 +64,7 @@ func init() {
 	// Flag definition
 	RootCmd.Flags().StringP("storage", "b", "memory", "the storage plugin to use")
 	RootCmd.Flags().String("token", "", "authorization token")
-	RootCmd.Flags().String("media", "./mohawk-webui", "path to media files (default is ./mohawk-webui)")
+	RootCmd.Flags().String("media", "./mohawk-webui", "path to media files")
 	RootCmd.Flags().String("key", defaultTLSKey, "path to TLS key file")
 	RootCmd.Flags().String("cert", defaultTLSCert, "path to TLS cert file")
 	RootCmd.Flags().String("options", "", "specific storage options [e.g. db-dirname, db-url]")
@@ -73,7 +73,7 @@ func init() {
 	RootCmd.Flags().BoolP("gzip", "g", false, "use gzip encoding")
 	RootCmd.Flags().BoolP("verbose", "V", false, "more debug output")
 	RootCmd.Flags().BoolP("version", "v", false, "display mohawk version number")
-	RootCmd.Flags().StringP("config", "c", "", "config file (default is None)")
+	RootCmd.Flags().StringP("config", "c", "", "config file")
 
 	// Viper Binding
 	viper.BindPFlag("storage", RootCmd.Flags().Lookup("storage"))
