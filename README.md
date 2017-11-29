@@ -86,7 +86,7 @@ Usage of mohawk:
 Running ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
 
 ```bash
-mohawk
+mohawk --storage sqlite
 2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
 ```
 
