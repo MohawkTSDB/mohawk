@@ -66,6 +66,9 @@ make clean
 make
 make test
 make install
+
+# Set up tls secrets for testing
+make secret
 ```
 
 ## Running the server
@@ -114,7 +117,7 @@ make secret
 Using TLS server requires certification files, default file names are `server.key` and `server.pem` .
 
 ```bash
-mohawk -tls -gzip -port 8443
+mohawk --tls --gzip --port 8443
 ```
 
 ## Reading and writing data
