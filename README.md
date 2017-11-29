@@ -83,7 +83,7 @@ To create a self signed credentials use this bash commands:
 openssl ecparam -genkey -name secp384r1 -out server.key
 openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 ```
-or
+If running from source, the Makefile has a utility for generating secrets:
 ```
 make secret
 ```
