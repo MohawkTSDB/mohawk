@@ -27,15 +27,11 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 Mohawk can use different storage plugins for different use cases. Different storage plugins may vary in speed, persistence and scale ability. Mohawk use a subset of Hawkular's REST API inheriting Hawkular's ecosystem of clients and plugins.
 
-Different use cases may have conflicting requirements for the metric engine, some use cases may require fast data transfer, while others may depend on long term, high availability data retention that inherently makes the system slower.
-
-Mohowk exposes the same simple REST API for different storage options, consumer application can use the same REST API with a lean low footprint stroage and with a resource-intensive high availability storage. Mohowk makes hierarchical data storage using short, middle and long term data retention tiers easy to set up and consume.     
-
 #### Compatibility
 
 Mohawk is tested(1) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster) to automagically scrape metrics from Kubernetes/OpenShift clusters.
 
-(1) Mohawk implement only part of Hawkular's API, some functionality may be missing.
+(1) Mohawk implement only a subset of Hawkular's API, some functionality may be missing.
 
 ## Installation
 
