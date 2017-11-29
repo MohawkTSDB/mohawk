@@ -1,6 +1,6 @@
 
 
-# mohawk/usage
+# mohawk/cli
 
 ![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
 
