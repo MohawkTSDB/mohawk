@@ -88,7 +88,7 @@ or
 make secret
 ```
 
-#### Running the server
+#### The server command line interface
 
 Request usage message.
 
