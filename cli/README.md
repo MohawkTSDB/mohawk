@@ -60,6 +60,8 @@ mohawk --tls --gzip --port 8443 --storage memory
 
 ###### When running with tls on, we need .key and .pem files:
 
+This commands will crate self signed secrets for testing.
+
 ```
 openssl ecparam -genkey -name secp384r1 -out server.key
 openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
