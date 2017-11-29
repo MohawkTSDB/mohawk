@@ -41,6 +41,8 @@ Mohawk Metrics offers a rich set of features around querying that are ideal for 
   - Downsampling and aggregation
   - Limit and order results
 
+###### See query examples in the [Examples directory](/api/examples/).
+
 #### Token authentication
 
 If the token flag is set, all API requests must send the valid bearer token in the "Authorization" request header.
