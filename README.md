@@ -29,26 +29,26 @@ Mohawk can use different storage plugins for different use cases. Different stor
 
 #### Compatibility
 
-Mohawk is tested(1) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster) to automagically scrape metrics from Kubernetes/OpenShift clusters.
+Mohawk is tested(1) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster) to automagically scrape metrics from [Kubernetes](https://kubernetes.io/) / [OpenShift](https://www.openshift.com/) clusters.
 
 (1) Mohawk implement only a subset of Hawkular's API, some functionality may be missing.
 
 ## Installation
 
-Using a Copr repository for Fedora:
+#### Using a Copr repository for Fedora
 
 ```
 sudo dnf copr enable yaacov/mohawk
 sudo dnf install mohawk
 ```
 
-Using Dockerhub repository:
+#### Using Dockerhub repository
 
 ```
 docker run -v [PATH TO KEY AND CERT FILES]:/root/ssh:Z yaacov/mohawk
 ```
 
-### Building from source
+#### Building from source
 
 ```
 # Create a directory for sources
@@ -70,20 +70,6 @@ make install
 
 ## Running the server
 
-#### Mock Certifications
-
-The server requires certification to serve ``https`` requests. Users can use self signed credentials files for testing.
-
-To create a self signed credentials use this bash commands:
-```
-openssl ecparam -genkey -name secp384r1 -out server.key
-openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
-```
-If running from source, the Makefile has a utility for generating secrets:
-```
-make secret
-```
-
 #### The server command line interface
 
 Request usage message.
@@ -101,12 +87,26 @@ mohawk
 2017/01/03 10:06:50 Start server, listen on http://0.0.0.0:8080
 ```
 
-Running the server with ``tls``, ``gzip`` encoding support and using the ``memory`` storage,
-**Remember to set up the ``server.key`` and ``server.pem`` files in your path**.
+Running the server with ``tls``, ``gzip`` encoding support and using the ``memory`` storage.
+
+###### Remember to set up the ``server.key`` and ``server.pem`` files in your path
 
 ```bash
 mohawk --storage memory --tls --gzip --port 8443
 2016/12/01 14:23:48 Start server, listen on https://0.0.0.0:8443
+```
+###### Mock Certifications for testing
+
+The server requires certification to serve ``https`` requests. Users can use self signed credentials files for testing.
+
+To create a self signed credentials use this bash commands:
+```
+openssl ecparam -genkey -name secp384r1 -out server.key
+openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
+```
+If running from source, the Makefile has a utility for generating secrets:
+```
+make secret
 ```
 
 #### Running the server for this examples
