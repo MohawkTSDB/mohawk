@@ -13,6 +13,7 @@ For more documentation see the [Mohawk Development Docs](https://github.com/Moha
   - [Introduction](#introduction)
   - [Installation](#installation)
   - [Running the server](#running-the-server)
+  - [Reading and writing data](#reading-and-writing-data)
 
 ## Introduction
 
@@ -68,20 +69,6 @@ make test
 make install
 ```
 
-#### Storage Plugins
-
-Mohawk architecture makes it easy to implement and set up [plugins](/storage) for new data storage. The storage directory include documentation, examples and a template for plugin development.
-
-###### Current storage plugin list include:
-
-| Plugin name       |  Storage          | Advantages                                  | Use case                                 |
-|-------------------|-------------------|---------------------------------------------|------------------------------------------|
-| memory            | Memory            | No storage ware and tear from fast I/O      | Fast I/O, no need for persistence data   |
-| sqlite            | Local File        | No data loss on network outages             | Persistence data, W/O external data base |
-| mongo             | Mongo DB          | High availabilty, High volume storage       | Long term H.A. storage                   |
-
-A template plugin named [example](/storage/example) is also available.
-
 ## Running the server
 
 #### Mock Certifications
@@ -131,7 +118,10 @@ Using TLS server requires certification files, default file names are `server.ke
 mohawk -tls -gzip -port 8443
 ```
 
-#### Reading and writing data
+## Reading and writing data
+
+#### Common queries
+
 ```
 # get server status
 curl -ks https://localhost:8443/hawkular/metrics/status
