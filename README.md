@@ -14,7 +14,12 @@ For more documentation see the [Mohawk Development Docs](https://github.com/Moha
   - [Installation](#installation)
   - [Running the server](#running-the-server)
   - [Reading and writing data](#reading-and-writing-data)
+  
+#### Also see
 
+  - [REST API](/api/) source directory
+  - [Command line interface (cli)](/cli/) source directory
+  
 ## Introduction
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/MohawkTSDB/mohawk)](https://goreportcard.com/report/github.com/MohawkTSDB/mohawk)
