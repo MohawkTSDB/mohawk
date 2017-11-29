@@ -1,4 +1,5 @@
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/MohawkTSDB/mohawk)](https://goreportcard.com/report/github.com/MohawkTSDB/mohawk)
+[![Build Status](https://travis-ci.org/MohawkTSDB/mohawk.svg?branch=master)](https://travis-ci.org/MohawkTSDB/mohawk)
 
 # Mohawk
 
@@ -21,9 +22,6 @@ For more documentation see the [Mohawk Development Docs](https://github.com/Moha
   - [Command line interface (cli)](/cli/) source directory
   
 ## Introduction
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/MohawkTSDB/mohawk)](https://goreportcard.com/report/github.com/MohawkTSDB/mohawk)
-[![Build Status](https://travis-ci.org/MohawkTSDB/mohawk.svg?branch=master)](https://travis-ci.org/MohawkTSDB/mohawk)
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
 
