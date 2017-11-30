@@ -51,6 +51,39 @@ func (r *Backend) Open(options url.Values) {
 	r.tenant = make(map[string]*sql.DB)
 }
 
+func (r Backend) GetLastDataItems(tenant string, id string, numOfItems int) ([]storage.DataItem, error) {
+	res := make([]storage.DataItem, numOfItems)
+	db, _ := r.GetTenant(tenant)
+	var count int
+	// check if id exist
+	if !r.IdExist(tenant, id) {
+		return nil, fmt.Errorf("Metric does not exist in database.")
+	}
+
+	countQuery := fmt.Sprintf("select count(timestamp) from %s", id)
+	db.QueryRow(countQuery).Scan(&count)
+	// If number of items is smaller than limit ==> get all the items in the database.
+	if count < numOfItems {
+		numOfItems = count
+	}
+	sqlStmt := fmt.Sprintf(`select timestamp, value
+	from '%s'
+	order by timestamp %s limit %d`, id, numOfItems)
+	rows, err := db.Query(sqlStmt)
+	defer rows.Close()
+	for rows.Next() {
+		var timestamp int64
+		var value float64
+		err = rows.Scan(&timestamp, &value)
+		res = append(res, storage.DataItem{
+			Timestamp: timestamp,
+			Value:     value,
+		})
+	}
+	err = rows.Err()
+	return res, err
+}
+
 func (r Backend) GetTenants() []storage.Tenant {
 	res := make([]storage.Tenant, 0)
 
