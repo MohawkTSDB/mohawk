@@ -1,0 +1,12 @@
+backend: "memory"
+port: 8080
+alerts:
+- id: "free_memory is low"
+  metric: "free_memory"
+  from: 2000
+  to: 2100
+  type: 1
+- id: "free_memory is extremly low"
+  metric: "free_memory"
+  to: 1500
+  type: 2
