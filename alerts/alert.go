@@ -17,9 +17,9 @@
 package alerts
 
 import (
-	"time"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"time"
 
 	"github.com/MohawkTSDB/mohawk/storage"
 )
@@ -33,16 +33,16 @@ const (
 type RangeIntervalType int
 
 type Alert struct {
-	ID      string            `mapstructure:"id"`
-	Metric  string            `mapstructure:"metric"`
-	Tenant  string            `mapstructure:"tenant"`
-	State   bool              `mapstructure:"state"`
-	From    float64           `mapstructure:"from"`
-	To      float64           `mapstructure:"to"`
-	Type    RangeIntervalType `mapstructure:"type"`
+	ID     string            `mapstructure:"id"`
+	Metric string            `mapstructure:"metric"`
+	Tenant string            `mapstructure:"tenant"`
+	State  bool              `mapstructure:"state"`
+	From   float64           `mapstructure:"from"`
+	To     float64           `mapstructure:"to"`
+	Type   RangeIntervalType `mapstructure:"type"`
 }
 
-type Alerts struct{
+type Alerts struct {
 	Backend storage.Backend
 	Verbose bool
 	Alerts  []*Alert
@@ -90,10 +90,10 @@ func (alert *Alert) updateAlertState(value float64) {
 
 // loop on all alerts and check for status change
 func (a *Alerts) checkAlerts() {
-	var end      int64
-	var start    int64
-	var tenant   string
-	var metric   string
+	var end int64
+	var start int64
+	var tenant string
+	var metric string
 	var oldState bool
 
 	for _, alert := range a.Alerts {
