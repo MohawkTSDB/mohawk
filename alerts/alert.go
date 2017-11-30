@@ -67,7 +67,6 @@ func (a *Alerts) Init() {
 func (a *Alerts) run() {
 	c := time.Tick(time.Second * 10)
 
-	// once a minute check for alerts in data
 	for range c {
 		fmt.Printf("alert check: start\n")
 		a.checkAlerts()
