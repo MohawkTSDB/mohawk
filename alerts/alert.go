@@ -43,9 +43,9 @@ type Alert struct {
 }
 
 type Alerts struct{
-	Backend storage.Backend `mapstrcuture: "storage"`
-	Verbose bool            `mapstrcuture: "verbose"`
-	Alerts  []*Alert        `mapstructure: "alerts"`
+	Backend storage.Backend
+	Verbose bool
+	Alerts  []*Alert
 }
 
 // Init fill in missing configuration data, and start the alert checking loop
