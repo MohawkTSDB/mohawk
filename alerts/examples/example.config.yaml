@@ -5,7 +5,7 @@ alerts:
   metric: "free_memory"
   from: 2000
   to: 2100
-  type: 1
+  type: 0
 - id: "free_memory is extremly low"
   metric: "free_memory"
   to: 1500

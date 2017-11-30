@@ -23,12 +23,18 @@ alerts:
   # from > value <= to
   from: 1500
   to: 2000
-  # type: 1 - alert if metric is out of valid range
+  # type: 0 - alert if metric is out of valid range
+  # type: 1 - alert if metric is above valid range
   # type: 2 - alert if metric is below valid range
-  # type: 3 - alert if metric is above valid range
-  type: 1
+  type: 0
 - id: "free_memory is extremely low"
   metric: "free_memory"
   to: 1500
+  # if type is 1 or 2, from or to values can be omitted.
   type: 2
+- id: "free_memory is low"
+  metric: "cpu_usage"
+  from: 1500
+  to: 2000
+  # Default type is 0, it can be omitted.
 ```
