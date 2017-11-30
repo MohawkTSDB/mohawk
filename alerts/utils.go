@@ -17,11 +17,9 @@ func (alert *Alert) updateAlertState(value float64) {
 	}
 }
 
-func (alert *Alert) setStatus(status bool){
-	alert.State = status
-}
-
 func (a *Alerts) Open() {
+	// if user omit the tenant field in the alerts config, fallback to default
+	// tenant
 	for _, alert := range a.Alerts {
 		// fall back to _ops
 		if alert.Tenant == "" {
@@ -35,6 +33,7 @@ func (a *Alerts) Open() {
 
 func (a *Alerts) maintenance() {
 	c := time.Tick(time.Second * 10)
+
 	// once a minute check for alerts in data
 	for range c {
 		fmt.Printf("alert check: start\n")
@@ -51,14 +50,17 @@ func (a *Alerts) checkAlerts() {
 
 	for _, alert := range a.Alerts {
 		// Get each tenants item list
-		end = int64(time.Now().UTC().Unix() * 1000) // utc time now in miliseconds
+		end = int64(time.Now().UTC().Unix() * 1000)
 		start = end - 60*60*1000 // one hour ago
 
 		tenant = alert.Tenant
 		metric = alert.Metric
 		rawData := a.Backend.GetRawData(tenant, metric, end, start, 1, "ASC")
+		
+		// check for alert status change
 		if len(rawData) > 0 {
 			oldState = alert.State
+
 			// update alert state and report to user if changed.
 			alert.updateAlertState(rawData[0].Value)
 			if alert.State != oldState {
