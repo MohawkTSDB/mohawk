@@ -49,7 +49,6 @@ func (a *Alerts) checkAlerts() {
 	var oldState bool
 
 	for _, alert := range a.Alerts {
-		// Get each tenants item list
 		end = int64(time.Now().UTC().Unix() * 1000)
 		start = end - 60*60*1000 // one hour ago
 
