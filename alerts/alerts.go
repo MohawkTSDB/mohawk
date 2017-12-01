@@ -26,22 +26,16 @@ import (
 	"github.com/MohawkTSDB/mohawk/storage"
 )
 
-const (
-	BETWEEN RangeIntervalType = iota
-	HIGHER_THAN
-	LOWER_THAN
-)
-
 type RangeIntervalType int
 
 type Alert struct {
 	ID              string            `mapstructure:"id"`
 	Metric          string            `mapstructure:"metric"`
 	Tenant          string            `mapstructure:"tenant"`
-	State           bool              `mapstructure:"state"`
 	From            float64           `mapstructure:"from"`
 	To              float64           `mapstructure:"to"`
 	Type            RangeIntervalType `mapstructure:"type"`
+	State           bool
 	TrigerValue     float64
 	TrigerTimestamp int64
 }
@@ -52,6 +46,12 @@ type Alerts struct {
 	Verbose   bool
 	Alerts    []*Alert
 }
+
+const (
+	BETWEEN RangeIntervalType = iota
+	HIGHER_THAN
+	LOWER_THAN
+)
 
 // Init fill in missing configuration data, and start the alert checking loop
 func (a *Alerts) Init() {
