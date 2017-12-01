@@ -22,6 +22,7 @@ alerts:
   metric: "free_memory"
   # valid range for metric is set -
   # from > value <= to
+  # here valid range is from 1k to 8k, if free memory drops below 1k, error will be active.
   from: 1000
   to: 8000
   # type: 0 - alert if metric is out of valid range
@@ -30,11 +31,13 @@ alerts:
   type: 0
 - id: "free_memory is extremely low"
   metric: "free_memory"
+  # here valid range is above 0.5k , if free memory drops below 0.5k, error will be active.
   from: 500
   # if type is 1 or 2, from or to values can be omitted.
   type: 2
 - id: "cpu_usage is above 95%"
   metric: "cpu_usage"
+  # here valid range is above 0% and below 95%, if cpu usage is above 95%, error will be active.
   from: 0
   to: 95
   # Default type is 0, it can be omitted.
