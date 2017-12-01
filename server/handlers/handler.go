@@ -13,18 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package middleware middlewares for Mohawk
-package middleware
+// Package handler
+package handler
 
 import (
 	"net/http"
 )
 
-func LoggingDecorator(logFunc func(format string, v ...interface{})) Decorator {
-	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			logFunc("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
-			h(w, r)
-		})
-	})
+type Handler interface {
+	SetNext(http.Handler)
+	ServeHTTP(http.ResponseWriter, *http.Request)
+}
+
+// Append concat a list of Routers into the router routing table
+// returns
+// 	http.HandlerFunc - the first http handler function to call
+func Append(handlers ...Handler) http.HandlerFunc {
+	listSize := len(handlers)
+
+	// concat all routes, last item has no next function
+	for ix, r := range handlers[:listSize-1] {
+		r.SetNext(handlers[ix+1])
+	}
+
+	return handlers[0].ServeHTTP
 }

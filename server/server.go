@@ -28,6 +28,7 @@ import (
 	"github.com/MohawkTSDB/mohawk/alerts"
 	"github.com/MohawkTSDB/mohawk/middleware"
 	"github.com/MohawkTSDB/mohawk/router"
+	"github.com/MohawkTSDB/mohawk/server/handlers"
 	"github.com/MohawkTSDB/mohawk/storage"
 	"github.com/MohawkTSDB/mohawk/storage/example"
 	"github.com/MohawkTSDB/mohawk/storage/memory"
@@ -56,6 +57,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 // Serve run the REST API server
 func Serve() error {
 	var db storage.Backend
+	var routers http.HandlerFunc
 
 	var backendQuery = viper.GetString("storage")
 	var optionsQuery = viper.GetString("options")
@@ -110,7 +112,7 @@ func Serve() error {
 
 	// h common variables to be used for the storage Handler functions
 	// Backend the storage to use for metrics source
-	h := Handler{
+	h := APIHhandler{
 		Verbose: verbose,
 		Backend: db,
 	}
@@ -163,35 +165,49 @@ func Serve() error {
 	rAvailability.Add("GET", ":id/raw", h.GetData)
 	rAvailability.Add("GET", ":id/stats", h.GetData)
 
-	// create a list of routes
-	routers := []*router.Router{}
-	routers = append(routers, &rGauges, &rCounters, &rAvailability, &rRoot)
+	// Create the http handlers
+	// logging handler
+	logger := handler.Logger{}
 
-	// fallback handler, static decorator + bad request handler
-	staticDecorator := middleware.FileServeDecorator(media)
-	badRequestHandler := middleware.BadRequestHandler(log.Printf)
-	fallback := staticDecorator(badRequestHandler)
+	// authorization handler
+	authorization := handler.Authorization{
+		PublicPathRegex: "^/hawkular/metrics/status$",
+		Token:           token,
+	}
+
+	// add headers to response
+	headers := handler.Headers{}
+
+	// static a file server handler
+	static := handler.Static{
+		MediaPath: media,
+	}
+
+	// badrequest a BadRequest handler
+	badrequest := handler.BadRequest{}
 
 	// concat all routers and add fallback handler
-	core := router.Append(fallback, routers...)
-
-	// create a list of middlwares
-	decorators := []middleware.Decorator{}
-	decorators = append(decorators, middleware.LoggingDecorator(log.Printf), middleware.DefaultHeadersDecorator())
-	if token != "" {
-		decorators = append(decorators, middleware.AuthDecorator(token, "^/hawkular/metrics/status$"))
+	if token == "" {
+		routers = handler.Append(
+			&logger, &headers, &rGauges, &rCounters, &rAvailability, &rRoot, &static, &badrequest)
+	} else {
+		routers = handler.Append(
+			&logger, &authorization, &headers, &rGauges, &rCounters, &rAvailability, &rRoot, &static, &badrequest)
 	}
+
+	// Create a list of middlwares
+	decorators := []middleware.Decorator{}
 	if gzip {
 		decorators = append(decorators, middleware.GzipDecodeDecorator(), middleware.GzipEncodeDecorator())
 	}
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
-	handler := middleware.Append(core, decorators...)
+	core := middleware.Append(routers, decorators...)
 
 	// Run the server
 	srv := &http.Server{
 		Addr:           fmt.Sprintf("0.0.0.0:%d", port),
-		Handler:        handler,
+		Handler:        core,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,

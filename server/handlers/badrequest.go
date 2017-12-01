@@ -13,29 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package middleware middlewares for Mohawk
-package middleware
+// Package handler
+package handler
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 )
 
-func DefaultHeadersDecorator() Decorator {
-	return HeadersDecorator(map[string]string{
-		"Content-Type":                 "application/json",
-		"Access-Control-Allow-Origin":  "*",
-		"Access-Control-Allow-Headers": "authorization,content-type,hawkular-tenant",
-		"Access-Control-Allow-Methods": "GET, POST, DELETE, PUT",
-	})
+// BadRequest will be called if no route found
+type BadRequest struct {
 }
 
-func HeadersDecorator(headers map[string]string) Decorator {
-	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			for k, v := range headers {
-				w.Header().Set(k, v)
-			}
-			h(w, r)
-		})
-	})
+// SetNext set next http serve func
+func (b *BadRequest) SetNext(_h http.Handler) {
+}
+
+// ServeHTTP http serve func
+func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Page not found - 404\n")
+
+	w.WriteHeader(404)
+	fmt.Fprintf(w, "Page not found - 404\n")
 }
