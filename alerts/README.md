@@ -6,12 +6,13 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 ## Alerting rules
 
-Alerting rules in Mohawk servers send alerts to an Alertbuffer for processing.
+Alerting rules in Mohawk servers send alerts to an Alertbuffer if a metric value is outsde valid range.
 
 ## Configuring Alerts
 
 Alerting Configuration is done using the config.yaml file.
-Using the alerts key, we set a list of alerts, each alert has a unique name, and the alerts type.
+Using the alerts key, we set a list of alerts, each alert has a unique name, metric id and a valid range for that metric.
+If a metric value change from being valid to not valid or from not valid to valid, an error status change is triggered and sent to allert buffer.
 
 For example:
 
