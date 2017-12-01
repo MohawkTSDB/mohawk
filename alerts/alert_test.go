@@ -1,45 +1,51 @@
 package alerts
 
 import (
-	"github.com/MohawkTSDB/mohawk/storage"
-	"github.com/MohawkTSDB/mohawk/storage/memory"
 	"testing"
 	"time"
+
+	"github.com/MohawkTSDB/mohawk/storage/memory"
 )
 
-var b storage.Backend
-
-func TestAlerts_Init(t *testing.T) {
-	var ti int64
-	var va float64
-	var state0 bool
-	var state1 bool
-	var state2 bool
-	c := make(chan bool)
+func TestAlerts_Init(test *testing.T) {
+	var t int64
+	var v float64
 
 	// Testing with memory backend.
-	b = &memory.Backend{}
-	// Initialize backend object.
+	b := &memory.Backend{}
 	b.Open(nil)
 
 	// creating some alerts.
 	l := []*Alert{
-		{ID: "cpu usage too high",
+		{
+			ID:     "cpu usage too high",
 			Tenant: "_ops",
+			Metric: "cpu_usage",
 			Type:   LOWER_THAN,
 			To:     0.9,
-			Metric: "cpu_usage"},
-		{ID: "free memory too low ",
+		},
+		{
+			ID:     "free memory too low ",
 			Tenant: "_ops",
-			Type:   HIGHER_THAN,
-			From:   10000,
-			Metric: "free_memory"},
-		{ID: "free memory in between ",
+			Metric: "free_memory",
+			Type:   LOWER_THAN,
+			From:   2000,
+		},
+		{
+			ID:     "free memory in between ",
 			Tenant: "_ops",
+			Metric: "free_memory",
 			Type:   BETWEEN,
-			From:   9000,
-			To:     20000,
-			Metric: "free_memory"},
+			From:   1000,
+			To:     9000,
+		},
+		{
+			ID:     "free memory in too high ",
+			Tenant: "_ops",
+			Metric: "free_memory",
+			Type:   HIGHER_THAN,
+			To:     4000,
+		},
 	}
 
 	// Create an alerts object with memory backend.
@@ -54,25 +60,17 @@ func TestAlerts_Init(t *testing.T) {
 	/////////
 
 	// Create some fake data
-	ti = int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
-	va = float64(9500) // Firing alert two
-	b.PostRawData("_ops", "free_memory", ti, va)
+	// Firing alert 1
+	t = int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
+	v = float64(1500)
+	b.PostRawData("_ops", "free_memory", t, v)
 
 	// run alerts worker in separate thread and push results to a channel:
-	go func() {
-		alerts.checkAlerts()
-		for _, alert := range l {
-			c <- alert.State
-		}
-	}()
+	alerts.checkAlerts()
 
-	state0 = <-c
-	state1 = <-c
-	state2 = <-c
-
-	// only alert two should fire!
-	if !state1 || state0 || state2 {
-		t.FailNow()
+	// only alert 1 should fire!
+	if l[0].State || !l[1].State || l[2].State || l[3].State {
+		test.Error("Fail test 1")
 	}
 
 	//////////
@@ -80,25 +78,52 @@ func TestAlerts_Init(t *testing.T) {
 	/////////
 
 	// Create some more fake data
-	ti = int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
-	va = float64(8500) // firing alert one and two
-	b.PostRawData("_ops", "free_memory", ti, va)
+	// firing alerts 1 and 2
+	t = int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
+	v = float64(500)
+	b.PostRawData("_ops", "free_memory", t, v)
 
 	// run alerts worker in separate thread and push results to a channel:
-	go func() {
-		alerts.checkAlerts()
-		for _, alert := range l {
-			c <- alert.State
-		}
-	}()
+	alerts.checkAlerts()
 
-	state0 = <-c
-	state1 = <-c
-	state2 = <-c
-
-	// only alert two and one should fire!
-	if !state1 || !state2 || state0 {
-		t.FailNow()
+	// only alerts 1 and 2 should fire!
+	if l[0].State || !l[1].State || !l[2].State || l[3].State {
+		test.Error("Fail test 2")
 	}
 
+	//////////
+	// TEST 3:
+	/////////
+
+	// Create some more fake data
+	// firing none
+	t = int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
+	v = float64(2500)
+	b.PostRawData("_ops", "free_memory", t, v)
+
+	// run alerts worker in separate thread and push results to a channel:
+	alerts.checkAlerts()
+
+	// no alerts should fire!
+	if l[0].State || l[1].State || l[2].State || l[3].State {
+		test.Error("Fail test 3")
+	}
+
+	//////////
+	// TEST 4:
+	/////////
+
+	// Create some more fake data
+	// firing alert 3
+	t = int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
+	v = float64(5000)
+	b.PostRawData("_ops", "free_memory", t, v)
+
+	// run alerts worker in separate thread and push results to a channel:
+	alerts.checkAlerts()
+
+	// alert 3 should fire
+	if l[0].State || l[1].State || l[2].State || !l[3].State {
+		test.Error("Fail test 3")
+	}
 }
