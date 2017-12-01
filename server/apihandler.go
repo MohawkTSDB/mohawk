@@ -31,16 +31,16 @@ import (
 const DEFAULT_ORDER = "DESC"
 const SECONDARY_ORDER = "ASC"
 
-// Handler common variables to be used by all Handler functions
+// APIHhandler common variables to be used by all APIHhandler functions
 // 	version the version of the Hawkular server we are mocking
-// 	storage the storage to be used by the Handler functions
-type Handler struct {
+// 	storage the storage to be used by the APIHhandler functions
+type APIHhandler struct {
 	Verbose bool
 	Backend storage.Backend
 }
 
 // GetTenants return a list of metrics tenants
-func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []storage.Tenant
 
 	res = h.Backend.GetTenants()
@@ -51,7 +51,7 @@ func (h Handler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[str
 }
 
 // GetMetrics return a list of metrics definitions
-func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []storage.Item
 
 	r.ParseForm()
@@ -89,7 +89,7 @@ func (h Handler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[str
 }
 
 // GetData return a list of metrics raw / stat data
-func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
@@ -131,7 +131,7 @@ func (h Handler) GetData(w http.ResponseWriter, r *http.Request, argv map[string
 }
 
 // DeleteData delete a list of metrics raw  data
-func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
@@ -167,7 +167,7 @@ func (h Handler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[str
 }
 
 // PostQuery send timestamp, value to the storage
-func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u dataQuery
 	var end int64
 	var start int64
@@ -237,7 +237,7 @@ func (h Handler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[stri
 }
 
 // PostData send timestamp, value to the storage
-func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u []postDataItems
 	json.NewDecoder(r.Body).Decode(&u)
 
@@ -268,7 +268,7 @@ func (h Handler) PostData(w http.ResponseWriter, r *http.Request, argv map[strin
 }
 
 // PutTags send tag, value pairs to the storage
-func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var tags map[string]string
 	json.NewDecoder(r.Body).Decode(&tags)
 
@@ -289,7 +289,7 @@ func (h Handler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string
 }
 
 // PutMultiTags send tags pet dataItem - tag, value pairs to the storage
-func (h Handler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u []putTags
 	json.NewDecoder(r.Body).Decode(&u)
 
@@ -316,7 +316,7 @@ func (h Handler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[s
 }
 
 // DeleteTags delete a tag
-func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	// use the id from the argv list
 	id := argv["id"]
 	tagsStr := argv["tags"]
@@ -336,7 +336,7 @@ func (h Handler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[str
 }
 
 // getData querys data from the storage, and return a json string
-func getData(h Handler, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
+func getData(h APIHhandler, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
 	var resStr string
 
 	// call storage for data

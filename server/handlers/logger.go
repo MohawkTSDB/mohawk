@@ -13,18 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package middleware middlewares for Mohawk
-package middleware
+// Package handler
+package handler
 
 import (
+	"log"
 	"net/http"
 )
 
-func LoggingDecorator(logFunc func(format string, v ...interface{})) Decorator {
-	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			logFunc("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
-			h(w, r)
-		})
-	})
+// Logger middleware that will log http requests
+type Logger struct {
+	next http.Handler
+}
+
+// SetNext set next http serve func
+func (l *Logger) SetNext(h http.Handler) {
+	l.next = h
+}
+
+// ServeHTTP http serve func
+func (l Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("%s Accept-Encoding: %s, %4s %s", r.RemoteAddr, r.Header.Get("Accept-Encoding"), r.Method, r.URL)
+
+	l.next.ServeHTTP(w, r)
 }

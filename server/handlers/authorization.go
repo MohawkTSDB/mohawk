@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package middleware middlewares for Mohawk
-package middleware
+// Package handler
+package handler
 
 import (
 	"fmt"
@@ -24,25 +24,26 @@ import (
 
 // Authorization middleware that will authorize http requests
 type Authorization struct {
-	UseToken        bool
-	Verbose         bool
 	PublicPathRegex string
 	Token           string
 	next            http.Handler
 }
 
-func AuthDecorator(token, publicPathRegex string) Decorator {
-	publicPath := regexp.MustCompile(publicPathRegex)
-	authToken := "Bearer " + token
-	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Println(r.Header.Get("Authorization"), authToken, r.Header.Get("Authorization") == authToken)
-			if r.Header.Get("Authorization") == authToken || publicPath.MatchString(r.URL.EscapedPath()) {
-				h(w, r)
-			}
+// SetNext set next http serve func
+func (a *Authorization) SetNext(h http.Handler) {
+	a.next = h
+}
 
-			w.WriteHeader(http.StatusUnauthorized)
-			fmt.Fprintf(w, "Unauthorized - 401\n")
-		})
-	})
+// ServeHTTP http serve func
+func (a *Authorization) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	publicPath := regexp.MustCompile(a.PublicPathRegex)
+	authToken := "Bearer " + a.Token
+
+	if r.Header.Get("Authorization") == authToken || publicPath.MatchString(r.URL.EscapedPath()) {
+		a.next.ServeHTTP(w, r)
+		return
+	}
+
+	w.WriteHeader(http.StatusUnauthorized)
+	fmt.Fprintf(w, "Unauthorized - 401\n")
 }
