@@ -17,8 +17,10 @@
 package alerts
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/MohawkTSDB/mohawk/storage"
@@ -33,19 +35,22 @@ const (
 type RangeIntervalType int
 
 type Alert struct {
-	ID     string            `mapstructure:"id"`
-	Metric string            `mapstructure:"metric"`
-	Tenant string            `mapstructure:"tenant"`
-	State  bool              `mapstructure:"state"`
-	From   float64           `mapstructure:"from"`
-	To     float64           `mapstructure:"to"`
-	Type   RangeIntervalType `mapstructure:"type"`
+	ID              string            `mapstructure:"id"`
+	Metric          string            `mapstructure:"metric"`
+	Tenant          string            `mapstructure:"tenant"`
+	State           bool              `mapstructure:"state"`
+	From            float64           `mapstructure:"from"`
+	To              float64           `mapstructure:"to"`
+	Type            RangeIntervalType `mapstructure:"type"`
+	TrigerValue     float64
+	TrigerTimestamp int64
 }
 
 type Alerts struct {
-	Backend storage.Backend
-	Verbose bool
-	Alerts  []*Alert
+	Backend   storage.Backend
+	ServerURL string
+	Verbose   bool
+	Alerts    []*Alert
 }
 
 // Init fill in missing configuration data, and start the alert checking loop
@@ -57,6 +62,11 @@ func (a *Alerts) Init() {
 		if alert.Tenant == "" {
 			alert.Tenant = "_ops"
 		}
+	}
+
+	// set default ServerURL
+	if a.ServerURL == "" {
+		a.ServerURL = "http://localhost:9099/append"
 	}
 
 	// check for alerts periodically.
@@ -104,7 +114,7 @@ func (a *Alerts) checkAlerts() {
 		// check out values for the alert metric
 		tenant = alert.Tenant
 		metric = alert.Metric
-		rawData := a.Backend.GetRawData(tenant, metric, end, start, 1, "ASC")
+		rawData := a.Backend.GetRawData(tenant, metric, end, start, 1, "DESC")
 
 		// if we have new data check for alert status change
 		// [ if no new data found, leave alert status un changed ]
@@ -114,10 +124,24 @@ func (a *Alerts) checkAlerts() {
 			// update alert state and report to user if changed.
 			alert.updateAlertState(rawData[0].Value)
 			if alert.State != oldState {
+				// set triger values
+				alert.TrigerValue = rawData[0].Value
+				alert.TrigerTimestamp = rawData[0].Timestamp
+
 				if b, err := json.Marshal(alert); err == nil {
-					fmt.Println(string(b))
+					s := string(b)
+					fmt.Println(s)
+					a.post(s)
 				}
 			}
 		}
+	}
+}
+
+func (a *Alerts) post(s string) {
+	client := http.Client{}
+	req, err := http.NewRequest("POST", a.ServerURL, bytes.NewBufferString(s))
+	if err == nil {
+		client.Do(req)
 	}
 }

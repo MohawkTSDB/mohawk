@@ -8,6 +8,33 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 Alerting rules in Mohawk servers send alerts to an Alertbuffer if a metric value is outsde valid range.
 
+## Runing Mohawk with alerting rules:
+
+###### Running with some alerts rules in the config file:
+```
+./mohawk -c example.config.yaml
+2017/12/01 17:40:58 Start server, listen on http://0.0.0.0:8080
+...
+```
+###### Running the alert buffer:
+```
+./examples/alert-buffer.py
+Starting httpd...
+{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":true,"From":2000,"To":8000,"Type":0,"TrigerValue":40,"TrigerTimestamp":1512142870000}
+127.0.0.1 - - [01/Dec/2017 17:41:18] "POST /append HTTP/1.1" 200 -
+{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":false,"From":2000,"To":8000,"Type":0,"TrigerValue":4000,"TrigerTimestamp":1512142893000}
+127.0.0.1 - - [01/Dec/2017 17:41:38] "POST /append HTTP/1.1" 200 -
+{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":true,"From":2000,"To":8000,"Type":0,"TrigerValue":40,"TrigerTimestamp":1512142901000}
+127.0.0.1 - - [01/Dec/2017 17:41:48] "POST /append HTTP/1.1" 200 -
+...
+```
+
+###### Trigering the alerts using curl command:
+```
+$ curl http://localhost:8080/hawkular/metrics/gauges/raw -d "[{\"id\":\"free_memory\", \"data\":[{\"timestamp\": $(date +%s)000, \"value\": 4000}]}]"
+$ curl http://localhost:8080/hawkular/metrics/gauges/raw -d "[{\"id\":\"free_memory\", \"data\":[{\"timestamp\": $(date +%s)000, \"value\": 40}]}]"
+```
+
 ## Configuring Alerts
 
 Alerting Configuration is done using the config.yaml file.
