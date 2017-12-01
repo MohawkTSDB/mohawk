@@ -8,7 +8,7 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 Alerting rules in Mohawk servers send alerts to an Alertbuffer if a metric value is outsde valid range.
 
-## Runing Mohawk with alerting rules:
+## Usage
 
 ###### Running with some alerts rules in the config file:
 ```
