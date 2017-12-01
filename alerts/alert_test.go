@@ -35,7 +35,7 @@ func TestAlerts_Init(test *testing.T) {
 			ID:     "free memory in between ",
 			Tenant: "_ops",
 			Metric: "free_memory",
-			Type:   BETWEEN,
+			Type:   OUTSIDE,
 			From:   1000,
 			To:     9000,
 		},

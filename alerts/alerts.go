@@ -48,7 +48,7 @@ type Alerts struct {
 }
 
 const (
-	BETWEEN RangeIntervalType = iota
+	OUTSIDE RangeIntervalType = iota
 	HIGHER_THAN
 	LOWER_THAN
 )
@@ -89,7 +89,7 @@ func (alert *Alert) updateAlertState(value float64) {
 	//    from < value >= to
 	//    values outside this range will triger an alert
 	switch alert.Type {
-	case BETWEEN:
+	case OUTSIDE:
 		alert.State = value <= alert.From || value > alert.To
 	case HIGHER_THAN:
 		alert.State = value > alert.To
