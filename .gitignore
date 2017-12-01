@@ -9,7 +9,6 @@ mohawk-webui
 mohawk-webui/*
 
 # Server DB and authentication
-server/*
 server.pem
 server.key
 
