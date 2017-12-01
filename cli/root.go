@@ -44,17 +44,17 @@ Version:
   %s
 
 Author:
-  %s`, api.VER, AUTHOR),
+  %s`, server.VER, AUTHOR),
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Print version and quit
 		if viper.GetBool("version") {
-			fmt.Printf("Mohawk version: %s\n\n", api.VER)
+			fmt.Printf("Mohawk version: %s\n\n", server.VER)
 			return
 		}
 
 		// Run the REST API server
-		api.Serve()
+		server.Serve()
 	},
 }
 
