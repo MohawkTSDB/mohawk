@@ -96,11 +96,11 @@ func (a *Alerts) checkAlerts() {
 	var metric string
 	var oldState bool
 
-	for _, alert := range a.Alerts {
-		// look for last values
-		end = int64(time.Now().UTC().Unix() * 1000)
-		start = end - 60*60*1000
+	// check only for current data
+	end = int64(time.Now().UTC().Unix() * 1000)
+	start = end - 60*60*1000
 
+	for _, alert := range a.Alerts {
 		// check out values for the alert metric
 		tenant = alert.Tenant
 		metric = alert.Metric
