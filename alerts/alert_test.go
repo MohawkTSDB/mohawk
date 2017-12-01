@@ -35,7 +35,7 @@ func TestAlerts_Init(t *testing.T) {
 			From:   10000,
 			Metric: "free_memory"},
 		{ID: "free memory in between ",
-			Tenant:"_ops",
+			Tenant: "_ops",
 			Type:   BETWEEN,
 			From:   9000,
 			To:     20000,
@@ -65,10 +65,10 @@ func TestAlerts_Init(t *testing.T) {
 			c <- alert.State
 		}
 	}()
-	
-	state0 = <- c
-	state1 = <- c
-	state2 = <- c
+
+	state0 = <-c
+	state1 = <-c
+	state2 = <-c
 
 	// only alert two should fire!
 	if !state1 || state0 || state2 {
@@ -92,9 +92,9 @@ func TestAlerts_Init(t *testing.T) {
 		}
 	}()
 
-	state0 = <- c
-	state1 = <- c
-	state2 = <- c
+	state0 = <-c
+	state1 = <-c
+	state2 = <-c
 
 	// only alert two and one should fire!
 	if !state1 || !state2 || state0 {
