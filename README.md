@@ -15,12 +15,12 @@ For more documentation see the [Mohawk Development Docs](https://github.com/Moha
   - [Installation](#installation)
   - [Running the server](#running-the-server)
   - [Reading and writing data](#reading-and-writing-data)
-  
+
 #### Also see
 
-  - [REST API](/api/) source directory
+  - [REST API (server)](/server/) source directory
   - [Command line interface (cli)](/cli/) source directory
-  
+
 ## Introduction
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.

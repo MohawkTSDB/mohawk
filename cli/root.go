@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/MohawkTSDB/mohawk/api"
+	"github.com/MohawkTSDB/mohawk/server"
 )
 
 // AUTHOR the author name and Email
