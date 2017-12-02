@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+NOW="$(($(date +%s) - 10000))000"
+
 wait_for_mohawk() {
   mohawk &
 
@@ -37,8 +39,10 @@ kill_mohawk() {
 
 @test "Data post and get" {
   wait_for_mohawk
-  curl -ks -X POST -H "Content-Type: application/json" -d '[{ "id": "free_memory", "data": [{"timestamp": 1498832548306, "value": 2075}]}]' http://localhost:8080/hawkular/metrics/gauges/raw
-  result="$(curl -X GET http://localhost:8080/hawkular/metrics/metrics)"
+  curl http://localhost:8080/hawkular/metrics/gauges/raw -d "[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW,\"value\": 42}]}]"
+
+  result="$(curl http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)"
   kill_mohawk
-  [ "$result" = '[{"id":"free_memory","type":"gauge","tags":{},"data":[{"timestamp":1498832548306,"value":2075}]}]' ]
+
+  [ "$result" = "[{\"timestamp\":$NOW,\"value\":42}]" ]
 }
