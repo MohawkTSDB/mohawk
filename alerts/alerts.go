@@ -138,10 +138,10 @@ func (a *Alerts) checkAlerts() {
 				}
 			}
 		}
-
-		// update check compleat heart beat timestamp
-		a.Heartbeat = end
 	}
+
+	// update check compleat heart beat timestamp
+	a.Heartbeat = end
 }
 
 func (a *Alerts) post(s string) {
