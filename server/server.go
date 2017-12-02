@@ -57,7 +57,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 // Serve run the REST API server
 func Serve() error {
 	var db storage.Storage
-	var alertRules alerts.AlertRules
+	var alertRules *alerts.AlertRules
 	var routers http.HandlerFunc
 
 	var backendQuery = viper.GetString("storage")
@@ -105,7 +105,7 @@ func Serve() error {
 
 		if len(l) > 0 {
 			// creat and Init the alert handler
-			alertRules = alerts.AlertRules{
+			alertRules = &alerts.AlertRules{
 				Storage:        db,
 				Verbose:        verbose,
 				Alerts:         l,
@@ -171,6 +171,12 @@ func Serve() error {
 	rAvailability.Add("GET", ":id/raw", h.GetData)
 	rAvailability.Add("GET", ":id/stats", h.GetData)
 
+	// Requests not handled by the routers will be forworded to BadRequest Handler
+	rAlerts := router.Router{
+		Prefix: "/hawkular/alerts/",
+	}
+	rAlerts.Add("GET", "status", h.GetAlertsStatus)
+
 	// Create the http handlers
 	// logging handler
 	logger := handler.Logger{}
@@ -195,10 +201,10 @@ func Serve() error {
 	// concat all routers and add fallback handler
 	if token == "" {
 		routers = handler.Append(
-			&logger, &headers, &rGauges, &rCounters, &rAvailability, &rRoot, &static, &badrequest)
+			&logger, &headers, &rGauges, &rCounters, &rAvailability, &rAlerts, &rRoot, &static, &badrequest)
 	} else {
 		routers = handler.Append(
-			&logger, &authorization, &headers, &rGauges, &rCounters, &rAvailability, &rRoot, &static, &badrequest)
+			&logger, &authorization, &headers, &rGauges, &rCounters, &rAvailability, &rAlerts, &rRoot, &static, &badrequest)
 	}
 
 	// Create a list of middlwares
