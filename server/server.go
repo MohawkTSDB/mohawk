@@ -178,6 +178,7 @@ func Serve() error {
 		Prefix: "/hawkular/alerts/",
 	}
 	rAlerts.Add("GET", "status", h.GetAlertsStatus)
+	rAlerts.Add("GET", "raw", h.GetAlerts)
 
 	// Create the http handlers
 	// logging handler

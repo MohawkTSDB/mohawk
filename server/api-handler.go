@@ -56,6 +56,25 @@ func (h APIHhandler) GetAlertsStatus(w http.ResponseWriter, r *http.Request, arg
 	fmt.Fprintln(w, res)
 }
 
+// GetAlerts return a list of alerts
+func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	var res []alerts.Alert
+
+	// get data from the form arguments
+	r.ParseForm()
+
+	// get tenant
+	tenant := parseTenant(r)
+	id := r.Form.Get("id")
+	state := r.Form.Get("state")
+
+	res = h.Alerts.FilterAlerts(tenant, id, state)
+	resJSON, _ := json.Marshal(res)
+
+	w.WriteHeader(200)
+	fmt.Fprintln(w, string(resJSON))
+}
+
 // GetTenants return a list of metrics tenants
 func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []storage.Tenant
