@@ -20,7 +20,7 @@ For more documentation see the [Mohawk Development Docs](https://github.com/Moha
 
   - [REST API (server)](/server/) source directory
   - [Command Line Interface (cli)](/cli/) source directory
-  - [Alert Rulles (alerts)](/alerts/) source directory
+  - [Alert Rules (alerts)](/alerts/) source directory
 
 ## Introduction
 
