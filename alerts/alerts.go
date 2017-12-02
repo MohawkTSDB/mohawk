@@ -41,10 +41,11 @@ type Alert struct {
 }
 
 type Alerts struct {
-	Backend   storage.Backend
-	ServerURL string
-	Verbose   bool
-	Alerts    []*Alert
+	Backend        storage.Backend
+	ServerURL      string
+	Verbose        bool
+	Alerts         []*Alert
+	AlertsInterval int
 }
 
 const (
@@ -70,13 +71,14 @@ func (a *Alerts) Init() {
 	}
 
 	// check for alerts periodically.
-	log.Printf("Start alerts, alert interval 10s, push to %+v", a.ServerURL)
+	log.Printf("Start alerts, alert buffer url: %+v", a.ServerURL)
+	log.Printf("Start alerts, alert interval: %+vs", a.AlertsInterval)
 	go a.run()
 }
 
 // check for alert status chenge periodically
 func (a *Alerts) run() {
-	c := time.Tick(time.Second * 10)
+	c := time.Tick(time.Second * time.Duration(a.AlertsInterval))
 
 	for range c {
 		a.checkAlerts()

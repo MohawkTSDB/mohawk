@@ -75,6 +75,7 @@ func init() {
 	RootCmd.Flags().BoolP("verbose", "V", false, "more debug output")
 	RootCmd.Flags().BoolP("version", "v", false, "display mohawk version number")
 	RootCmd.Flags().StringP("config", "c", "", "config file")
+	RootCmd.Flags().Int("alerts-interval", 5, "Check alerts every N sec")
 
 	// Viper Binding
 	viper.BindPFlag("storage", RootCmd.Flags().Lookup("storage"))
@@ -89,6 +90,7 @@ func init() {
 	viper.BindPFlag("verbose", RootCmd.Flags().Lookup("verbose"))
 	viper.BindPFlag("version", RootCmd.Flags().Lookup("version"))
 	viper.BindPFlag("config", RootCmd.Flags().Lookup("config"))
+	viper.BindPFlag("alerts-interval", RootCmd.Flags().Lookup("alerts-interval"))
 }
 
 func initConfig() {

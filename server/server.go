@@ -69,6 +69,7 @@ func Serve() error {
 	var port = viper.GetInt("port")
 	var cert = viper.GetString("cert")
 	var key = viper.GetString("key")
+	var alertsInterval = viper.GetInt("alerts-interval")
 	var configAlerts = viper.ConfigFileUsed() != "" && viper.Get("alerts") != ""
 
 	// Create and init the storage
@@ -104,9 +105,10 @@ func Serve() error {
 		if len(l) > 0 {
 			// creat and Init the alert handler
 			a := &alerts.Alerts{
-				Backend: db,
-				Verbose: verbose,
-				Alerts:  l,
+				Backend:        db,
+				Verbose:        verbose,
+				Alerts:         l,
+				AlertsInterval: alertsInterval,
 			}
 			a.Init()
 		}
