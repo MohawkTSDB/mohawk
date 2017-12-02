@@ -24,21 +24,21 @@ import (
 	"github.com/MohawkTSDB/mohawk/storage"
 )
 
-type Backend struct {
+type Storage struct {
 }
 
-// Backend functions
+// Storage functions
 // Required by storage interface
 
-func (r Backend) Name() string {
-	return "Backend-Example"
+func (r Storage) Name() string {
+	return "Storage-Example"
 }
 
-func (r *Backend) Open(options url.Values) {
+func (r *Storage) Open(options url.Values) {
 	// open db connection
 }
 
-func (r Backend) GetTenants() []storage.Tenant {
+func (r Storage) GetTenants() []storage.Tenant {
 	res := make([]storage.Tenant, 0)
 
 	// return a list of tenants
@@ -47,7 +47,7 @@ func (r Backend) GetTenants() []storage.Tenant {
 	return res
 }
 
-func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.Item {
+func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
 	res := make([]storage.Item, 0)
 	maxSize := 42
 
@@ -76,7 +76,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.It
 	return res
 }
 
-func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
 	res := make([]storage.DataItem, 0)
 	var sampleDuration int64
 	var l int64
@@ -98,7 +98,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 	return res
 }
 
-func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
 	res := make([]storage.StatItem, 0)
 	var l int64
 	var i int64
@@ -130,19 +130,19 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 
 // unimplemented requests should fail silently
 
-func (r Backend) PostRawData(tenant string, id string, t int64, v float64) bool {
+func (r Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
 	return true
 }
 
-func (r Backend) PutTags(tenant string, id string, tags map[string]string) bool {
+func (r Storage) PutTags(tenant string, id string, tags map[string]string) bool {
 	return true
 }
 
-func (r Backend) DeleteData(tenant string, id string, end int64, start int64) bool {
+func (r Storage) DeleteData(tenant string, id string, end int64, start int64) bool {
 	return true
 }
 
-func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
+func (r Storage) DeleteTags(tenant string, id string, tags []string) bool {
 	return true
 }
 

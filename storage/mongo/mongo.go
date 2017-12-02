@@ -26,19 +26,19 @@ import (
 	"github.com/MohawkTSDB/mohawk/storage"
 )
 
-type Backend struct {
+type Storage struct {
 	dbURL        string
 	mongoSession *mgo.Session
 }
 
-// Backend functions
+// Storage functions
 // Required by storage interface
 
-func (r Backend) Name() string {
-	return "Backend-Mongo"
+func (r Storage) Name() string {
+	return "Storage-Mongo"
 }
 
-func (r *Backend) Open(options url.Values) {
+func (r *Storage) Open(options url.Values) {
 	var err error
 
 	// get storage options
@@ -65,7 +65,7 @@ func (r *Backend) Open(options url.Values) {
 	r.mongoSession.SetMode(mgo.Monotonic, true)
 }
 
-func (r Backend) GetTenants() []storage.Tenant {
+func (r Storage) GetTenants() []storage.Tenant {
 	res := make([]storage.Tenant, 0)
 
 	// copy storage session
@@ -87,7 +87,7 @@ func (r Backend) GetTenants() []storage.Tenant {
 	return res
 }
 
-func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.Item {
+func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
 	var query bson.M
 	res := make([]storage.Item, 0)
 
@@ -115,7 +115,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.It
 	return res
 }
 
-func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
 	var sort string
 	res := make([]storage.DataItem, 0)
 
@@ -142,7 +142,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 	return res
 }
 
-func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
 	var sort int
 	res := make([]storage.StatItem, 0)
 
@@ -210,7 +210,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 
 // unimplemented requests should fail silently
 
-func (r Backend) PostRawData(tenant string, id string, t int64, v float64) bool {
+func (r Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
 	// check if id exist
 	if !r.IdExist(tenant, id) {
 		r.createId(tenant, id)
@@ -220,7 +220,7 @@ func (r Backend) PostRawData(tenant string, id string, t int64, v float64) bool 
 	return true
 }
 
-func (r Backend) PutTags(tenant string, id string, tags map[string]string) bool {
+func (r Storage) PutTags(tenant string, id string, tags map[string]string) bool {
 	// check if id exist
 	if !r.IdExist(tenant, id) {
 		r.createId(tenant, id)
@@ -232,18 +232,18 @@ func (r Backend) PutTags(tenant string, id string, tags map[string]string) bool 
 	return true
 }
 
-func (r Backend) DeleteData(tenant string, id string, end int64, start int64) bool {
+func (r Storage) DeleteData(tenant string, id string, end int64, start int64) bool {
 	return true
 }
 
-func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
+func (r Storage) DeleteTags(tenant string, id string, tags []string) bool {
 	return true
 }
 
 // Helper functions
 // Not required by storage interface
 
-func (r Backend) IdExist(tenant string, id string) bool {
+func (r Storage) IdExist(tenant string, id string) bool {
 	result := storage.Item{}
 
 	// copy storage session
@@ -256,7 +256,7 @@ func (r Backend) IdExist(tenant string, id string) bool {
 	return err == nil
 }
 
-func (r Backend) createId(tenant string, id string) bool {
+func (r Storage) createId(tenant string, id string) bool {
 	// copy storage session
 	sessionCopy := r.mongoSession.Copy()
 	defer sessionCopy.Close()
@@ -272,7 +272,7 @@ func (r Backend) createId(tenant string, id string) bool {
 	return true
 }
 
-func (r Backend) insertTag(tenant string, id string, k string, v string) {
+func (r Storage) insertTag(tenant string, id string, k string, v string) {
 	result := storage.Item{}
 
 	// copy storage session
@@ -295,7 +295,7 @@ func (r Backend) insertTag(tenant string, id string, k string, v string) {
 	}
 }
 
-func (r Backend) insertData(tenant string, id string, t int64, v float64) {
+func (r Storage) insertData(tenant string, id string, t int64, v float64) {
 	// copy storage session
 	sessionCopy := r.mongoSession.Copy()
 	defer sessionCopy.Close()

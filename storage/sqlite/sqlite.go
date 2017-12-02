@@ -29,19 +29,19 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type Backend struct {
+type Storage struct {
 	dbDirName string
 	tenant    map[string]*sql.DB
 }
 
-// Backend functions
+// Storage functions
 // Required by storage interface
 
-func (r Backend) Name() string {
-	return "Backend-Sqlite3"
+func (r Storage) Name() string {
+	return "Storage-Sqlite3"
 }
 
-func (r *Backend) Open(options url.Values) {
+func (r *Storage) Open(options url.Values) {
 	// get storage options
 	r.dbDirName = options.Get("db-dirname")
 	if r.dbDirName == "" {
@@ -51,7 +51,7 @@ func (r *Backend) Open(options url.Values) {
 	r.tenant = make(map[string]*sql.DB)
 }
 
-func (r Backend) GetTenants() []storage.Tenant {
+func (r Storage) GetTenants() []storage.Tenant {
 	res := make([]storage.Tenant, 0)
 
 	files, _ := ioutil.ReadDir(r.dbDirName)
@@ -65,7 +65,7 @@ func (r Backend) GetTenants() []storage.Tenant {
 	return res
 }
 
-func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.Item {
+func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
 	res := make([]storage.Item, 0)
 	db, _ := r.GetTenant(tenant)
 
@@ -129,7 +129,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.It
 	return res
 }
 
-func (r Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
 	res := make([]storage.DataItem, 0)
 	db, _ := r.GetTenant(tenant)
 
@@ -170,7 +170,7 @@ func (r Backend) GetRawData(tenant string, id string, end int64, start int64, li
 	return res
 }
 
-func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
 	var t int64
 	count := int64(0)
 	res := make([]storage.StatItem, 0)
@@ -266,7 +266,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
-func (r Backend) PostRawData(tenant string, id string, t int64, v float64) bool {
+func (r Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
 	// check if id exist
 	if !r.IdExist(tenant, id) {
 		r.createId(tenant, id)
@@ -276,7 +276,7 @@ func (r Backend) PostRawData(tenant string, id string, t int64, v float64) bool 
 	return true
 }
 
-func (r Backend) PutTags(tenant string, id string, tags map[string]string) bool {
+func (r Storage) PutTags(tenant string, id string, tags map[string]string) bool {
 	// check if id exist
 	if !r.IdExist(tenant, id) {
 		r.createId(tenant, id)
@@ -288,7 +288,7 @@ func (r Backend) PutTags(tenant string, id string, tags map[string]string) bool 
 	return true
 }
 
-func (r Backend) DeleteData(tenant string, id string, end int64, start int64) bool {
+func (r Storage) DeleteData(tenant string, id string, end int64, start int64) bool {
 	// check if id exist
 	if r.IdExist(tenant, id) {
 		r.deleteData(tenant, id, end, start)
@@ -298,7 +298,7 @@ func (r Backend) DeleteData(tenant string, id string, end int64, start int64) bo
 	return false
 }
 
-func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
+func (r Storage) DeleteTags(tenant string, id string, tags []string) bool {
 	// check if id exist
 	if r.IdExist(tenant, id) {
 		for _, k := range tags {
@@ -313,7 +313,7 @@ func (r Backend) DeleteTags(tenant string, id string, tags []string) bool {
 // Helper functions
 // Not required by storage interface
 
-func (r *Backend) GetTenant(name string) (*sql.DB, error) {
+func (r *Storage) GetTenant(name string) (*sql.DB, error) {
 	var filename string
 
 	if tenant, ok := r.tenant[name]; ok {
@@ -350,7 +350,7 @@ func (r *Backend) GetTenant(name string) (*sql.DB, error) {
 	return db, nil
 }
 
-func (r Backend) IdExist(tenant string, id string) bool {
+func (r Storage) IdExist(tenant string, id string) bool {
 	var _id string
 	db, _ := r.GetTenant(tenant)
 
@@ -359,7 +359,7 @@ func (r Backend) IdExist(tenant string, id string) bool {
 	return err != sql.ErrNoRows
 }
 
-func (r Backend) insertData(tenant string, id string, t int64, v float64) {
+func (r Storage) insertData(tenant string, id string, t int64, v float64) {
 	db, _ := r.GetTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("insert into '%s' values (%d, %f)", id, t, v)
@@ -369,7 +369,7 @@ func (r Backend) insertData(tenant string, id string, t int64, v float64) {
 	}
 }
 
-func (r Backend) insertTag(tenant string, id string, k string, v string) {
+func (r Storage) insertTag(tenant string, id string, k string, v string) {
 	db, _ := r.GetTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
@@ -379,7 +379,7 @@ func (r Backend) insertTag(tenant string, id string, k string, v string) {
 	}
 }
 
-func (r Backend) deleteData(tenant string, id string, end int64, start int64) {
+func (r Storage) deleteData(tenant string, id string, end int64, start int64) {
 	db, _ := r.GetTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("delete from '%s' where timestamp >= %d and timestamp < %d", id, start, end)
@@ -389,7 +389,7 @@ func (r Backend) deleteData(tenant string, id string, end int64, start int64) {
 	}
 }
 
-func (r Backend) deleteTag(tenant string, id string, k string) {
+func (r Storage) deleteTag(tenant string, id string, k string) {
 	db, _ := r.GetTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("delete from tags where id='%s' and tag='%s'", id, k)
@@ -399,7 +399,7 @@ func (r Backend) deleteTag(tenant string, id string, k string) {
 	}
 }
 
-func (r Backend) createId(tenant string, id string) bool {
+func (r Storage) createId(tenant string, id string) bool {
 	db, _ := r.GetTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
@@ -425,7 +425,7 @@ func (r Backend) createId(tenant string, id string) bool {
 	return true
 }
 
-func (r Backend) UpdateTag(items []storage.Item, tenant string, id string, tag string, value string) []storage.Item {
+func (r Storage) UpdateTag(items []storage.Item, tenant string, id string, tag string, value string) []storage.Item {
 	// try to update tag if item exist
 	for i, item := range items {
 		if item.Id == id {

@@ -41,7 +41,7 @@ type Alert struct {
 }
 
 type AlertRules struct {
-	Backend        storage.Backend
+	Storage        storage.Storage
 	ServerURL      string
 	Verbose        bool
 	Alerts         []*Alert
@@ -121,7 +121,7 @@ func (a *AlertRules) checkAlerts() {
 		// check out values for the alert metric
 		tenant = alert.Tenant
 		metric = alert.Metric
-		rawData := a.Backend.GetRawData(tenant, metric, end, start, 1, "DESC")
+		rawData := a.Storage.GetRawData(tenant, metric, end, start, 1, "DESC")
 
 		// if we have new data check for alert status change
 		// [ if no new data found, leave alert status un changed ]

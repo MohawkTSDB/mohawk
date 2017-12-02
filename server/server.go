@@ -56,7 +56,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 
 // Serve run the REST API server
 func Serve() error {
-	var db storage.Backend
+	var db storage.Storage
 	var alertRules alerts.AlertRules
 	var routers http.HandlerFunc
 
@@ -76,13 +76,13 @@ func Serve() error {
 	// Create and init the storage
 	switch backendQuery {
 	case "sqlite":
-		db = &sqlite.Backend{}
+		db = &sqlite.Storage{}
 	case "memory":
-		db = &memory.Backend{}
+		db = &memory.Storage{}
 	case "mongo":
-		db = &mongo.Backend{}
+		db = &mongo.Storage{}
 	case "example":
-		db = &example.Backend{}
+		db = &example.Storage{}
 	default:
 		log.Fatal("Can't find storage:", backendQuery)
 	}
@@ -106,7 +106,7 @@ func Serve() error {
 		if len(l) > 0 {
 			// creat and Init the alert handler
 			alertRules = alerts.AlertRules{
-				Backend:        db,
+				Storage:        db,
 				Verbose:        verbose,
 				Alerts:         l,
 				AlertsInterval: alertsInterval,
@@ -116,10 +116,10 @@ func Serve() error {
 	}
 
 	// h common variables to be used for the storage Handler functions
-	// Backend the storage to use for metrics source
+	// Storage the storage to use for metrics source
 	h := APIHhandler{
 		Verbose: verbose,
-		Backend: db,
+		Storage: db,
 		Alerts:  alertRules,
 	}
 

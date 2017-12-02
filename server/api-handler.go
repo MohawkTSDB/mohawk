@@ -37,7 +37,7 @@ const SECONDARY_ORDER = "ASC"
 // 	storage the storage to be used by the APIHhandler functions
 type APIHhandler struct {
 	Verbose bool
-	Backend storage.Backend
+	Storage storage.Storage
 	Alerts  alerts.AlertRules
 }
 
@@ -45,7 +45,7 @@ type APIHhandler struct {
 func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []storage.Tenant
 
-	res = h.Backend.GetTenants()
+	res = h.Storage.GetTenants()
 	resJSON, _ := json.Marshal(res)
 
 	w.WriteHeader(200)
@@ -80,9 +80,9 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 			w.WriteHeader(504)
 			return
 		}
-		res = h.Backend.GetItemList(tenant, tags)
+		res = h.Storage.GetItemList(tenant, tags)
 	} else {
-		res = h.Backend.GetItemList(tenant, map[string]string{})
+		res = h.Storage.GetItemList(tenant, map[string]string{})
 	}
 	resJSON, _ := json.Marshal(res)
 
@@ -156,7 +156,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 
 	// call storage for data
 	if start < end {
-		h.Backend.DeleteData(tenant, id, end, start)
+		h.Storage.DeleteData(tenant, id, end, start)
 
 		// output to client
 		w.WriteHeader(200)
@@ -261,7 +261,7 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 			timestamp, _ := data.Timestamp.Int64()
 			value, _ := data.Value.Float64()
 
-			h.Backend.PostRawData(tenant, id, timestamp, value)
+			h.Storage.PostRawData(tenant, id, timestamp, value)
 		}
 	}
 
@@ -284,7 +284,7 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 	// get tenant
 	tenant := parseTenant(r)
 
-	h.Backend.PutTags(tenant, id, tags)
+	h.Storage.PutTags(tenant, id, tags)
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
@@ -309,7 +309,7 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 	for _, item := range u {
 		id := item.ID
 		if validTags(item.Tags) {
-			h.Backend.PutTags(tenant, id, item.Tags)
+			h.Storage.PutTags(tenant, id, item.Tags)
 		}
 	}
 
@@ -331,7 +331,7 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	// get tenant
 	tenant := parseTenant(r)
 
-	h.Backend.DeleteTags(tenant, id, tags)
+	h.Storage.DeleteTags(tenant, id, tags)
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
@@ -343,11 +343,11 @@ func getData(h APIHhandler, tenant string, id string, end int64, start int64, li
 
 	// call storage for data
 	if bucketDuration == 0 {
-		res := h.Backend.GetRawData(tenant, id, end, start, limit, order)
+		res := h.Storage.GetRawData(tenant, id, end, start, limit, order)
 		resJSON, _ := json.Marshal(res)
 		resStr = string(resJSON)
 	} else {
-		res := h.Backend.GetStatData(tenant, id, end, start, limit, order, bucketDuration)
+		res := h.Storage.GetStatData(tenant, id, end, start, limit, order, bucketDuration)
 		resJSON, _ := json.Marshal(res)
 		resStr = string(resJSON)
 	}
