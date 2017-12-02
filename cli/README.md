@@ -20,7 +20,6 @@ The `-h` flag will print out a help text, that list the command line arguments.
 
 ```
 mohawk -h
-
 Mohawk is a metric data storage engine.
 
 Mohawk is a metric data storage engine that uses a plugin architecture for data
@@ -36,19 +35,21 @@ Usage:
   mohawk [flags]
 
 Flags:
-      --cert string      path to TLS cert file (default "server.pem")
-  -c, --config string    config file
-  -g, --gzip             use gzip encoding
-  -h, --help             help for mohawk
-      --key string       path to TLS key file (default "server.key")
-      --media string     path to media files (default "./mohawk-webui")
-      --options string   specific storage options [e.g. db-dirname, db-url]
-  -p, --port int         server port (default 8080)
-  -b, --storage string   the storage plugin to use (default "memory")
-  -t, --tls              use TLS server
-      --token string     authorization token
-  -V, --verbose          more debug output
-  -v, --version          display mohawk version number
+      --alerts-interval int    Check alerts every N sec (default 5)
+      --alerts-server string   Alert buffer URL (default "http://localhost:9099/append")
+      --cert string            path to TLS cert file (default "server.pem")
+  -c, --config string          config file
+  -g, --gzip                   use gzip encoding
+  -h, --help                   help for mohawk
+      --key string             path to TLS key file (default "server.key")
+      --media string           path to media files (default "./mohawk-webui")
+      --options string         specific storage options [e.g. db-dirname, db-url]
+  -p, --port int               server port (default 8080)
+  -b, --storage string         the storage plugin to use (default "memory")
+  -t, --tls                    use TLS server
+      --token string           authorization token
+  -V, --verbose                more debug output
+  -v, --version                display mohawk version number
 ```
 
 Running ``mohawk`` with ``tls`` and using the ``memory`` back end.
