@@ -18,6 +18,7 @@ package cli
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -94,7 +95,7 @@ func initConfig() {
 	if viper.GetString("config") != "" {
 		viper.SetConfigFile(viper.GetString("config"))
 		if err := viper.ReadInConfig(); err != nil {
-			fmt.Println("Error reading config file:", err)
+			log.Println("Error reading config file:", err)
 		}
 	}
 }

@@ -101,13 +101,15 @@ func Serve() error {
 		l := []*alerts.Alert{}
 		viper.UnmarshalKey("alerts", &l)
 
-		// creat and Init the alert handler
-		a := &alerts.Alerts{
-			Backend: db,
-			Verbose: verbose,
-			Alerts:  l,
+		if len(l) > 0 {
+			// creat and Init the alert handler
+			a := &alerts.Alerts{
+				Backend: db,
+				Verbose: verbose,
+				Alerts:  l,
+			}
+			a.Init()
 		}
-		a.Init()
 	}
 
 	// h common variables to be used for the storage Handler functions

@@ -17,7 +17,7 @@
 package memory
 
 import (
-	"fmt"
+	"log"
 	"net/url"
 	"regexp"
 	"time"
@@ -374,7 +374,7 @@ func (r *Backend) maintenance() {
 
 	// once a tick clean data
 	for range c {
-		fmt.Printf("maintenance: start\n")
+		log.Printf("maintenance: start\n")
 		r.cleanData()
 	}
 }
@@ -391,7 +391,7 @@ func (r *Backend) cleanData() {
 
 			// if last value is more then time span old, remove data
 			if lastTimeStampSec <= validTimeStamp {
-				fmt.Printf("maintenance: delete item %s\n", key)
+				log.Printf("maintenance: delete item %s\n", key)
 				delete(t.ts, key)
 			}
 		}
