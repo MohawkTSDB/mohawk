@@ -38,7 +38,7 @@ const SECONDARY_ORDER = "ASC"
 type APIHhandler struct {
 	Verbose bool
 	Backend storage.Backend
-	Alerts  alerts.Alerts
+	Alerts  alerts.AlertRules
 }
 
 // GetTenants return a list of metrics tenants

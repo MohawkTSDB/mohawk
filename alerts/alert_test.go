@@ -49,7 +49,7 @@ func TestAlerts_Init(test *testing.T) {
 	}
 
 	// Create an alerts object with memory backend.
-	alerts := Alerts{
+	alerts := AlertRules{
 		Alerts:  l,
 		Backend: b,
 		Verbose: true,

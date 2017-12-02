@@ -40,7 +40,7 @@ type Alert struct {
 	TrigerTimestamp int64
 }
 
-type Alerts struct {
+type AlertRules struct {
 	Backend        storage.Backend
 	ServerURL      string
 	Verbose        bool
@@ -55,8 +55,27 @@ const (
 	LOWER_THAN
 )
 
+// Alert
+
+// updateAlertState update the alert status
+func (alert *Alert) updateAlertState(value float64) {
+	// valid metric values are:
+	//    from < value >= to
+	//    values outside this range will triger an alert
+	switch alert.Type {
+	case OUTSIDE:
+		alert.State = value <= alert.From || value > alert.To
+	case HIGHER_THAN:
+		alert.State = value > alert.To
+	case LOWER_THAN:
+		alert.State = value <= alert.From
+	}
+}
+
+// AlertRules
+
 // Init fill in missing configuration data, and start the alert checking loop
-func (a *Alerts) Init() {
+func (a *AlertRules) Init() {
 	// if user omit the tenant field in the alerts config, fallback to default
 	// tenant
 	for _, alert := range a.Alerts {
@@ -78,7 +97,7 @@ func (a *Alerts) Init() {
 }
 
 // check for alert status chenge periodically
-func (a *Alerts) run() {
+func (a *AlertRules) run() {
 	c := time.Tick(time.Second * time.Duration(a.AlertsInterval))
 
 	for range c {
@@ -86,23 +105,8 @@ func (a *Alerts) run() {
 	}
 }
 
-// updateAlertState update the alert status
-func (alert *Alert) updateAlertState(value float64) {
-	// valid metric values are:
-	//    from < value >= to
-	//    values outside this range will triger an alert
-	switch alert.Type {
-	case OUTSIDE:
-		alert.State = value <= alert.From || value > alert.To
-	case HIGHER_THAN:
-		alert.State = value > alert.To
-	case LOWER_THAN:
-		alert.State = value <= alert.From
-	}
-}
-
 // loop on all alerts and check for status change
-func (a *Alerts) checkAlerts() {
+func (a *AlertRules) checkAlerts() {
 	var end int64
 	var start int64
 	var tenant string
@@ -144,7 +148,7 @@ func (a *Alerts) checkAlerts() {
 	a.Heartbeat = end
 }
 
-func (a *Alerts) post(s string) {
+func (a *AlertRules) post(s string) {
 	client := http.Client{}
 	req, err := http.NewRequest("POST", a.ServerURL, bytes.NewBufferString(s))
 	if err == nil {
