@@ -150,3 +150,16 @@ func (a *AlertRules) post(s string) {
 		client.Do(req)
 	}
 }
+
+func (alerts *AlertRules) FilterAlerts(tenant string, id string, state string) []Alert {
+	res := make([]Alert, 0)
+	s := state == "T"
+
+	for _, a := range alerts.Alerts {
+		if a.Tenant == tenant && (id == "" || a.ID == id) && (state == "" || a.State == s) {
+			res = append(res, *a)
+		}
+	}
+
+	return res
+}
