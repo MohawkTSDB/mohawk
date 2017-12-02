@@ -19,7 +19,7 @@ package alerts
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -70,6 +70,7 @@ func (a *Alerts) Init() {
 	}
 
 	// check for alerts periodically.
+	log.Printf("Start alerts, alert interval 10s, push to %+v", a.ServerURL)
 	go a.run()
 }
 
@@ -78,7 +79,6 @@ func (a *Alerts) run() {
 	c := time.Tick(time.Second * 10)
 
 	for range c {
-		fmt.Printf("alert check: start\n")
 		a.checkAlerts()
 	}
 }
@@ -130,7 +130,7 @@ func (a *Alerts) checkAlerts() {
 
 				if b, err := json.Marshal(alert); err == nil {
 					s := string(b)
-					fmt.Println(s)
+					log.Println(s)
 					a.post(s)
 				}
 			}
