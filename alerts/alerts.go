@@ -85,11 +85,6 @@ func (a *AlertRules) Init() {
 		}
 	}
 
-	// set default ServerURL
-	if a.ServerURL == "" {
-		a.ServerURL = "http://localhost:9099/append"
-	}
-
 	// check for alerts periodically.
 	log.Printf("Start alerts, alert buffer url: %+v", a.ServerURL)
 	log.Printf("Start alerts, alert interval: %+vs", a.AlertsInterval)
