@@ -106,18 +106,6 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 		}
 	}
 
-	// filter using tags
-	// 	if we have a list of _all_ items, we need to filter them by tags
-	// 	if the list is already filtered, we do not need to re-filter it
-	if len(tags) > 0 {
-		for key, value := range tags {
-			res = storage.FilterItems(res, func(i storage.Item) bool {
-				r, _ := regexp.Compile("^" + value + "$")
-				return r.MatchString(i.Tags[key])
-			})
-		}
-	}
-
 	return res
 }
 
