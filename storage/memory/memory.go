@@ -40,7 +40,7 @@ type Tenant struct {
 	ts map[string]*TimeSeries
 }
 
-type Backend struct {
+type Storage struct {
 	timeGranularitySec int64
 	timeRetentionSec   int64
 	timeLastSec        int64
@@ -48,14 +48,14 @@ type Backend struct {
 	tenant map[string]*Tenant
 }
 
-// Backend functions
+// Storage functions
 // Required by storage interface
 
-func (r Backend) Name() string {
-	return "Backend-Memory"
+func (r Storage) Name() string {
+	return "Storage-Memory"
 }
 
-func (r *Backend) Open(options url.Values) {
+func (r *Storage) Open(options url.Values) {
 	// set last entry time
 	r.timeLastSec = 0
 	// set time granularity to 30 sec
@@ -70,7 +70,7 @@ func (r *Backend) Open(options url.Values) {
 	go r.maintenance()
 }
 
-func (r Backend) GetTenants() []storage.Tenant {
+func (r Storage) GetTenants() []storage.Tenant {
 	res := make([]storage.Tenant, 0, len(r.tenant))
 
 	// return a list of tenants
@@ -81,7 +81,7 @@ func (r Backend) GetTenants() []storage.Tenant {
 	return res
 }
 
-func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.Item {
+func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
 	res := make([]storage.Item, 0)
 	t, ok := r.tenant[tenant]
 
@@ -121,7 +121,7 @@ func (r Backend) GetItemList(tenant string, tags map[string]string) []storage.It
 	return res
 }
 
-func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
 	res := make([]storage.DataItem, 0)
 
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
@@ -165,7 +165,7 @@ func (r *Backend) GetRawData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
-func (r Backend) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
 	res := make([]storage.StatItem, 0)
 
 	// make sure start and end times is in the retention time
@@ -259,7 +259,7 @@ func (r Backend) GetStatData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
-func (r *Backend) PostRawData(tenant string, id string, t int64, v float64) bool {
+func (r *Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
 	// check if tenant and id exists, create them if necessary
 	r.checkID(tenant, id)
 
@@ -282,7 +282,7 @@ func (r *Backend) PostRawData(tenant string, id string, t int64, v float64) bool
 	return true
 }
 
-func (r *Backend) PutTags(tenant string, id string, tags map[string]string) bool {
+func (r *Storage) PutTags(tenant string, id string, tags map[string]string) bool {
 	// check if tenant and id exists, create them if necessary
 	r.checkID(tenant, id)
 
@@ -296,18 +296,18 @@ func (r *Backend) PutTags(tenant string, id string, tags map[string]string) bool
 	return true
 }
 
-func (r *Backend) DeleteData(tenant string, id string, end int64, start int64) bool {
+func (r *Storage) DeleteData(tenant string, id string, end int64, start int64) bool {
 	return true
 }
 
-func (r *Backend) DeleteTags(tenant string, id string, tags []string) bool {
+func (r *Storage) DeleteTags(tenant string, id string, tags []string) bool {
 	return true
 }
 
 // Helper functions
 // Not required by storage interface
 
-func (r *Backend) checkTimespan(start int64, end int64) (int64, int64) {
+func (r *Storage) checkTimespan(start int64, end int64) (int64, int64) {
 	memFirstTime := (r.timeLastSec - r.timeRetentionSec) * 1000
 	memLastTime := r.timeLastSec * 1000
 
@@ -322,14 +322,14 @@ func (r *Backend) checkTimespan(start int64, end int64) (int64, int64) {
 	return start, end
 }
 
-func (r *Backend) getPosForTimestamp(timestamp int64) int64 {
+func (r *Storage) getPosForTimestamp(timestamp int64) int64 {
 	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	arrayPos := timestamp / 1000 / r.timeGranularitySec
 
 	return arrayPos % arraySize
 }
 
-func (r *Backend) checkID(tenant string, id string) {
+func (r *Storage) checkID(tenant string, id string) {
 	var ok bool
 
 	// check for tenant
@@ -368,7 +368,7 @@ func hasMatchingTag(tags map[string]string, itemTags map[string]string) bool {
 	return out
 }
 
-func (r *Backend) maintenance() {
+func (r *Storage) maintenance() {
 	// clean data every 120 minutes
 	c := time.Tick(120 * time.Minute)
 
@@ -379,7 +379,7 @@ func (r *Backend) maintenance() {
 	}
 }
 
-func (r *Backend) cleanData() {
+func (r *Storage) cleanData() {
 	var lastTimeStampSec int64
 	validTimeStamp := time.Now().Unix() - r.timeRetentionSec
 

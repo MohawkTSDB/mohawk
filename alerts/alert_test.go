@@ -12,7 +12,7 @@ func TestAlerts_Init(test *testing.T) {
 	var v float64
 
 	// Testing with memory backend.
-	b := &memory.Backend{}
+	b := &memory.Storage{}
 	b.Open(nil)
 
 	// creating some alerts.
@@ -51,7 +51,7 @@ func TestAlerts_Init(test *testing.T) {
 	// Create an alerts object with memory backend.
 	alerts := AlertRules{
 		Alerts:  l,
-		Backend: b,
+		Storage: b,
 		Verbose: true,
 	}
 

@@ -51,7 +51,7 @@ type StatItem struct {
 	Sum     float64 `json:"sum,omitempty"`
 }
 
-type Backend interface {
+type Storage interface {
 	Name() string
 	Open(options url.Values)
 	GetTenants() []Tenant
