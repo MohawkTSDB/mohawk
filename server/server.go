@@ -57,6 +57,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 // Serve run the REST API server
 func Serve() error {
 	var db storage.Backend
+	var alertRules alerts.Alerts
 	var routers http.HandlerFunc
 
 	var backendQuery = viper.GetString("storage")
@@ -104,13 +105,13 @@ func Serve() error {
 
 		if len(l) > 0 {
 			// creat and Init the alert handler
-			a := &alerts.Alerts{
+			alertRules = alerts.Alerts{
 				Backend:        db,
 				Verbose:        verbose,
 				Alerts:         l,
 				AlertsInterval: alertsInterval,
 			}
-			a.Init()
+			alertRules.Init()
 		}
 	}
 
@@ -119,6 +120,7 @@ func Serve() error {
 	h := APIHhandler{
 		Verbose: verbose,
 		Backend: db,
+		Alerts:  alertRules,
 	}
 
 	// Create the routers

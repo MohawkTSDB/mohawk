@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MohawkTSDB/mohawk/alerts"
 	"github.com/MohawkTSDB/mohawk/storage"
 )
 
@@ -37,6 +38,7 @@ const SECONDARY_ORDER = "ASC"
 type APIHhandler struct {
 	Verbose bool
 	Backend storage.Backend
+	Alerts  alerts.Alerts
 }
 
 // GetTenants return a list of metrics tenants
