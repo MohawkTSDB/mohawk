@@ -46,6 +46,7 @@ type Alerts struct {
 	Verbose        bool
 	Alerts         []*Alert
 	AlertsInterval int
+	Heartbeat      int64
 }
 
 const (
@@ -137,6 +138,9 @@ func (a *Alerts) checkAlerts() {
 				}
 			}
 		}
+
+		// update check compleat heart beat timestamp
+		a.Heartbeat = end
 	}
 }
 
