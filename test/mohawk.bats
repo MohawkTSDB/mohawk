@@ -40,7 +40,6 @@ kill_mohawk() {
 @test "Data post and get" {
   wait_for_mohawk
   curl http://localhost:8080/hawkular/metrics/gauges/raw -d "[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW,\"value\": 42}]}]"
-
   result="$(curl http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)"
   kill_mohawk
 
