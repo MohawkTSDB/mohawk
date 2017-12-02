@@ -38,7 +38,22 @@ const SECONDARY_ORDER = "ASC"
 type APIHhandler struct {
 	Verbose bool
 	Storage storage.Storage
-	Alerts  alerts.AlertRules
+	Alerts  *alerts.AlertRules
+}
+
+// GetAlertsStatus return a json alerts status struct
+func (h APIHhandler) GetAlertsStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	if h.Alerts == nil {
+		w.WriteHeader(200)
+		fmt.Fprintln(w, `{"AlertsService":"UNAVAILABLE"}`)
+		return
+	}
+
+	resTemplate := `{"AlertsService":"STARTED","AlertsInterval":"%ds","Heartbeat":"%d","ServerURL":"%s"}`
+	res := fmt.Sprintf(resTemplate, h.Alerts.AlertsInterval, h.Alerts.Heartbeat, h.Alerts.ServerURL)
+
+	w.WriteHeader(200)
+	fmt.Fprintln(w, res)
 }
 
 // GetTenants return a list of metrics tenants
