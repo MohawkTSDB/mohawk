@@ -21,8 +21,8 @@ BuildRequires:  bzr
 BuildRequires:  golang >= 1.2-7
 BuildRequires:  golang-github-mattn-go-sqlite3-devel
 BuildRequires:  golang-github-go-mgo-mgo-devel
-BuildRequires:  golang-github-spf13-cobra
-BuildRequires:  golang-github-spf13-viper
+BuildRequires:  golang-github-spf13-cobra-devel
+BuildRequires:  golang-github-spf13-viper-devel
 
 %description
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
