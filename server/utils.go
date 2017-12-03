@@ -18,6 +18,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -122,4 +123,13 @@ func parseTimespan(r *http.Request) (int64, int64, int64) {
 	}
 
 	return end, start, bucketDuration
+}
+
+func badID(w http.ResponseWriter, v bool) {
+	w.WriteHeader(504)
+	fmt.Fprintf(w, "Bad metrics ID - 504")
+
+	if v {
+		log.Printf("Bad metrics ID - 504\n")
+	}
 }

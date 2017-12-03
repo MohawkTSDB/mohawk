@@ -194,6 +194,7 @@ func Serve() error {
 		// this will prevent this values from re-calculate each http request
 		PublicPathRegex: regexp.MustCompile(publicPath),
 		Authorization:   "Bearer " + token,
+		Verbose:         verbose,
 	}
 
 	// add headers to response
@@ -205,7 +206,9 @@ func Serve() error {
 	}
 
 	// badrequest a BadRequest handler
-	badrequest := handler.BadRequest{}
+	badrequest := handler.BadRequest{
+		Verbose: verbose,
+	}
 
 	// concat all routers and add fallback handler
 	if token == "" {
