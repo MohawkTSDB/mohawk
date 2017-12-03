@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.24.4
+Version:        0.24.5
 Release:        6%{?dist}
 Summary:        Mohawk metric data storage
 License:        Apache
@@ -17,6 +17,7 @@ Source0:        https://github.com/MohawkTSDB/mohawk/archive/%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  bzr
+BuildRequires:  git
 
 BuildRequires:  golang >= 1.2-7
 # BuildRequires:  golang-github-mattn-go-sqlite3-devel
