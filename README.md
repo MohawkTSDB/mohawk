@@ -7,8 +7,6 @@
 
 Mohawk is a metric data storage engine, it's fun, fast, light and easy to use.
 
-For more documentation see the [Mohawk Development Docs](https://github.com/MohawkTSDB/mohawk-docs).
-
 #### Table of contents
 
   - [Introduction](#introduction)
@@ -162,6 +160,8 @@ curl -ks -H "Accept-Encoding: gzip" https://localhost:8443/hawkular/metrics/metr
 # sendig gziped data file with curl's --data-binary flag
 curl -ks -H "Content-Encoding: gzip" -X PUT "https://localhost:8443/hawkular/metrics/gauges/tags" --data-binary @tags.json.gz
 ```
+
+For more documentation see the [Mohawk Development Docs](https://github.com/MohawkTSDB/mohawk-docs).
 
 #### Issues? Questions?
 Join the conversation at our slack channel: https://mohawktsdb.slack.com.
