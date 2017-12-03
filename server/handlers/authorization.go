@@ -17,7 +17,9 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 )
@@ -26,6 +28,7 @@ import (
 type Authorization struct {
 	PublicPathRegex *regexp.Regexp
 	Authorization   string
+	Verbose         bool
 	next            http.Handler
 }
 
@@ -36,11 +39,24 @@ func (a *Authorization) SetNext(h http.Handler) {
 
 // ServeHTTP http serve func
 func (a *Authorization) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var u interface{}
+
 	if r.Header.Get("Authorization") == a.Authorization || a.PublicPathRegex.MatchString(r.URL.EscapedPath()) {
 		a.next.ServeHTTP(w, r)
 		return
 	}
 
-	w.WriteHeader(http.StatusUnauthorized)
+	log.Printf("Unauthorized - 401\n")
+
+	// printout debug data
+	if a.Verbose {
+		json.NewDecoder(r.Body).Decode(&u)
+		r.ParseForm()
+
+		log.Printf("Request: %+v\n", r)
+		log.Printf("Body: %+v\n", u)
+	}
+
+	w.WriteHeader(401)
 	fmt.Fprintf(w, "Unauthorized - 401\n")
 }

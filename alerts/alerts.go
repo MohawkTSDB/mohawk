@@ -132,8 +132,12 @@ func (a *AlertRules) checkAlerts() {
 
 				if b, err := json.Marshal(alert); err == nil {
 					s := string(b)
-					log.Println(s)
 					a.post(s)
+
+					// log alert status change
+					if a.Verbose {
+						log.Println(s)
+					}
 				}
 			}
 		}
@@ -145,9 +149,14 @@ func (a *AlertRules) checkAlerts() {
 
 func (a *AlertRules) post(s string) {
 	client := http.Client{}
-	req, err := http.NewRequest("POST", a.ServerURL, bytes.NewBufferString(s))
-	if err == nil {
-		client.Do(req)
+	req, e := http.NewRequest("POST", a.ServerURL, bytes.NewBufferString(s))
+	if e == nil {
+		_, err := client.Do(req)
+
+		// log post errors
+		if a.Verbose && err != nil {
+			log.Println(err)
+		}
 	}
 }
 

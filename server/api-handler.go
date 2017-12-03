@@ -99,10 +99,6 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 
 	r.ParseForm()
 
-	if h.Verbose {
-		log.Printf("Metrics type: %s", r.Form.Get("type"))
-	}
-
 	// we only use gauges
 	if typeStr, ok := r.Form["type"]; ok && len(typeStr) > 0 && typeStr[0] != "gauge" {
 		w.WriteHeader(200)
@@ -118,7 +114,7 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
 		tags := parseTags(tagsStr[0])
 		if !validTags(tags) {
-			w.WriteHeader(504)
+			badID(w, h.Verbose)
 			return
 		}
 		res = h.Storage.GetItemList(tenant, tags)
@@ -136,7 +132,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		w.WriteHeader(504)
+		badID(w, h.Verbose)
 		return
 	}
 
@@ -178,7 +174,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		w.WriteHeader(504)
+		badID(w, h.Verbose)
 		return
 	}
 
@@ -226,8 +222,7 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 
 	for _, id := range u.IDs {
 		if !validStr(id) {
-			w.WriteHeader(504)
-			fmt.Fprintf(w, "<p>Error 504, Bad metrics ID</p>")
+			badID(w, h.Verbose)
 			return
 		}
 	}
@@ -286,8 +281,7 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			w.WriteHeader(504)
-			fmt.Fprintf(w, "<p>Error 504, Bad metrics ID</p>")
+			badID(w, h.Verbose)
 			return
 		}
 	}
@@ -302,6 +296,9 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 			timestamp, _ := data.Timestamp.Int64()
 			value, _ := data.Value.Float64()
 
+			if h.Verbose {
+				log.Printf("Tenant: %s, ID: %+v {timestamp: %+v, value: %+v}\n", tenant, id, timestamp, value)
+			}
 			h.Storage.PostRawData(tenant, id, timestamp, value)
 		}
 	}
@@ -318,13 +315,16 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) || !validTags(tags) {
-		w.WriteHeader(504)
+		badID(w, h.Verbose)
 		return
 	}
 
 	// get tenant
 	tenant := parseTenant(r)
 
+	if h.Verbose {
+		log.Printf("Tenant: %s, ID: %+v {tags: %+v}\n", tenant, id, tags)
+	}
 	h.Storage.PutTags(tenant, id, tags)
 
 	w.WriteHeader(200)
@@ -338,8 +338,7 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			w.WriteHeader(504)
-			fmt.Fprintf(w, "<p>Error 504, Bad metrics ID</p>")
+			badID(w, h.Verbose)
 			return
 		}
 	}
@@ -350,6 +349,9 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 	for _, item := range u {
 		id := item.ID
 		if validTags(item.Tags) {
+			if h.Verbose {
+				log.Printf("Tenant: %s, ID: %+v {tags: %+v}\n", tenant, id, item.Tags)
+			}
 			h.Storage.PutTags(tenant, id, item.Tags)
 		}
 	}
@@ -364,7 +366,7 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	id := argv["id"]
 	tagsStr := argv["tags"]
 	if !validStr(id) || !validStr(tagsStr) {
-		w.WriteHeader(504)
+		badID(w, h.Verbose)
 		return
 	}
 	tags := strings.Split(tagsStr, ",")

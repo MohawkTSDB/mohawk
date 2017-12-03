@@ -17,6 +17,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,6 +25,7 @@ import (
 
 // BadRequest will be called if no route found
 type BadRequest struct {
+	Verbose bool
 }
 
 // SetNext set next http serve func
@@ -32,7 +34,18 @@ func (b *BadRequest) SetNext(_h http.Handler) {
 
 // ServeHTTP http serve func
 func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var u interface{}
+
 	log.Printf("Page not found - 404\n")
+
+	// printout debug data
+	if b.Verbose {
+		json.NewDecoder(r.Body).Decode(&u)
+		r.ParseForm()
+
+		log.Printf("Request: %+v\n", r)
+		log.Printf("Body: %+v\n", u)
+	}
 
 	w.WriteHeader(404)
 	fmt.Fprintf(w, "Page not found - 404\n")
