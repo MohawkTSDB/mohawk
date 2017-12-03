@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.24.5
+Version:        0.24.6
 Release:        6%{?dist}
 Summary:        Mohawk metric data storage
 License:        Apache
@@ -40,6 +40,7 @@ mkdir -p ./_build/src/github.com/MohawkTSDB
 ln -s $(pwd) ./_build/src/github.com/MohawkTSDB/mohawk
 
 export GOPATH=$(pwd)/_build:%{gopath}
+go get github.com/LK4D4/vndr
 make vendor
 make
 
