@@ -24,8 +24,8 @@ import (
 
 // Authorization middleware that will authorize http requests
 type Authorization struct {
-	PublicPathRegex string
-	Token           string
+	PublicPathRegex *regexp.Regexp
+	Authorization   string
 	next            http.Handler
 }
 
@@ -36,10 +36,7 @@ func (a *Authorization) SetNext(h http.Handler) {
 
 // ServeHTTP http serve func
 func (a *Authorization) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	publicPath := regexp.MustCompile(a.PublicPathRegex)
-	authToken := "Bearer " + a.Token
-
-	if r.Header.Get("Authorization") == authToken || publicPath.MatchString(r.URL.EscapedPath()) {
+	if r.Header.Get("Authorization") == a.Authorization || a.PublicPathRegex.MatchString(r.URL.EscapedPath()) {
 		a.next.ServeHTTP(w, r)
 		return
 	}

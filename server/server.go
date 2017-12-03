@@ -21,6 +21,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"regexp"
 	"time"
 
 	"github.com/spf13/viper"
@@ -41,6 +42,7 @@ const VER = "0.22.1"
 
 // defaults
 const defaultAPI = "0.21.0"
+const publicPath = "/hawkular/metrics/status"
 
 // BackendName Mohawk active storage
 var BackendName string
@@ -186,8 +188,12 @@ func Serve() error {
 
 	// authorization handler
 	authorization := handler.Authorization{
-		PublicPathRegex: "^/hawkular/metrics/status$",
-		Token:           token,
+		// init the values:
+		//    make the public path a regex once on init
+		//    create the full Authorization header using the bearer token
+		// this will prevent this values from re-calculate each http request
+		PublicPathRegex: regexp.MustCompile("^" + publicPath + "$"),
+		Authorization:   "Bearer " + token,
 	}
 
 	// add headers to response

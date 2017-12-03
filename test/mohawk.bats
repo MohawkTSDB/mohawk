@@ -3,7 +3,7 @@
 NOW="$(($(date +%s) - 10000))000"
 
 wait_for_mohawk() {
-  mohawk &
+  mohawk $args &
 
   for i in $(seq 0 50); do
     if [[ $(pidof mohawk) != "" ]]; then
@@ -14,7 +14,7 @@ wait_for_mohawk() {
 }
 
 kill_mohawk() {
-  pkill -KILL mohawk || true
+  killall mohawk || true
 }
 
 @test "Mohawk binary is found in PATH" {
@@ -30,6 +30,8 @@ kill_mohawk() {
 }
 
 @test "Server should be available" {
+  args=""
+
   wait_for_mohawk
   result="$(curl http://localhost:8080/hawkular/metrics/status)"
   kill_mohawk
@@ -38,10 +40,26 @@ kill_mohawk() {
 }
 
 @test "Data post and get" {
+  args=""
+
   wait_for_mohawk
   curl http://localhost:8080/hawkular/metrics/gauges/raw -d "[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW,\"value\": 42}]}]"
   result="$(curl http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)"
   kill_mohawk
 
   [ "$result" = "[{\"timestamp\":$NOW,\"value\":42}]" ]
+}
+
+@test "Reject requests when using bearer token" {
+  args="--token=123"
+
+  wait_for_mohawk
+  result1=$(curl -H "Authorization: Bearer 123" http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)
+  result2=$(curl -H "Authorization: Bearer 142" http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)
+  result3=$(curl http://localhost:8080/hawkular/metrics/status)
+  kill_mohawk
+
+  [ "$result1" = "[]" ]
+  [[ "$result2" =~ "401" ]]
+  [[ "$result3" =~ "STARTED" ]]
 }
