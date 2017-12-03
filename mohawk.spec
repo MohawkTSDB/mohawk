@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.24.7
+Version:        0.24.8
 Release:        6%{?dist}
 Summary:        Mohawk metric data storage
 License:        Apache
@@ -20,10 +20,10 @@ BuildRequires:  bzr
 BuildRequires:  git
 
 BuildRequires:  golang >= 1.2-7
-# BuildRequires:  golang-github-mattn-go-sqlite3-devel
-# BuildRequires:  golang-github-go-mgo-mgo-devel
-# BuildRequires:  golang-github-spf13-cobra-devel
-# BuildRequires:  golang-github-spf13-viper-devel
+BuildRequires:  golang-github-mattn-go-sqlite3-devel
+BuildRequires:  golang-github-go-mgo-mgo-devel
+BuildRequires:  golang-github-spf13-cobra-devel
+BuildRequires:  golang-github-spf13-viper-devel
 
 %description
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
@@ -40,7 +40,6 @@ mkdir -p ./_build/src/github.com/MohawkTSDB
 ln -s $(pwd) ./_build/src/github.com/MohawkTSDB/mohawk
 
 export GOPATH=$(pwd)/_build:%{gopath}
-go get
 make
 
 %install
