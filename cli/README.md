@@ -13,7 +13,7 @@ When installed, run using the command line ``mohawk``
 ```bash
 mohawk --version
 
-Mohawk version: 0.24.3
+Mohawk version: 0.24.4
 ```
 
 The `-h` flag will print out a help text, that list the command line arguments.
@@ -26,7 +26,7 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data
 storage and a simple REST API as the primary interface.
 
 Version:
-  0.24.3
+  0.24.4
 
 Author:
   Yaacov Zamir <kobi.zamir@gmail.com>
