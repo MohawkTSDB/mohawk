@@ -60,6 +60,13 @@ func (h APIHhandler) GetAlertsStatus(w http.ResponseWriter, r *http.Request, arg
 func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []alerts.Alert
 
+	// if no alerts return empty list
+	if h.Alerts == nil {
+		w.WriteHeader(200)
+		fmt.Fprintln(w, `[]`)
+		return
+	}
+
 	// get data from the form arguments
 	r.ParseForm()
 
