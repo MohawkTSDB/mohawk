@@ -38,7 +38,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.22.1"
+const VER = "0.24.2"
 
 // defaults
 const defaultAPI = "0.21.0"
