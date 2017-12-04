@@ -63,3 +63,13 @@ kill_mohawk() {
   [[ "$result2" =~ "401" ]]
   [[ "$result3" =~ "STARTED" ]]
 }
+
+@test "Alerts are working" {
+  mohawk --config="./alerts/examples/example.config.yaml" --verbose &
+  # triggering alert number one.
+  curl http://localhost:8080/hawkular/metrics/gauges/raw -d "[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW,\"value\": 12000}]}]"
+  sleep 10 # allow the alerts worker to run..
+  result="$(curl http://localhost:8080/hawkular/alerts/raw)"
+  kill_mohawk
+  [ "$result" = "[]" ]
+}
