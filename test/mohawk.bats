@@ -63,3 +63,14 @@ kill_mohawk() {
   [[ "$result2" =~ "401" ]]
   [[ "$result3" =~ "STARTED" ]]
 }
+
+@test "alerts are on" {
+  args="--config=./alerts/examples/example.config.yaml"
+
+  wait_for_mohawk
+  result="$(curl http://localhost:8080/hawkular/alerts/status)"
+  kill_mohawk
+
+  [ "$result" = "{\"AlertsService\":\"STARTED\",\"AlertsInterval\":\"5s\",\"Heartbeat\":\"0\",\"ServerURL\":\"http://localhost:9099/append\"}" ]
+}
+
