@@ -19,7 +19,6 @@ package memory
 import (
 	"log"
 	"net/url"
-	"regexp"
 	"time"
 
 	"github.com/MohawkTSDB/mohawk/storage"
@@ -335,25 +334,21 @@ func (r *Storage) checkID(tenant string, id string) {
 }
 
 func hasMatchingTag(tags map[string]string, itemTags map[string]string) bool {
-	out := true
-
-	// if no tags, all items match
 	if len(tags) == 0 {
 		return true
 	}
 
-	// if item has no tags, item is invalid
 	if len(itemTags) == 0 {
 		return false
 	}
 
-	// loop on all the tags, we need _all_ query tags to match tags on item
 	for key, value := range tags {
-		r, _ := regexp.Compile("^" + value + "$")
-		out = out && r.MatchString(itemTags[key])
+		// assuming key exists in itemTags
+		if value != itemTags[key] {
+			return false
+		}
 	}
-
-	return out
+	return true
 }
 
 func (r *Storage) maintenance() {
