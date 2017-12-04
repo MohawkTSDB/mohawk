@@ -18,6 +18,7 @@ package alerts
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -43,6 +44,8 @@ type Alert struct {
 type AlertRules struct {
 	Storage        storage.Storage
 	ServerURL      string
+	ServerMethod   string
+	ServerInsecure bool
 	Verbose        bool
 	Alerts         []*Alert
 	AlertsInterval int
@@ -148,9 +151,20 @@ func (a *AlertRules) checkAlerts() {
 }
 
 func (a *AlertRules) post(s string) {
-	client := http.Client{}
-	req, e := http.NewRequest("POST", a.ServerURL, bytes.NewBufferString(s))
+	var client http.Client
+
+	if a.ServerInsecure {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client = http.Client{Transport: tr}
+	} else {
+		client = http.Client{}
+	}
+
+	req, e := http.NewRequest(a.ServerMethod, a.ServerURL, bytes.NewBufferString(s))
 	if e == nil {
+		req.Header.Set("Content-Type", "application/json")
 		_, err := client.Do(req)
 
 		// log post errors

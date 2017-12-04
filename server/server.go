@@ -74,6 +74,8 @@ func Serve() error {
 	var key = viper.GetString("key")
 	var alertsInterval = viper.GetInt("alerts-interval")
 	var alertsServerURL = viper.GetString("alerts-server")
+	var alertsServerMethod = viper.GetString("alerts-server-method")
+	var alertsServerInsecure = viper.GetBool("alerts-server-insecure")
 	var configAlerts = viper.ConfigFileUsed() != "" && viper.Get("alerts") != ""
 
 	// Create and init the storage
@@ -114,6 +116,8 @@ func Serve() error {
 				Alerts:         l,
 				AlertsInterval: alertsInterval,
 				ServerURL:      alertsServerURL,
+				ServerMethod:   alertsServerMethod,
+				ServerInsecure: alertsServerInsecure,
 			}
 			alertRules.Init()
 		}

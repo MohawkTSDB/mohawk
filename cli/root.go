@@ -77,6 +77,8 @@ func init() {
 	RootCmd.Flags().StringP("config", "c", "", "config file")
 	RootCmd.Flags().Int("alerts-interval", 5, "Check alerts every N sec")
 	RootCmd.Flags().String("alerts-server", "http://localhost:9099/append", "Alert buffer URL")
+	RootCmd.Flags().String("alerts-server-method", "POST", "Alert server http method")
+	RootCmd.Flags().Bool("alerts-server-insecure", false, "Alert server https skip verify")
 
 	// Viper Binding
 	viper.BindPFlag("storage", RootCmd.Flags().Lookup("storage"))
