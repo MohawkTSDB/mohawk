@@ -65,7 +65,7 @@ kill_mohawk() {
 }
 
 @test "alerts are on" {
-  args="--config=\"./alerts/examples/example.config.yaml\""
+  args="--config=./alerts/examples/example.config.yaml"
 
   wait_for_mohawk
   result="$(curl http://localhost:8080/hawkular/alerts/status)"
