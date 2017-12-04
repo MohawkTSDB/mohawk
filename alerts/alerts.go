@@ -30,12 +30,12 @@ import (
 type RangeIntervalType int
 
 type Alert struct {
-	ID              string            `mapstructure:"id"`
-	Metric          string            `mapstructure:"metric"`
-	Tenant          string            `mapstructure:"tenant"`
-	From            float64           `mapstructure:"from"`
-	To              float64           `mapstructure:"to"`
-	Type            RangeIntervalType `mapstructure:"type"`
+	ID              string   `mapstructure:"id"`
+	Metric          string   `mapstructure:"metric"`
+	Tenant          string   `mapstructure:"tenant"`
+	From            *float64 `mapstructure:"from"`
+	To              *float64 `mapstructure:"to"`
+	Type            RangeIntervalType
 	State           bool
 	TrigerValue     float64
 	TrigerTimestamp int64
@@ -67,11 +67,11 @@ func (alert *Alert) updateAlertState(value float64) {
 	//    values outside this range will triger an alert
 	switch alert.Type {
 	case OUTSIDE:
-		alert.State = value <= alert.From || value > alert.To
+		alert.State = value <= *alert.From || value > *alert.To
 	case HIGHER_THAN:
-		alert.State = value > alert.To
+		alert.State = value > *alert.To
 	case LOWER_THAN:
-		alert.State = value <= alert.From
+		alert.State = value <= *alert.From
 	}
 }
 
@@ -82,6 +82,14 @@ func (a *AlertRules) Init() {
 	// if user omit the tenant field in the alerts config, fallback to default
 	// tenant
 	for _, alert := range a.Alerts {
+		// Infer alert type from parsed values
+		if alert.From == nil {
+			alert.Type = LOWER_THAN
+		} else if alert.To == nil {
+			alert.Type = HIGHER_THAN
+		} else {
+			alert.Type = OUTSIDE
+		}
 		// fall back to _ops
 		if alert.Tenant == "" {
 			alert.Tenant = "_ops"
