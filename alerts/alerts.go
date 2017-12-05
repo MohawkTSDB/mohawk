@@ -30,15 +30,15 @@ import (
 type RangeIntervalType int
 
 type Alert struct {
-	ID              string   `mapstructure:"id"`
-	Metric          string   `mapstructure:"metric"`
-	Tenant          string   `mapstructure:"tenant"`
-	High            *float64 `mapstructure:"alert-if-higher-then"`
-	Low             *float64 `mapstructure:"alert-if-lower-then"`
-	Type            RangeIntervalType
-	State           bool
-	TrigerValue     float64
-	TrigerTimestamp int64
+	ID                string   `mapstructure:"id"`
+	Metric            string   `mapstructure:"metric"`
+	Tenant            string   `mapstructure:"tenant"`
+	AlertIfHigherThen *float64 `mapstructure:"alert-if-higher-then"`
+	AlertIfLowerThen  *float64 `mapstructure:"alert-if-lower-then"`
+	Type              RangeIntervalType
+	State             bool
+	TrigerValue       float64
+	TrigerTimestamp   int64
 }
 
 type AlertRules struct {
@@ -68,15 +68,15 @@ func (alert *Alert) updateAlertState(value float64) {
 	}
 
 	// valid metric values are:
-	//    Low <= value > High
+	//    AlertIfLowerThen <= value > AlertIfHigherThen
 	//    values outside this range will triger an alert
 	switch alert.Type {
 	case OUTSIDE:
-		alert.State = value < *alert.Low || value >= *alert.High
+		alert.State = value < *alert.AlertIfLowerThen || value >= *alert.AlertIfHigherThen
 	case HIGHER_THAN:
-		alert.State = value >= *alert.High
+		alert.State = value >= *alert.AlertIfHigherThen
 	case LOWER_THAN:
-		alert.State = value < *alert.Low
+		alert.State = value < *alert.AlertIfLowerThen
 	}
 }
 
@@ -87,14 +87,14 @@ func (a *AlertRules) Init() {
 	// Init alert objects
 	for _, alert := range a.Alerts {
 		// alert type:
-		//   if we have only Low  -> alert type is lower then
-		//   if we have only High -> alert type is higher then
+		//   if we have only AlertIfLowerThen  -> alert type is lower then
+		//   if we have only AlertIfHigherThen -> alert type is higher then
 		//   o/w                  -> alert if outside
-		if alert.High == nil && alert.Low != nil {
+		if alert.AlertIfHigherThen == nil && alert.AlertIfLowerThen != nil {
 			alert.Type = LOWER_THAN
-		} else if alert.High != nil && alert.Low == nil {
+		} else if alert.AlertIfHigherThen != nil && alert.AlertIfLowerThen == nil {
 			alert.Type = HIGHER_THAN
-		} else if alert.High != nil && alert.Low != nil {
+		} else if alert.AlertIfHigherThen != nil && alert.AlertIfLowerThen != nil {
 			alert.Type = OUTSIDE
 		} else {
 			alert.Type = NONE
