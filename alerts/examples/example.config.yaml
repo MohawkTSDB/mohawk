@@ -3,8 +3,8 @@ port: 8080
 alerts:
 - id: "free_memory is low or high"
   metric: "free_memory"
-  alert-if-lower-then: 2000
-  alert-if-higher-then: 8000
+  alert-if-lower-than: 2000
+  alert-if-higher-than: 8000
 - id: "free_memory is extremly low"
   metric: "free_memory"
-  alert-if-lower-then: 500
+  alert-if-lower-than: 500
