@@ -21,30 +21,26 @@ func TestAlerts_Init(test *testing.T) {
 			ID:     "cpu usage too high",
 			Tenant: "_ops",
 			Metric: "cpu_usage",
-			Type:   LOWER_THAN,
-			To:     createFloatPtr(0.9),
+			High:   createFloatPtr(0.9),
 		},
 		{
 			ID:     "free memory too low ",
 			Tenant: "_ops",
 			Metric: "free_memory",
-			Type:   LOWER_THAN,
-			From:   createFloatPtr(2000),
+			Low:    createFloatPtr(2000),
 		},
 		{
 			ID:     "free memory in between ",
 			Tenant: "_ops",
 			Metric: "free_memory",
-			Type:   OUTSIDE,
-			From:   createFloatPtr(1000),
-			To:     createFloatPtr(9000),
+			Low:    createFloatPtr(1000),
+			High:   createFloatPtr(9000),
 		},
 		{
 			ID:     "free memory in too high ",
 			Tenant: "_ops",
 			Metric: "free_memory",
-			Type:   HIGHER_THAN,
-			To:     createFloatPtr(4000),
+			High:   createFloatPtr(4000),
 		},
 	}
 
@@ -53,6 +49,16 @@ func TestAlerts_Init(test *testing.T) {
 		Alerts:  l,
 		Storage: b,
 		Verbose: true,
+	}
+	alerts.Init()
+
+	/////////
+	// TEST 0:
+	/////////
+
+	// check that init set types
+	if l[0].Type != HIGHER_THAN || l[1].Type != LOWER_THAN || l[2].Type != OUTSIDE || l[3].Type != HIGHER_THAN {
+		test.Error("Fail test 0")
 	}
 
 	/////////
