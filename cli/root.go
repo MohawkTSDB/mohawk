@@ -95,6 +95,8 @@ func init() {
 	viper.BindPFlag("config", RootCmd.Flags().Lookup("config"))
 	viper.BindPFlag("alerts-interval", RootCmd.Flags().Lookup("alerts-interval"))
 	viper.BindPFlag("alerts-server", RootCmd.Flags().Lookup("alerts-server"))
+	viper.BindPFlag("alerts-server-method", RootCmd.Flags().Lookup("alerts-server-method"))
+	viper.BindPFlag("alerts-server-insecure", RootCmd.Flags().Lookup("alerts-server"))
 }
 
 func initConfig() {
