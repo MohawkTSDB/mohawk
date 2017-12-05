@@ -20,11 +20,11 @@ Alerting rules in Mohawk servers send alerts to an Alertbuffer if a metric value
 ```
 ./examples/alert-buffer.py
 Starting httpd...
-{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":true,"From":2000,"To":8000,"Type":0,"TrigerValue":40,"TrigerTimestamp":1512142870000}
+{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":true,"AlertIfLowerThan":2000,"AlertIfHigherThen":8000,"Type":0,"TrigerValue":40,"TrigerTimestamp":1512142870000}
 127.0.0.1 - - [01/Dec/2017 17:41:18] "POST /append HTTP/1.1" 200 -
-{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":false,"From":2000,"To":8000,"Type":0,"TrigerValue":4000,"TrigerTimestamp":1512142893000}
+{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":false,"AlertIfLowerThan":2000,"AlertIfHigherThen":8000,"Type":0,"TrigerValue":4000,"TrigerTimestamp":1512142893000}
 127.0.0.1 - - [01/Dec/2017 17:41:38] "POST /append HTTP/1.1" 200 -
-{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":true,"From":2000,"To":8000,"Type":0,"TrigerValue":40,"TrigerTimestamp":1512142901000}
+{"ID":"free_memory is low","Metric":"free_memory","Tenant":"_ops","State":true,"AlertIfLowerThan":2000,"AlertIfHigherThen":8000,"Type":0,"TrigerValue":40,"TrigerTimestamp":1512142901000}
 127.0.0.1 - - [01/Dec/2017 17:41:48] "POST /append HTTP/1.1" 200 -
 ...
 ```
@@ -47,12 +47,12 @@ For example:
 alerts:
 - id: "free_memory is lower then 1000 or higher then 8000"
   metric: "free_memory"
-  alert-if-lower-then: 1000
-  alert-if-higher-then: 8000
+  alert-if-lower-than: 1000
+  alert-if-higher-than: 8000
 - id: "free_memory is lower then 500"
   metric: "free_memory"
-  alert-if-lower-then: 500
+  alert-if-lower-than: 500
 - id: "cpu_usage is above 95%"
   metric: "cpu_usage"
-  alert-if-higher-then: 95
+  alert-if-higher-than: 95
 ```

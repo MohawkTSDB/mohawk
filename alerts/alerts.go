@@ -33,8 +33,8 @@ type Alert struct {
 	ID                string   `mapstructure:"id"`
 	Metric            string   `mapstructure:"metric"`
 	Tenant            string   `mapstructure:"tenant"`
-	AlertIfHigherThen *float64 `mapstructure:"alert-if-higher-then"`
-	AlertIfLowerThen  *float64 `mapstructure:"alert-if-lower-then"`
+	AlertIfHigherThan *float64 `mapstructure:"alert-if-higher-than"`
+	AlertIfLowerThan  *float64 `mapstructure:"alert-if-lower-than"`
 	Type              RangeIntervalType
 	State             bool
 	TrigerValue       float64
@@ -72,11 +72,11 @@ func (alert *Alert) updateAlertState(value float64) {
 	//    values outside this range will triger an alert
 	switch alert.Type {
 	case OUTSIDE:
-		alert.State = value < *alert.AlertIfLowerThen || value >= *alert.AlertIfHigherThen
+		alert.State = value < *alert.AlertIfLowerThan || value >= *alert.AlertIfHigherThan
 	case HIGHER_THAN:
-		alert.State = value >= *alert.AlertIfHigherThen
+		alert.State = value >= *alert.AlertIfHigherThan
 	case LOWER_THAN:
-		alert.State = value < *alert.AlertIfLowerThen
+		alert.State = value < *alert.AlertIfLowerThan
 	}
 }
 
@@ -90,11 +90,11 @@ func (a *AlertRules) Init() {
 		//   if we have only AlertIfLowerThen  -> alert type is lower then
 		//   if we have only AlertIfHigherThen -> alert type is higher then
 		//   o/w                  -> alert if outside
-		if alert.AlertIfHigherThen == nil && alert.AlertIfLowerThen != nil {
+		if alert.AlertIfHigherThan == nil && alert.AlertIfLowerThan != nil {
 			alert.Type = LOWER_THAN
-		} else if alert.AlertIfHigherThen != nil && alert.AlertIfLowerThen == nil {
+		} else if alert.AlertIfHigherThan != nil && alert.AlertIfLowerThan == nil {
 			alert.Type = HIGHER_THAN
-		} else if alert.AlertIfHigherThen != nil && alert.AlertIfLowerThen != nil {
+		} else if alert.AlertIfHigherThan != nil && alert.AlertIfLowerThan != nil {
 			alert.Type = OUTSIDE
 		} else {
 			alert.Type = NONE
