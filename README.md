@@ -161,7 +161,9 @@ curl -ks -H "Accept-Encoding: gzip" https://localhost:8443/hawkular/metrics/metr
 curl -ks -H "Content-Encoding: gzip" -X PUT "https://localhost:8443/hawkular/metrics/gauges/tags" --data-binary @tags.json.gz
 ```
 
-For more documentation see the [Mohawk Docs](https://mohawktsdb.github.io).
 
 #### Issues? Questions?
-Join the conversation at our slack channel: https://mohawktsdb.slack.com.
+
+[Mohawk Docs](https://mohawktsdb.github.io).
+
+[Slack channel](https://mohawktsdb.slack.com.)
