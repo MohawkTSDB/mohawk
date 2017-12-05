@@ -21,26 +21,26 @@ func TestAlerts_Init(test *testing.T) {
 			ID:                "cpu usage too high",
 			Tenant:            "_ops",
 			Metric:            "cpu_usage",
-			AlertIfHigherThen: createFloatPtr(0.9),
+			AlertIfHigherThan: createFloatPtr(0.9),
 		},
 		{
 			ID:               "free memory too low ",
 			Tenant:           "_ops",
 			Metric:           "free_memory",
-			AlertIfLowerThen: createFloatPtr(2000),
+			AlertIfLowerThan: createFloatPtr(2000),
 		},
 		{
 			ID:                "free memory in between ",
 			Tenant:            "_ops",
 			Metric:            "free_memory",
-			AlertIfLowerThen:  createFloatPtr(1000),
-			AlertIfHigherThen: createFloatPtr(9000),
+			AlertIfLowerThan:  createFloatPtr(1000),
+			AlertIfHigherThan: createFloatPtr(9000),
 		},
 		{
 			ID:                "free memory in too high ",
 			Tenant:            "_ops",
 			Metric:            "free_memory",
-			AlertIfHigherThen: createFloatPtr(4000),
+			AlertIfHigherThan: createFloatPtr(4000),
 		},
 	}
 
