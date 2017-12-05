@@ -6,7 +6,7 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 ## Alerting rules
 
-Alerting rules in Mohawk servers send alerts to an Alertbuffer if a metric value is outsde valid range.
+Alerting rules in Mohawk servers send alerts to an Alertbuffer if a metric value is outside valid range.
 
 ## Usage
 
@@ -45,27 +45,14 @@ For example:
 
 ```yaml
 alerts:
-- id: "free_memory is low"
+- id: "free_memory is lower then 1000 or higher then 8000"
   metric: "free_memory"
-  # valid range for metric is set -
-  # from > value <= to
-  # here valid range is from 1k to 8k, if free memory drops below 1k, error will be active.
-  from: 1000
-  to: 8000
-  # type: 0 - alert if metric is out of valid range
-  # type: 1 - alert if metric is above valid range
-  # type: 2 - alert if metric is below valid range
-  type: 0
-- id: "free_memory is extremely low"
+  alert-if-lower-then: 1000
+  alert-if-higher-then: 8000
+- id: "free_memory is lower then 500"
   metric: "free_memory"
-  # here valid range is above 0.5k , if free memory drops below 0.5k, error will be active.
-  from: 500
-  # if type is 1 or 2, from or to values can be omitted.
-  type: 2
+  alert-if-lower-then: 500
 - id: "cpu_usage is above 95%"
   metric: "cpu_usage"
-  # here valid range is above 0% and below 95%, if cpu usage is above 95%, error will be active.
-  from: 0
-  to: 95
-  # Default type is 0, it can be omitted.
+  alert-if-higher-then: 95
 ```

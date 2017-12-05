@@ -1,11 +1,10 @@
 backend: "memory"
 port: 8080
 alerts:
-- id: "free_memory is low"
+- id: "free_memory is low or high"
   metric: "free_memory"
-  from: 2000
-  to: 8000
+  alert-if-lower-then: 2000
+  alert-if-higher-then: 8000
 - id: "free_memory is extremly low"
   metric: "free_memory"
-  from: 500
-  type: 2
+  alert-if-lower-then: 500
