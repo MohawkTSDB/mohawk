@@ -33,8 +33,8 @@ type Alert struct {
 	ID              string   `mapstructure:"id"`
 	Metric          string   `mapstructure:"metric"`
 	Tenant          string   `mapstructure:"tenant"`
-	From            *float64 `mapstructure:"from"`
-	To              *float64 `mapstructure:"to"`
+	High            *float64 `mapstructure:"alert-if-higher-then"`
+	Low             *float64 `mapstructure:"alert-if-lower-then"`
 	Type            RangeIntervalType
 	State           bool
 	TrigerValue     float64
@@ -53,7 +53,8 @@ type AlertRules struct {
 }
 
 const (
-	OUTSIDE RangeIntervalType = iota
+	NONE RangeIntervalType = iota
+	OUTSIDE
 	HIGHER_THAN
 	LOWER_THAN
 )
@@ -62,16 +63,20 @@ const (
 
 // updateAlertState update the alert status
 func (alert *Alert) updateAlertState(value float64) {
+	if alert.Type == NONE {
+		return
+	}
+
 	// valid metric values are:
-	//    from < value >= to
+	//    Low <= value > High
 	//    values outside this range will triger an alert
 	switch alert.Type {
 	case OUTSIDE:
-		alert.State = value <= *alert.From || value > *alert.To
+		alert.State = value < *alert.Low || value >= *alert.High
 	case HIGHER_THAN:
-		alert.State = value > *alert.To
+		alert.State = value >= *alert.High
 	case LOWER_THAN:
-		alert.State = value <= *alert.From
+		alert.State = value < *alert.Low
 	}
 }
 
@@ -79,18 +84,23 @@ func (alert *Alert) updateAlertState(value float64) {
 
 // Init fill in missing configuration data, and start the alert checking loop
 func (a *AlertRules) Init() {
-	// if user omit the tenant field in the alerts config, fallback to default
-	// tenant
+	// Init alert objects
 	for _, alert := range a.Alerts {
-		// Infer alert type from parsed values
-		if alert.From == nil {
+		// alert type:
+		//   if we have only Low  -> alert type is lower then
+		//   if we have only High -> alert type is higher then
+		//   o/w                  -> alert if outside
+		if alert.High == nil && alert.Low != nil {
 			alert.Type = LOWER_THAN
-		} else if alert.To == nil {
+		} else if alert.High != nil && alert.Low == nil {
 			alert.Type = HIGHER_THAN
-		} else {
+		} else if alert.High != nil && alert.Low != nil {
 			alert.Type = OUTSIDE
+		} else {
+			alert.Type = NONE
 		}
-		// fall back to _ops
+
+		// fall back to _ops if no tenant given
 		if alert.Tenant == "" {
 			alert.Tenant = "_ops"
 		}
