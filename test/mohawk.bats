@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-NOW="$(($(date +%s) - 10000))000"
+NOW="$(($(date +%s) - 10))000"
 
 wait_for_mohawk() {
   mohawk $args &
@@ -15,6 +15,17 @@ wait_for_mohawk() {
 
 kill_mohawk() {
   killall mohawk || true
+}
+
+wait_for_alert() {
+  cmd="curl http://localhost:8080/hawkular/alerts/raw?id=free_memory+is+low+or+high&state=T"
+
+  for i in $(seq 0 50); do
+    if [[ $($cmd) != "[]" ]]; then
+      return 0
+    fi
+    sleep 0.1;
+  done
 }
 
 @test "Mohawk binary is found in PATH" {
@@ -74,3 +85,17 @@ kill_mohawk() {
   [ "$result" = "{\"AlertsService\":\"STARTED\",\"AlertsInterval\":\"5s\",\"Heartbeat\":\"0\",\"ServerURL\":\"http://localhost:9099/append\"}" ]
 }
 
+@test "alerts fire" {
+  args="--config=./alerts/examples/example.config.yaml --alerts-interval=1"
+  data="[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW,\"value\":40}]}]"
+
+  wait_for_mohawk
+  result1="$(curl http://localhost:8080/hawkular/alerts/raw?id=free_memory+is+low+or+high)"
+  curl http://localhost:8080/hawkular/metrics/gauges/raw -d "$data"
+  wait_for_alert
+  result2="$(curl http://localhost:8080/hawkular/alerts/raw?id=free_memory+is+low+or+high)"
+  kill_mohawk
+
+  [[ "$result1" =~ "\"State\":false" ]]
+  [[ "$result2" =~ "\"State\":true" ]]
+}
