@@ -22,29 +22,29 @@ func TestAlerts_Init(test *testing.T) {
 			Tenant: "_ops",
 			Metric: "cpu_usage",
 			Type:   LOWER_THAN,
-			To:     0.9,
+			To:     createFloatPtr(0.9),
 		},
 		{
 			ID:     "free memory too low ",
 			Tenant: "_ops",
 			Metric: "free_memory",
 			Type:   LOWER_THAN,
-			From:   2000,
+			From:   createFloatPtr(2000),
 		},
 		{
 			ID:     "free memory in between ",
 			Tenant: "_ops",
 			Metric: "free_memory",
 			Type:   OUTSIDE,
-			From:   1000,
-			To:     9000,
+			From:   createFloatPtr(1000),
+			To:     createFloatPtr(9000),
 		},
 		{
 			ID:     "free memory in too high ",
 			Tenant: "_ops",
 			Metric: "free_memory",
 			Type:   HIGHER_THAN,
-			To:     4000,
+			To:     createFloatPtr(4000),
 		},
 	}
 
@@ -126,4 +126,8 @@ func TestAlerts_Init(test *testing.T) {
 	if l[0].State || l[1].State || l[2].State || !l[3].State {
 		test.Error("Fail test 3")
 	}
+}
+
+func createFloatPtr(v float64) *float64 {
+	return &v
 }
