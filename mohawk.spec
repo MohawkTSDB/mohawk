@@ -9,8 +9,8 @@
 
 Name:           %{repo}
 Version:        0.26.2
-Release:        6%{?dist}
-Summary:        Mohawk metric data storage
+Release:        7%{?dist}
+Summary:        Time series metric data storage
 License:        Apache
 URL:            https://%{import_path}
 Source0:        https://github.com/MohawkTSDB/mohawk/archive/%{version}.tar.gz
@@ -52,5 +52,5 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %{_bindir}/mohawk
 
 %changelog
-* Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.26.2-6
+* Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.26.2-7
 - Initial RPM release
