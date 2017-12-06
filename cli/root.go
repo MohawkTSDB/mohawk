@@ -64,7 +64,8 @@ func init() {
 
 	// Flag definition
 	RootCmd.Flags().StringP("storage", "b", "memory", "the storage plugin to use")
-	RootCmd.Flags().String("token", "", "authorization token")
+	RootCmd.Flags().String("bearer-auth", "", "token used for bearer authorization")
+	RootCmd.Flags().String("basic-auth", "", "authorization user and password pair (e.g. jack:secret-password)")
 	RootCmd.Flags().String("media", "./mohawk-webui", "path to media files")
 	RootCmd.Flags().String("key", defaultTLSKey, "path to TLS key file")
 	RootCmd.Flags().String("cert", defaultTLSCert, "path to TLS cert file")
@@ -82,7 +83,8 @@ func init() {
 
 	// Viper Binding
 	viper.BindPFlag("storage", RootCmd.Flags().Lookup("storage"))
-	viper.BindPFlag("token", RootCmd.Flags().Lookup("token"))
+	viper.BindPFlag("bearer-auth", RootCmd.Flags().Lookup("bearer-auth"))
+	viper.BindPFlag("basic-auth", RootCmd.Flags().Lookup("basic-auth"))
 	viper.BindPFlag("media", RootCmd.Flags().Lookup("media"))
 	viper.BindPFlag("key", RootCmd.Flags().Lookup("key"))
 	viper.BindPFlag("cert", RootCmd.Flags().Lookup("cert"))
