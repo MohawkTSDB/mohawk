@@ -52,5 +52,5 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %{_bindir}/mohawk
 
 %changelog
-* Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.25.1-6
+* Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.26.2-6
 - Initial RPM release
