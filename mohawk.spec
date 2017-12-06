@@ -50,3 +50,7 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %defattr(-,root,root,-)
 %doc LICENSE README.md
 %{_bindir}/mohawk
+
+%changelog
+* Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.25.1-6
+- Initial RPM release
