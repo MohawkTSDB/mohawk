@@ -62,11 +62,25 @@ wait_for_alert() {
 }
 
 @test "Reject requests when using bearer token" {
-  args="--token=123"
+  args="--bearer-auth=123"
 
   wait_for_mohawk
   result1=$(curl -H "Authorization: Bearer 123" http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)
   result2=$(curl -H "Authorization: Bearer 142" http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)
+  result3=$(curl http://localhost:8080/hawkular/metrics/status)
+  kill_mohawk
+
+  [ "$result1" = "[]" ]
+  [[ "$result2" =~ "401" ]]
+  [[ "$result3" =~ "STARTED" ]]
+}
+
+@test "Reject requests when using basic auth" {
+  args="--basic-auth=user:pass"
+
+  wait_for_mohawk
+  result1=$(curl -H "Authorization: Basic dXNlcjpwYXNz" http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)
+  result2=$(curl -H "Authorization: Basic dXnLcjpwYXNz" http://localhost:8080/hawkular/metrics/gauges/free_memory/raw?limit=1)
   result3=$(curl http://localhost:8080/hawkular/metrics/status)
   kill_mohawk
 
