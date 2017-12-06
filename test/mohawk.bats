@@ -34,10 +34,10 @@ wait_for_alert() {
   [ "$status" -eq 0 ]
 }
 
-@test "Mohawk is installed in version 0.25.1" {
+@test "Mohawk is installed in version 0.26.2" {
   run mohawk --version
 
-  [[ "$output" =~ "0.25.1"  ]]
+  [[ "$output" =~ "0.26.2"  ]]
 }
 
 @test "Server should be available" {
