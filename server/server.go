@@ -17,6 +17,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -61,6 +62,7 @@ func Serve() error {
 	var db storage.Storage
 	var alertRules *alerts.AlertRules
 	var routers http.HandlerFunc
+	var authorizationKey string
 
 	var backendQuery = viper.GetString("storage")
 	var optionsQuery = viper.GetString("options")
@@ -68,7 +70,8 @@ func Serve() error {
 	var media = viper.GetString("media")
 	var tls = viper.GetBool("tls")
 	var gzip = viper.GetBool("gzip")
-	var token = viper.GetString("token")
+	var bearerAuth = viper.GetString("bearer-auth")
+	var basicAuth = viper.GetString("basic-auth")
 	var port = viper.GetInt("port")
 	var cert = viper.GetString("cert")
 	var key = viper.GetString("key")
@@ -190,15 +193,13 @@ func Serve() error {
 	// logging handler
 	logger := handler.Logger{}
 
-	// authorization handler
-	authorization := handler.Authorization{
-		// init the values:
-		//    make the public path a regex once on init
-		//    create the full Authorization header using the bearer token
-		// this will prevent this values from re-calculate each http request
-		PublicPathRegex: regexp.MustCompile(publicPath),
-		Authorization:   "Bearer " + token,
-		Verbose:         verbose,
+	// set the authorization key
+	if basicAuth != "" {
+		authorizationKey = "Basic " + base64.StdEncoding.EncodeToString([]byte(basicAuth))
+	}
+
+	if bearerAuth != "" {
+		authorizationKey = "Bearer " + bearerAuth
 	}
 
 	// add headers to response
@@ -215,10 +216,21 @@ func Serve() error {
 	}
 
 	// concat all routers and add fallback handler
-	if token == "" {
+	if authorizationKey == "" {
 		routers = handler.Append(
 			&logger, &headers, &rGauges, &rCounters, &rAvailability, &rAlerts, &rRoot, &static, &badrequest)
 	} else {
+		// create an authentication handler
+		authorization := handler.Authorization{
+			// init the values:
+			//    make the public path a regex once on init
+			//    create the full Authorization header using the bearer token
+			// this will prevent this values from re-calculate each http request
+			PublicPathRegex: regexp.MustCompile(publicPath),
+			Authorization:   authorizationKey,
+			Verbose:         verbose,
+		}
+
 		routers = handler.Append(
 			&logger, &authorization, &headers, &rGauges, &rCounters, &rAvailability, &rAlerts, &rRoot, &static, &badrequest)
 	}
