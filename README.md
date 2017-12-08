@@ -18,6 +18,7 @@
 
   - [REST API (server)](/server/) source directory
   - [Command Line Interface (cli)](/cli/) source directory
+  - [Metric Data Storage (storage)](/storage/) source directory
   - [Alert Rules (alerts)](/alerts/) source directory
 
 ## Introduction
