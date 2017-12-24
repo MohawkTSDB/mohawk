@@ -199,13 +199,33 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 	for b := pEnd; count < limit && b > pStart && startTimestamp >= stepMillisec; b -= pStep {
 		samples := int64(0)
 		sum := float64(0)
+		first := float64(0)
 		last := float64(0)
+		min := float64(0)
+		max := float64(0)
 
 		// loop on all points in bucket
 		for i := (b - pStep); i < b; i++ {
 			d := r.tenant[tenant].ts[id].data[i%arraySize]
 			if d.timeStamp <= end && d.timeStamp > start {
 				samples++
+
+				// calculate bucket stat values
+				if samples == 1 {
+					// first sample
+					first = d.value
+					min = first
+					max = first
+				} else {
+					// all samples except first sample
+					if min > d.value {
+						min = d.value
+					}
+					if max < d.value {
+						max = d.value
+					}
+				}
+
 				last = d.value
 				sum += d.value
 			}
@@ -222,7 +242,10 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 				End:     startTimestamp + stepMillisec,
 				Empty:   false,
 				Samples: samples,
+				First:   first,
 				Last:    last,
+				Min:     min,
+				Max:     max,
 				Avg:     sum / float64(samples),
 				Sum:     sum,
 			})
