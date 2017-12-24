@@ -59,6 +59,6 @@ For a starting template of a storage plugin, look at the [storage example](/stor
 | Plugin           | Min | Max| First | Last | Avg | Median | Std | Sum | Count |
 |------------------|-----|----|-------|------|-----|--------|-----|-----|-------|
 | Example          |     |    |       |      | ✔️   |        |     |     | ✔️     |
-| Memory           |     |    |       | ✔️    | ✔️   |        |     | ✔️   | ✔️     |
+| Memory           | ✔️   | ✔️  | ✔️     | ✔️    | ✔️   |        |     | ✔️   | ✔️     |
 | Sqlite           | ✔️   | ✔️  |       |      | ✔️   |        |     | ✔️   | ✔️     |
 | Mongo            | ✔️   | ✔️  | ✔️     | ✔️    | ✔️   |        |     | ✔️   | ✔️     |
