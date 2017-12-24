@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.27.0
+Version:        0.27.1
 Release:        1%{?dist}
 Summary:        Time series metric data storage
 License:        Apache
@@ -46,7 +46,7 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %{_bindir}/mohawk
 
 %changelog
-* Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.27.0-1
+* Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.27.1-1
 - Add min max to memory storage stats
 
 * Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.26.2-7
