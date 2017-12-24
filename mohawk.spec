@@ -8,22 +8,15 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.26.2
-Release:        7%{?dist}
+Version:        0.27.0
+Release:        1%{?dist}
 Summary:        Time series metric data storage
 License:        Apache
 URL:            https://%{import_path}
 Source0:        https://github.com/MohawkTSDB/mohawk/archive/%{version}.tar.gz
 
-BuildRequires:  gcc
-BuildRequires:  bzr
 BuildRequires:  git
-
 BuildRequires:  golang >= 1.2-7
-BuildRequires:  golang-github-mattn-go-sqlite3-devel
-BuildRequires:  golang-github-go-mgo-mgo-devel
-BuildRequires:  golang-github-spf13-cobra-devel
-BuildRequires:  golang-github-spf13-viper-devel
 
 %description
 Mohawk is a metric data storage engine that uses a plugin architecture for data storage and a simple REST API as the primary interface.
@@ -40,6 +33,7 @@ mkdir -p ./_build/src/github.com/MohawkTSDB
 ln -s $(pwd) ./_build/src/github.com/MohawkTSDB/mohawk
 
 export GOPATH=$(pwd)/_build:%{gopath}
+make vendor
 make
 
 %install
@@ -52,5 +46,8 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %{_bindir}/mohawk
 
 %changelog
+* Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.27.0-1
+- Add min max to memory storage stats
+
 * Wed Dec 6 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.26.2-7
 - Initial RPM release
