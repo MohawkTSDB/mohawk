@@ -16,10 +16,10 @@
 
 #### Source Modules
 
-  - [REST API (server)](/server/) source directory
-  - [Command Line Interface (cli)](/cli/) source directory
-  - [Metric Data Storage (storage)](/storage/) source directory
-  - [Alert Rules (alerts)](/alerts/) source directory
+  - [REST API (server)](/src/server/) source directory
+  - [Command Line Interface (cli)](/src/cli/) source directory
+  - [Metric Data Storage (storage)](/src/storage/) source directory
+  - [Alert Rules (alerts)](/src/alerts/) source directory
 
 ## Introduction
 
