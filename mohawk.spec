@@ -33,7 +33,7 @@ mkdir -p ./_build/src/github.com/MohawkTSDB
 ln -s $(pwd) ./_build/src/github.com/MohawkTSDB/mohawk
 
 export GOPATH=$(pwd)/_build:%{gopath}
-make vendor
+go get
 make
 
 %install
