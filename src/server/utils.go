@@ -127,7 +127,7 @@ func parseTimespan(r *http.Request) (int64, int64, int64) {
 
 func badID(w http.ResponseWriter, v bool) {
 	w.WriteHeader(504)
-	fmt.Fprintf(w, "Bad metrics ID - 504")
+	fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Bad metrics IDe - 504\"}")
 
 	if v {
 		log.Printf("Bad metrics ID - 504\n")

@@ -58,5 +58,5 @@ func (a *Authorization) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(401)
-	fmt.Fprintf(w, "Unauthorized - 401\n")
+	fmt.Fprintf(w, "{\"error\":\"401\",\"message\":\"Unauthorized - 401\"}")
 }
