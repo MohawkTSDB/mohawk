@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/MohawkTSDB/mohawk/storage"
+	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
 type RangeIntervalType int

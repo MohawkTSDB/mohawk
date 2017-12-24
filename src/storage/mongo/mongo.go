@@ -23,7 +23,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/MohawkTSDB/mohawk/storage"
+	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
 type Storage struct {

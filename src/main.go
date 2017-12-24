@@ -19,7 +19,7 @@ package main
 import (
 	"log"
 
-	"github.com/MohawkTSDB/mohawk/cli"
+	"github.com/MohawkTSDB/mohawk/src/cli"
 )
 
 func main() {

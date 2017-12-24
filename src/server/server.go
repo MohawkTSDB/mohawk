@@ -27,15 +27,15 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/MohawkTSDB/mohawk/alerts"
-	"github.com/MohawkTSDB/mohawk/middleware"
-	"github.com/MohawkTSDB/mohawk/router"
-	"github.com/MohawkTSDB/mohawk/server/handlers"
-	"github.com/MohawkTSDB/mohawk/storage"
-	"github.com/MohawkTSDB/mohawk/storage/example"
-	"github.com/MohawkTSDB/mohawk/storage/memory"
-	"github.com/MohawkTSDB/mohawk/storage/mongo"
-	"github.com/MohawkTSDB/mohawk/storage/sqlite"
+	"github.com/MohawkTSDB/mohawk/src/alerts"
+	"github.com/MohawkTSDB/mohawk/src/middleware"
+	"github.com/MohawkTSDB/mohawk/src/router"
+	"github.com/MohawkTSDB/mohawk/src/server/handlers"
+	"github.com/MohawkTSDB/mohawk/src/storage"
+	"github.com/MohawkTSDB/mohawk/src/storage/example"
+	"github.com/MohawkTSDB/mohawk/src/storage/memory"
+	"github.com/MohawkTSDB/mohawk/src/storage/mongo"
+	"github.com/MohawkTSDB/mohawk/src/storage/sqlite"
 )
 
 // VER the server version

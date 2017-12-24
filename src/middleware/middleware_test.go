@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/MohawkTSDB/mohawk/router"
+	"github.com/MohawkTSDB/mohawk/src/router"
 )
 
 func TestAppendMiddleware(t *testing.T) {
