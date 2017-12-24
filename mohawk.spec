@@ -33,6 +33,7 @@ mkdir -p ./_build/src/github.com/MohawkTSDB
 ln -s $(pwd) ./_build/src/github.com/MohawkTSDB/mohawk
 
 export GOPATH=$(pwd)/_build:%{gopath}
+export GOBIN=$(pwd)/_build/bin
 go get ./src
 make
 
