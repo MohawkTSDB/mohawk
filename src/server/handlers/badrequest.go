@@ -48,5 +48,5 @@ func (b BadRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(404)
-	fmt.Fprintf(w, "Page not found - 404\n")
+	fmt.Fprintf(w, "{\"error\":\"404\",\"message\":\"Page not found - 404\"}")
 }

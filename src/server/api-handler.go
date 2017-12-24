@@ -202,7 +202,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	}
 
 	w.WriteHeader(504)
-	fmt.Fprintf(w, "504 - Can't delete time rage")
+	fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't delete time rage - 504\"}")
 }
 
 // PostQuery send timestamp, value to the storage
