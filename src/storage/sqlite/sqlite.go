@@ -25,7 +25,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/MohawkTSDB/mohawk/storage"
+	"github.com/MohawkTSDB/mohawk/src/storage"
 	_ "github.com/mattn/go-sqlite3"
 )
 

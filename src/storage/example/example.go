@@ -21,7 +21,7 @@ import (
 	"math/rand"
 	"net/url"
 
-	"github.com/MohawkTSDB/mohawk/storage"
+	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
 type Storage struct {

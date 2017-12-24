@@ -25,8 +25,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MohawkTSDB/mohawk/alerts"
-	"github.com/MohawkTSDB/mohawk/storage"
+	"github.com/MohawkTSDB/mohawk/src/alerts"
+	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
 const DEFAULT_ORDER = "DESC"

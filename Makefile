@@ -1,11 +1,11 @@
 PREFIX := $(GOPATH)
 BINDIR := $(PREFIX)/bin
-SOURCE := *.go router/*.go middleware/*.go storage/*.go storage/*/*.go cli/*.go server/*.go server/*/*.go alerts/*.go
+SOURCE := src/*.go src/*/*.go src/*/*/*.go
 
 all: fmt mohawk
 
 mohawk: $(SOURCE)
-	go build -o mohawk *.go
+	go build -o mohawk src/*.go
 
 .PHONY: fmt
 fmt: $(SOURCE)

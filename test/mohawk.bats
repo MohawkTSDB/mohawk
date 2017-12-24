@@ -90,7 +90,7 @@ wait_for_alert() {
 }
 
 @test "alerts are on" {
-  args="--config=./alerts/examples/example.config.yaml"
+  args="--config=./src/alerts/examples/example.config.yaml"
 
   wait_for_mohawk
   result="$(curl http://localhost:8080/hawkular/alerts/status)"
@@ -100,7 +100,7 @@ wait_for_alert() {
 }
 
 @test "alerts fire" {
-  args="--config=./alerts/examples/example.config.yaml --alerts-interval=1"
+  args="--config=./src/alerts/examples/example.config.yaml --alerts-interval=1"
   data="[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW,\"value\":40}]}]"
 
   wait_for_mohawk

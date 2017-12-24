@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MohawkTSDB/mohawk/storage/memory"
+	"github.com/MohawkTSDB/mohawk/src/storage/memory"
 )
 
 func TestAlerts_Init(test *testing.T) {
