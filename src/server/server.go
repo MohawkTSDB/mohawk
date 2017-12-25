@@ -128,7 +128,7 @@ func Serve() error {
 
 	// h common variables to be used for the storage Handler functions
 	// Storage the storage to use for metrics source
-	h := APIHhandler{
+	h := handler.APIHhandler{
 		Verbose: verbose,
 		Storage: db,
 		Alerts:  alertRules,
