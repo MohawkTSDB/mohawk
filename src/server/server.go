@@ -28,9 +28,9 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/MohawkTSDB/mohawk/src/alerts"
-	"github.com/MohawkTSDB/mohawk/src/middleware"
-	"github.com/MohawkTSDB/mohawk/src/router"
 	"github.com/MohawkTSDB/mohawk/src/server/handlers"
+	"github.com/MohawkTSDB/mohawk/src/server/middleware"
+	"github.com/MohawkTSDB/mohawk/src/server/router"
 	"github.com/MohawkTSDB/mohawk/src/storage"
 	"github.com/MohawkTSDB/mohawk/src/storage/example"
 	"github.com/MohawkTSDB/mohawk/src/storage/memory"
