@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package server API REST server
-package server
+// Package handler
+package handler
 
 import (
 	"encoding/json"
