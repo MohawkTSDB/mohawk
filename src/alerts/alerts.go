@@ -192,13 +192,13 @@ func (a *AlertRules) post(s string) {
 	}
 }
 
-func (alerts *AlertRules) FilterAlerts(tenant string, id string, state string) []Alert {
+func (a *AlertRules) FilterAlerts(tenant string, id string, state string) []Alert {
 	res := make([]Alert, 0)
 	s := state == "T"
 
-	for _, a := range alerts.Alerts {
-		if a.Tenant == tenant && (id == "" || a.ID == id) && (state == "" || a.State == s) {
-			res = append(res, *a)
+	for _, al := range a.Alerts {
+		if al.Tenant == tenant && (id == "" || al.ID == id) && (state == "" || al.State == s) {
+			res = append(res, *al)
 		}
 	}
 

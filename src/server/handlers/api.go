@@ -23,12 +23,12 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/MohawkTSDB/mohawk/src/alerts"
 	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
+const DEFAULT_LIMIT = 2000
 const DEFAULT_ORDER = "DESC"
 const SECONDARY_ORDER = "ASC"
 
@@ -209,7 +209,9 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var u dataQuery
 	var end int64
+	var endStr string
 	var start int64
+	var startStr string
 	var limit int64
 	var err error
 
@@ -228,16 +230,24 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 	}
 	numOfItems := len(u.IDs) - 1
 
-	if end, err = u.End.Int64(); err != nil || end < 1 {
-		end = int64(time.Now().UTC().Unix() * 1000)
+	switch v := u.Start.(type) {
+	case string:
+		startStr = u.Start.(string)
+	default:
+		startStr = fmt.Sprintf("%+v", v)
 	}
 
-	if start, err = u.Start.Int64(); err != nil || start < 1 {
-		start = end - int64(8*60*60*1000)
+	switch v := u.End.(type) {
+	case string:
+		endStr = u.End.(string)
+	default:
+		endStr = fmt.Sprintf("%+v", v)
 	}
+
+	end, start, _ = parseTimespanStrings(endStr, startStr, "")
 
 	if limit, err = u.Limit.Int64(); err != nil || limit < 1 {
-		limit = int64(20000)
+		limit = int64(DEFAULT_LIMIT)
 	}
 
 	order := DEFAULT_ORDER
@@ -254,7 +264,7 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 
 	if h.Verbose {
 		log.Printf("Tenant: %s, IDs: %+v", tenant, u.IDs)
-		log.Printf("End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", end, start, limit, order, bucketDuration)
+		log.Printf("End: %d(%s), Start: %d(%s), Limit: %d, Order: %s, bucketDuration: %ds", end, endStr, start, startStr, limit, order, bucketDuration)
 	}
 
 	w.WriteHeader(200)
