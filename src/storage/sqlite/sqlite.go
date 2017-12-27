@@ -58,7 +58,7 @@ func (r Storage) GetTenants() []storage.Tenant {
 	for _, f := range files {
 		// take only sqlite db files as tenant names
 		if p := strings.Split(f.Name(), "."); len(p) == 2 && p[1] == "db" {
-			res = append(res, storage.Tenant{Id: p[0]})
+			res = append(res, storage.Tenant{ID: p[0]})
 		}
 	}
 
@@ -84,7 +84,7 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 			log.Printf("%q\n", err)
 		}
 		res = append(res, storage.Item{
-			Id:   id,
+			ID:   id,
 			Type: "gauge",
 			Tags: map[string]string{},
 		})
@@ -428,7 +428,7 @@ func (r Storage) createId(tenant string, id string) bool {
 func (r Storage) UpdateTag(items []storage.Item, tenant string, id string, tag string, value string) []storage.Item {
 	// try to update tag if item exist
 	for i, item := range items {
-		if item.Id == id {
+		if item.ID == id {
 			items[i].Tags[tag] = value
 			return items
 		}
@@ -436,7 +436,7 @@ func (r Storage) UpdateTag(items []storage.Item, tenant string, id string, tag s
 
 	// if here we did not find a matching item
 	items = append(items, storage.Item{
-		Id:   id,
+		ID:   id,
 		Tags: map[string]string{tag: value},
 	})
 

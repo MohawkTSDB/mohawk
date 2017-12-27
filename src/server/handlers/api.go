@@ -229,11 +229,19 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 	// get tenant
 	tenant := parseTenant(r)
 
-	// get ids list
+	// get ids from explicit ids list
 	for _, id := range u.IDs {
 		if !validStr(id) {
 			badID(w, h.Verbose)
 			return
+		}
+	}
+
+	// add ids from tags query
+	if len(u.Tags) != 0 {
+		res := h.Storage.GetItemList(tenant, u.Tags)
+		for _, r := range res {
+			u.IDs = append(u.IDs, r.ID)
 		}
 	}
 	numOfItems := len(u.IDs) - 1
