@@ -1,6 +1,7 @@
 #!/usr/bin/env bats
 
 NOW="$(($(date +%s) - 10))000"
+NOW_5MN="$(($(date +%s) - 5 * 60))000"
 
 wait_for_mohawk() {
   mohawk $args &
@@ -112,4 +113,19 @@ wait_for_alert() {
 
   [[ "$result1" =~ "\"State\":false" ]]
   [[ "$result2" =~ "\"State\":true" ]]
+}
+
+@test "parse relative time" {
+  data="[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW_5MN,\"value\":40}]}]"
+  query1="{\"ids\":[\"free_memory\"],\"start\":\"-2mn\"}"
+  query2="{\"ids\":[\"free_memory\"],\"start\":\"-8mn\"}"
+
+  wait_for_mohawk
+  curl http://localhost:8080/hawkular/metrics/gauges/raw -d "$data"
+  result1="$(curl http://localhost:8080/hawkular/metrics/gauges/raw/query -d $query1)"
+  result2="$(curl http://localhost:8080/hawkular/metrics/gauges/raw/query -d $query2)"
+  kill_mohawk
+
+  [[ "$result1" =~ "[]" ]]
+  [[ "$result2" =~ "\"value\":40" ]]
 }
