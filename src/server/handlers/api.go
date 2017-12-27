@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package handler
+// Package handler http server handler functions
 package handler
 
 import (
@@ -28,9 +28,14 @@ import (
 	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
-const DEFAULT_LIMIT = 2000
-const DEFAULT_ORDER = "DESC"
-const SECONDARY_ORDER = "ASC"
+// const defaultLimit default REST API call query limit
+const defaultLimit = 2000
+
+// const defaultOrder default REST API call query order
+const defaultOrder = "DESC"
+
+// const secondaryOrder secondary REST API call query order
+const secondaryOrder = "ASC"
 
 // APIHhandler common variables to be used by all APIHhandler functions
 // 	version the version of the Hawkular server we are mocking
@@ -152,9 +157,9 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 		}
 	}
 
-	order := DEFAULT_ORDER
-	if v, ok := r.Form["order"]; ok && len(v) > 0 && v[0] == SECONDARY_ORDER {
-		order = SECONDARY_ORDER
+	order := defaultOrder
+	if v, ok := r.Form["order"]; ok && len(v) > 0 && v[0] == secondaryOrder {
+		order = secondaryOrder
 	}
 
 	if h.Verbose {
@@ -212,6 +217,8 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 	var endStr string
 	var start int64
 	var startStr string
+	var bucketDuration int64
+	var bucketDurationStr string
 	var limit int64
 	var err error
 
@@ -244,22 +251,22 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 		endStr = fmt.Sprintf("%+v", v)
 	}
 
-	end, start, _ = parseTimespanStrings(endStr, startStr, "")
+	switch v := u.BucketDuration.(type) {
+	case string:
+		bucketDurationStr = u.BucketDuration.(string)
+	default:
+		bucketDurationStr = fmt.Sprintf("%+v", v)
+	}
+
+	end, start, bucketDuration = parseTimespanStrings(endStr, startStr, bucketDurationStr)
 
 	if limit, err = u.Limit.Int64(); err != nil || limit < 1 {
-		limit = int64(DEFAULT_LIMIT)
+		limit = int64(defaultLimit)
 	}
 
-	order := DEFAULT_ORDER
-	if u.Order == SECONDARY_ORDER {
-		order = SECONDARY_ORDER
-	}
-
-	bucketDuration := int64(0)
-	if v := u.BucketDuration; len(v) > 1 {
-		if i, err := strconv.Atoi(v[:len(v)-1]); err == nil {
-			bucketDuration = int64(i)
-		}
+	order := defaultOrder
+	if u.Order == secondaryOrder {
+		order = secondaryOrder
 	}
 
 	if h.Verbose {

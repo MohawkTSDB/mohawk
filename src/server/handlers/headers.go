@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package handler
+// Package handler http server handler functions
 package handler
 
 import (
