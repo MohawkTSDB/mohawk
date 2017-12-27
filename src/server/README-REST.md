@@ -30,7 +30,7 @@ Mohawk is a metric data storage engine that uses a plugin architecture for data 
 
 #### Item
 
-	Id         string            `json:"id"`
+	ID         string            `json:"id"`
 	Type       string            `json:"type"`
 	Tags       map[string]string `json:"tags"`
 	LastValues []DataItem        `json:"data,omitempty"`

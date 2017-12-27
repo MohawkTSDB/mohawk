@@ -75,7 +75,7 @@ func (r Storage) GetTenants() []storage.Tenant {
 
 	// return a list of tenants
 	for key := range r.tenant {
-		res = append(res, storage.Tenant{Id: key})
+		res = append(res, storage.Tenant{ID: key})
 	}
 
 	return res
@@ -98,7 +98,7 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 			}
 
 			res = append(res, storage.Item{
-				Id:         key,
+				ID:         key,
 				Type:       "gauge",
 				Tags:       ts.tags,
 				LastValues: []storage.DataItem{lastValue},

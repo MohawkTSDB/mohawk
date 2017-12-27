@@ -80,7 +80,7 @@ func (r Storage) GetTenants() []storage.Tenant {
 	}
 	for _, t := range names {
 		if t != "admin" && t != "local" {
-			res = append(res, storage.Tenant{Id: t})
+			res = append(res, storage.Tenant{ID: t})
 		}
 	}
 
@@ -263,7 +263,7 @@ func (r Storage) createId(tenant string, id string) bool {
 
 	c := sessionCopy.DB(tenant).C("ids")
 
-	err := c.Insert(&storage.Item{Id: id, Type: "gauge", Tags: map[string]string{}, LastValues: []storage.DataItem{}})
+	err := c.Insert(&storage.Item{ID: id, Type: "gauge", Tags: map[string]string{}, LastValues: []storage.DataItem{}})
 	if err != nil {
 		log.Printf("%q\n", err)
 		return false

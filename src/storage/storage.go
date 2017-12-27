@@ -21,11 +21,11 @@ import (
 )
 
 type Tenant struct {
-	Id string `json:"id"`
+	ID string `json:"id"`
 }
 
 type Item struct {
-	Id         string            `json:"id" bson:"_id"`
+	ID         string            `json:"id" bson:"_id"`
 	Type       string            `json:"type" bson:"type"`
 	Tags       map[string]string `json:"tags" bson:"tags"`
 	LastValues []DataItem        `json:"data,omitempty" bson:"data,omitempty"`

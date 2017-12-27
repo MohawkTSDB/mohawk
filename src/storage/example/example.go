@@ -42,7 +42,7 @@ func (r Storage) GetTenants() []storage.Tenant {
 	res := make([]storage.Tenant, 0)
 
 	// return a list of tenants
-	res = append(res, storage.Tenant{Id: "Example tenant"})
+	res = append(res, storage.Tenant{ID: "Example tenant"})
 
 	return res
 }
@@ -53,7 +53,7 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 
 	for i := 0; i < maxSize; i++ {
 		res = append(res, storage.Item{
-			Id:   fmt.Sprintf("container/%08d/example/gouge", i),
+			ID:   fmt.Sprintf("container/%08d/example/gouge", i),
 			Type: "gauge",
 			Tags: map[string]string{"name": "example/gouge", "units": "byte"},
 		})
