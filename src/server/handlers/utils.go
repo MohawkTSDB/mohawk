@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package handler
+// Package handler http server handler functions
 package handler
 
 import (
@@ -31,17 +31,17 @@ import (
 // validRegex regexp for validating sql variables
 var validRegex = regexp.MustCompile(`^[ A-Za-z0-9_@,|:/\[\]\(\)\.\+\*-]*$`)
 
-// default start value
-var DEFAULT_START_TIME = "-8h"
+// const defaultStartTime default REST API query start time value
+var defaultStartTime = "-8h"
 
 // json struct used to query data by the POST http request
 type dataQuery struct {
 	IDs            []string    `json:"ids"`
-	Start          interface{} `json:"start"`
 	End            interface{} `json:"end"`
+	Start          interface{} `json:"start"`
+	BucketDuration interface{} `json:"bucketDuration"`
 	Limit          json.Number `json:"limit"`
 	Order          string      `json:"order"`
-	BucketDuration string      `json:"bucketDuration"`
 }
 
 // json struct used to parse post data http request
@@ -118,7 +118,7 @@ func parseTimespanStrings(e string, s string, b string) (int64, int64, int64) {
 	if i, err := parseSec(s); err == nil {
 		start = i * 1000
 	} else {
-		if i, err := parseSec(DEFAULT_START_TIME); err == nil {
+		if i, err := parseSec(defaultStartTime); err == nil {
 			start = i * 1000
 		}
 	}
