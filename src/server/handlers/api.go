@@ -229,6 +229,7 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 	// get tenant
 	tenant := parseTenant(r)
 
+	// get ids list
 	for _, id := range u.IDs {
 		if !validStr(id) {
 			badID(w, h.Verbose)
@@ -237,6 +238,7 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 	}
 	numOfItems := len(u.IDs) - 1
 
+	// get start time string
 	switch v := u.Start.(type) {
 	case string:
 		startStr = u.Start.(string)
@@ -244,6 +246,7 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 		startStr = fmt.Sprintf("%+v", v)
 	}
 
+	// get end time string
 	switch v := u.End.(type) {
 	case string:
 		endStr = u.End.(string)
@@ -251,6 +254,7 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 		endStr = fmt.Sprintf("%+v", v)
 	}
 
+	// get bucket duration string
 	switch v := u.BucketDuration.(type) {
 	case string:
 		bucketDurationStr = u.BucketDuration.(string)
@@ -258,16 +262,19 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 		bucketDurationStr = fmt.Sprintf("%+v", v)
 	}
 
-	end, start, bucketDuration = parseTimespanStrings(endStr, startStr, bucketDurationStr)
-
+	// get query items limit
 	if limit, err = u.Limit.Int64(); err != nil || limit < 1 {
 		limit = int64(defaultLimit)
 	}
 
+	// get query order
 	order := defaultOrder
 	if u.Order == secondaryOrder {
 		order = secondaryOrder
 	}
+
+	// calc timestamps from end, start and bucket duration strings
+	end, start, bucketDuration = parseTimespanStrings(endStr, startStr, bucketDurationStr)
 
 	if h.Verbose {
 		log.Printf("Tenant: %s, IDs: %+v", tenant, u.IDs)
