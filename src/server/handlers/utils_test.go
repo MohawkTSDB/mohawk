@@ -45,7 +45,7 @@ func TestParseSec(t *testing.T) {
 		{"42000", 42},
 	}
 
-	// run tests
+	// run test list
 	for _, tc := range testcases {
 		if i, err = parseSec(tc.testStr); err != nil {
 			t.Errorf("error parsing '%s'", tc.testStr)
@@ -55,4 +55,8 @@ func TestParseSec(t *testing.T) {
 		}
 	}
 
+	// check that we raise errors on bad strings
+	if i, err = parseSec(""); err == nil {
+		t.Errorf("no error while parsing empty string \"\"")
+	}
 }
