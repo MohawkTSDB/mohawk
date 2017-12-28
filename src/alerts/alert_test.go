@@ -7,7 +7,7 @@ import (
 	"github.com/MohawkTSDB/mohawk/src/storage/memory"
 )
 
-func initTestEnv()(*memory.Storage, []*Alert, AlertRules){
+func initTestEnv() (*memory.Storage, []*Alert, AlertRules) {
 	// Testing with memory backend.
 	b := &memory.Storage{}
 	b.Open(nil)
