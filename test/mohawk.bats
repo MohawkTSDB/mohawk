@@ -142,3 +142,16 @@ wait_for_alert() {
 
   [[ "$result" =~ "\"value\":40" ]]
 }
+
+@test "query the m metrics endpoint by tags" {
+  data="[{\"id\":\"rss\",\"data\":[{\"timestamp\":$NOW_5MN,\"value\":40}],\"tags\":{\"name\":\"free_memory\"}}]"
+  query="{\"tags\":{\"name\":\"free_memory\"},\"start\":\"-8mn\"}"
+
+  wait_for_mohawk
+  curl http://localhost:8080/hawkular/metrics/gauges/raw -d "$data"
+  curl http://localhost:8080/hawkular/metrics/gauges/tags -d "$data" -X PUT
+  result="$(curl http://localhost:8080/hawkular/metrics/m/stats/query -d $query)"
+  kill_mohawk
+
+  [[ "$result" =~ "\"rss\":" ]]
+}

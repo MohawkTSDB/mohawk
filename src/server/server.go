@@ -144,6 +144,12 @@ func Serve() error {
 	rRoot.Add("GET", "tenants", h.GetTenants)
 	rRoot.Add("GET", "metrics", h.GetMetrics)
 
+	// M (Global Metrics) Routing tables
+	rM := router.Router{
+		Prefix: "/hawkular/metrics/m/",
+	}
+	rM.Add("POST", "stats/query", h.PostMQuery)
+
 	// Metrics Routing tables
 	rGauges := router.Router{
 		Prefix: "/hawkular/metrics/gauges/",
@@ -218,7 +224,7 @@ func Serve() error {
 	// concat all routers and add fallback handler
 	if authorizationKey == "" {
 		routers = handler.Append(
-			&logger, &headers, &rGauges, &rCounters, &rAvailability, &rAlerts, &rRoot, &static, &badrequest)
+			&logger, &headers, &rM, &rGauges, &rCounters, &rAvailability, &rAlerts, &rRoot, &static, &badrequest)
 	} else {
 		// create an authentication handler
 		authorization := handler.Authorization{
@@ -232,7 +238,7 @@ func Serve() error {
 		}
 
 		routers = handler.Append(
-			&logger, &authorization, &headers, &rGauges, &rCounters, &rAvailability, &rAlerts, &rRoot, &static, &badrequest)
+			&logger, &authorization, &headers, &rM, &rGauges, &rCounters, &rAvailability, &rAlerts, &rRoot, &static, &badrequest)
 	}
 
 	// Create a list of middlwares
