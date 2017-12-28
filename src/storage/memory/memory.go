@@ -153,9 +153,7 @@ func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
-func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
-	res := make([]storage.StatItem, 0)
-
+func (r Storage) GetStatTimes(end int64, start int64, limit int64, bucketDuration int64) (int64, int64, int64, int64, int64, int64) {
 	// make sure start and end times is in the retention time
 	start, end = r.checkTimespan(start, end)
 
@@ -187,6 +185,13 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 	if pStep > (pEnd - pStart) {
 		pStep = pEnd - pStart
 	}
+
+	return end, start, pEnd, pStart, pStep, arraySize
+}
+
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+	res := make([]storage.StatItem, 0)
+	end, start, pEnd, pStart, pStep, arraySize := r.GetStatTimes(end, start, limit, bucketDuration)
 
 	startTimestamp := end
 	stepMillisec := pStep * r.timeGranularitySec * 1000
