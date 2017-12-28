@@ -210,94 +210,49 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't delete time rage - 504\"}")
 }
 
-// PostQuery send timestamp, value to the storage
-func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	var u dataQuery
-	var end int64
-	var endStr string
-	var start int64
-	var startStr string
-	var bucketDuration int64
-	var bucketDurationStr string
-	var limit int64
-	var err error
-
-	decoder := json.NewDecoder(r.Body)
-	decoder.UseNumber()
-	decoder.Decode(&u)
-
-	// get tenant
-	tenant := parseTenant(r)
-
-	// get ids from explicit ids list
-	for _, id := range u.IDs {
-		if !validStr(id) {
-			badID(w, h.Verbose)
-			return
-		}
-	}
-
-	// add ids from tags query
-	if len(u.Tags) != 0 {
-		res := h.Storage.GetItemList(tenant, u.Tags)
-		for _, r := range res {
-			u.IDs = append(u.IDs, r.ID)
-		}
-	}
-	numOfItems := len(u.IDs) - 1
-
-	// get start time string
-	switch v := u.Start.(type) {
-	case string:
-		startStr = u.Start.(string)
-	default:
-		startStr = fmt.Sprintf("%+v", v)
-	}
-
-	// get end time string
-	switch v := u.End.(type) {
-	case string:
-		endStr = u.End.(string)
-	default:
-		endStr = fmt.Sprintf("%+v", v)
-	}
-
-	// get bucket duration string
-	switch v := u.BucketDuration.(type) {
-	case string:
-		bucketDurationStr = u.BucketDuration.(string)
-	default:
-		bucketDurationStr = fmt.Sprintf("%+v", v)
-	}
-
-	// get query items limit
-	if limit, err = u.Limit.Int64(); err != nil || limit < 1 {
-		limit = int64(defaultLimit)
-	}
-
-	// get query order
-	order := defaultOrder
-	if u.Order == secondaryOrder {
-		order = secondaryOrder
-	}
-
-	// calc timestamps from end, start and bucket duration strings
-	end, start, bucketDuration = parseTimespanStrings(endStr, startStr, bucketDurationStr)
-
-	if h.Verbose {
-		log.Printf("Tenant: %s, IDs: %+v", tenant, u.IDs)
-		log.Printf("End: %d(%s), Start: %d(%s), Limit: %d, Order: %s, bucketDuration: %ds", end, endStr, start, startStr, limit, order, bucketDuration)
-	}
+// PostQuery query data from storage + gauges
+func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	// parse query args
+	tenant, ids, end, start, limit, order, bucketDuration := h.parseQueryArgs(w, r, argv)
+	numOfItems := len(ids) - 1
 
 	w.WriteHeader(200)
-	fmt.Fprintf(w, "[")
+	fmt.Fprintf(w, "{\"gauge\":{")
 
-	for i, id := range u.IDs {
+	for i, id := range ids {
 		// call storage for data
 		resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
 
 		// write data
-		fmt.Fprintf(w, "{\"id\": \"%s\", \"data\": %s}", id, resStr)
+		fmt.Fprintf(w, "\"%s\":", id)
+		fmt.Fprintf(w, resStr)
+
+		if i < numOfItems {
+			fmt.Fprintf(w, ",")
+		}
+	}
+
+	fmt.Fprintf(w, "}}")
+}
+
+// PostQuery query data from storage
+func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	// parse query args
+	tenant, ids, end, start, limit, order, bucketDuration := h.parseQueryArgs(w, r, argv)
+	numOfItems := len(ids) - 1
+
+	w.WriteHeader(200)
+	fmt.Fprintf(w, "[")
+
+	for i, id := range ids {
+		// call storage for data
+		resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
+
+		// write data
+		fmt.Fprintf(w, "{\"id\": \"%s\", \"data\":", id)
+		fmt.Fprintf(w, resStr)
+		fmt.Fprintf(w, "}")
+
 		if i < numOfItems {
 			fmt.Fprintf(w, ",")
 		}
@@ -410,6 +365,83 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, "{}")
+}
+
+// parseQueryArgs parse query request body args
+func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv map[string]string) (tenant string, ids []string, end int64, start int64, limit int64, order string, bucketDuration int64) {
+	var u dataQuery
+	var endStr string
+	var startStr string
+	var bucketDurationStr string
+	var err error
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.UseNumber()
+	decoder.Decode(&u)
+
+	// get tenant
+	tenant = parseTenant(r)
+
+	// get ids from explicit ids list
+	for _, id := range u.IDs {
+		if !validStr(id) {
+			badID(w, h.Verbose)
+			return
+		}
+	}
+
+	// add ids from tags query
+	if len(u.Tags) != 0 {
+		res := h.Storage.GetItemList(tenant, u.Tags)
+		for _, r := range res {
+			u.IDs = append(u.IDs, r.ID)
+		}
+	}
+
+	// get start time string
+	switch v := u.Start.(type) {
+	case string:
+		startStr = u.Start.(string)
+	default:
+		startStr = fmt.Sprintf("%+v", v)
+	}
+
+	// get end time string
+	switch v := u.End.(type) {
+	case string:
+		endStr = u.End.(string)
+	default:
+		endStr = fmt.Sprintf("%+v", v)
+	}
+
+	// get bucket duration string
+	switch v := u.BucketDuration.(type) {
+	case string:
+		bucketDurationStr = u.BucketDuration.(string)
+	default:
+		bucketDurationStr = fmt.Sprintf("%+v", v)
+	}
+
+	// get query items limit
+	if limit, err = u.Limit.Int64(); err != nil || limit < 1 {
+		limit = int64(defaultLimit)
+	}
+
+	// get query order
+	order = defaultOrder
+	if u.Order == secondaryOrder {
+		order = secondaryOrder
+	}
+
+	// calc timestamps from end, start and bucket duration strings
+	end, start, bucketDuration = parseTimespanStrings(endStr, startStr, bucketDurationStr)
+
+	if h.Verbose {
+		log.Printf("Tenant: %s, IDs: %+v", tenant, u.IDs)
+		log.Printf("End: %d(%s), Start: %d(%s), Limit: %d, Order: %s, bucketDuration: %ds", end, endStr, start, startStr, limit, order, bucketDuration)
+	}
+
+	return tenant, u.IDs, end, start, limit, order, bucketDuration
 }
 
 // getData querys data from the storage, and return a json string
