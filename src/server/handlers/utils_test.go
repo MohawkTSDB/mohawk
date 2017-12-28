@@ -56,7 +56,7 @@ func TestParseSec(t *testing.T) {
 	}
 
 	// check that we raise errors on bad strings
-	if i, err = parseSec(""); err == nil {
+	if _, err = parseSec(""); err == nil {
 		t.Errorf("no error while parsing empty string \"\"")
 	}
 }

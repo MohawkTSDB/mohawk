@@ -210,7 +210,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't delete time rage - 504\"}")
 }
 
-// PostQuery query data from storage + gauges
+// PostMQuery query data from storage + gauges
 func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	// parse query args
 	tenant, ids, end, start, limit, order, bucketDuration := h.parseQueryArgs(w, r, argv)

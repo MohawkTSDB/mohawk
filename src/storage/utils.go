@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package storage
+// Package storage interface for metric data storage
 package storage
 
 func FilterItems(vs []Item, f func(Item) bool) []Item {
