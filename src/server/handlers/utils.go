@@ -18,7 +18,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -162,65 +161,59 @@ func badID(w http.ResponseWriter, v bool) {
 	}
 }
 
+func baseTime(t int) int64 {
+	nowSec := int64(time.Now().UTC().Unix())
+
+	// if time is negative, assume base is now
+	if t < 0 {
+		return nowSec + int64(t)
+	}
+
+	return int64(t)
+}
+
 func parseSec(t string) (int64, error) {
 	var err error
 	var i int
-	var outSec int64
-	nowSec := int64(time.Now().UTC().Unix())
+	outSec := int64(0)
 
-	// check for empty string
-	if t == "" {
-		return outSec, errors.New("Empty time string")
+	// check for simple int
+	if i, err = strconv.Atoi(t); err == nil {
+		return baseTime(i / 1e3), nil
+	} else if len(t) < 2 {
+		// len < 2 and not int is an error
+		return 0, err
 	}
-
-	// if length < 2 then default to just do Atoi, assume ms
-	if len(t) < 2 {
-		if i, err = strconv.Atoi(t); err == nil {
-			outSec = int64(i) / 1e3
-		}
-		return outSec, err
-	}
-
-	// supported units: ms, s, mn, h, d
 
 	// check for ms and mn
 	switch t[len(t)-2:] {
 	case "ms":
 		if i, err = strconv.Atoi(t[:len(t)-2]); err == nil {
-			outSec = int64(i) / 1e3
+			return baseTime(i / 1e3), nil
 		}
 	case "mn":
 		if i, err = strconv.Atoi(t[:len(t)-2]); err == nil {
-			outSec = int64(i) * 60
+			return baseTime(i * 60), nil
 		}
 	}
 
 	// check for s, h and d
 	switch t[len(t)-1:] {
 	case "s":
-		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil {
-			outSec = int64(i)
+		// if this is the "s" from "ms" then outSec != nil
+		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil && outSec == 0 {
+			return baseTime(i), nil
 		}
 	case "h":
 		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil {
-			outSec = int64(i) * 60 * 60
+			return baseTime(i * 60 * 60), nil
 		}
 	case "d":
 		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil {
-			outSec = int64(i) * 60 * 60 * 24
+			return baseTime(i * 60 * 60 * 24), nil
 		}
 	}
 
-	// if value is not zero, return value
-	if outSec < 0 {
-		return nowSec + outSec, nil
-	} else if outSec > 0 {
-		return outSec, nil
-	}
-
-	// if we had an error parsing, re-try atoi and assume ms
-	if i, err = strconv.Atoi(t); err == nil {
-		outSec = int64(i) / 1e3
-	}
-	return outSec, err
+	// if here must be an error
+	return 0, err
 }
