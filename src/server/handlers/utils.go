@@ -18,6 +18,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -222,5 +223,6 @@ func parseSec(t string) (int64, error) {
 	}
 
 	// if here must be an error
-	return 0, err
+	errMsg := fmt.Sprintf("Can't parse %s timestamp", t)
+	return 0, errors.New(errMsg)
 }
