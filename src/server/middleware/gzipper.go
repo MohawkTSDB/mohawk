@@ -46,6 +46,7 @@ func (w gzRespWriter) Write(b []byte) (int, error) {
 	return w.Writer.Write(b)
 }
 
+// GzipDecodeDecorator addes a gzip decoder to reader
 func GzipDecodeDecorator() Decorator {
 	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +63,7 @@ func GzipDecodeDecorator() Decorator {
 	})
 }
 
+// GzipEncodeDecorator addes a gzip encoder to Writer
 func GzipEncodeDecorator() Decorator {
 	return Decorator(func(h http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

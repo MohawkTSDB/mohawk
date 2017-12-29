@@ -20,6 +20,7 @@ import (
 	"net/http"
 )
 
+// Handler handler type interface
 type Handler interface {
 	SetNext(http.Handler)
 	ServeHTTP(http.ResponseWriter, *http.Request)

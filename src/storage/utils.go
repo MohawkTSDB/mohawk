@@ -16,6 +16,7 @@
 // Package storage interface for metric data storage
 package storage
 
+// FilterItems filters a list using a filter function
 func FilterItems(vs []Item, f func(Item) bool) []Item {
 	vsf := make([]Item, 0)
 

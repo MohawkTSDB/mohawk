@@ -56,7 +56,7 @@ func TestAlertsInit0(test *testing.T) {
 	_, l, _ := initTestEnv()
 
 	// check that init set types
-	if l[0].Type != HIGHER_THAN || l[1].Type != LOWER_THAN || l[2].Type != OUTSIDE || l[3].Type != HIGHER_THAN {
+	if l[0].Type != higherThan || l[1].Type != lowerThan || l[2].Type != outside || l[3].Type != higherThan {
 		test.Error("Fail test 0")
 	}
 }

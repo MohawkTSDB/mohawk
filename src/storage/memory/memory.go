@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package storage interface for metric data storage
+// Package memory interface for memory metric data storage
 package memory
 
 import (
