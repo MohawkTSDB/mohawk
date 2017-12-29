@@ -508,9 +508,8 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 
 	// get query items limit
 	if limit, err = u.Limit.Int64(); err != nil || limit < 1 {
-		limit = int64(defaultLimit)
-
 		// using default value, remove error
+		limit = int64(defaultLimit)
 		err = nil
 	}
 
