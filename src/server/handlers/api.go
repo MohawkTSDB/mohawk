@@ -266,6 +266,9 @@ func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map
 	// parse query args
 	tenant, ids, end, start, limit, order, bucketDuration, err := h.parseQueryArgs(w, r, argv)
 	if err != nil {
+		if h.Verbose {
+			log.Printf(err.Error())
+		}
 		w.WriteHeader(504)
 		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
 		return
@@ -295,6 +298,9 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 	// parse query args
 	tenant, ids, end, start, limit, order, bucketDuration, err := h.parseQueryArgs(w, r, argv)
 	if err != nil {
+		if h.Verbose {
+			log.Printf(err.Error())
+		}
 		w.WriteHeader(504)
 		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
 		return
@@ -427,33 +433,23 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	fmt.Fprintf(w, "{\"message\":\"Deleted tags for %s@%s\"}", tenant, id)
 }
 
-// parseQueryArgs parse query request body args
-func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv map[string]string) (tenant string, ids []string, end int64, start int64, limit int64, order string, bucketDuration int64, err error) {
-	var u dataQuery
-	var endStr string
-	var startStr string
-	var bucketDurationStr string
+// decodeRequestBody parse request body
+func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQuery, err error) {
+	// get tenant
+	tenant = parseTenant(r)
 
+	// decode query body
 	decoder := json.NewDecoder(r.Body)
 	decoder.UseNumber()
 	if err = decoder.Decode(&u); err != nil {
-		if h.Verbose {
-			log.Printf("Can't parse request json")
-		}
-		return tenant, []string{}, end, start, limit, order, bucketDuration, err
+		return tenant, u, err
 	}
-
-	// get tenant
-	tenant = parseTenant(r)
 
 	// get ids from explicit ids list
 	for _, id := range u.IDs {
 		if !validStr(id) {
-			if h.Verbose {
-				log.Printf("Bad metrics ID - 504\n")
-			}
 			err = errors.New("Bad metrics ID - 504")
-			return tenant, u.IDs, end, start, limit, order, bucketDuration, err
+			return tenant, u, err
 		}
 	}
 
@@ -463,6 +459,21 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 		for _, r := range res {
 			u.IDs = append(u.IDs, r.ID)
 		}
+	}
+
+	return tenant, u, err
+}
+
+// parseQueryArgs parse query request body args
+func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv map[string]string) (tenant string, ids []string, end int64, start int64, limit int64, order string, bucketDuration int64, err error) {
+	var endStr string
+	var startStr string
+	var bucketDurationStr string
+
+	// get tenant
+	tenant, u, err := h.decodeRequestBody(r)
+	if err != nil {
+		return tenant, []string{}, 0, 0, 0, "", 0, err
 	}
 
 	// get start time string
