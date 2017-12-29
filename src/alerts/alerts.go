@@ -27,20 +27,23 @@ import (
 	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
-type RangeIntervalType int
+// AlertType describe alert type
+type AlertType int
 
+// Alert defines one alert
 type Alert struct {
 	ID                string   `mapstructure:"id"`
 	Metric            string   `mapstructure:"metric"`
 	Tenant            string   `mapstructure:"tenant"`
 	AlertIfHigherThan *float64 `mapstructure:"alert-if-higher-than"`
 	AlertIfLowerThan  *float64 `mapstructure:"alert-if-lower-than"`
-	Type              RangeIntervalType
+	Type              AlertType
 	State             bool
 	TrigerValue       float64
 	TrigerTimestamp   int64
 }
 
+// AlertRules defines prameters for the alerts run rutine
 type AlertRules struct {
 	Storage        storage.Storage
 	ServerURL      string
@@ -53,17 +56,17 @@ type AlertRules struct {
 }
 
 const (
-	NONE RangeIntervalType = iota
-	OUTSIDE
-	HIGHER_THAN
-	LOWER_THAN
+	undefined AlertType = iota
+	outside
+	higherThan
+	lowerThan
 )
 
 // Alert
 
 // updateAlertState update the alert status
 func (alert *Alert) updateAlertState(value float64) {
-	if alert.Type == NONE {
+	if alert.Type == undefined {
 		return
 	}
 
@@ -71,11 +74,11 @@ func (alert *Alert) updateAlertState(value float64) {
 	//    AlertIfLowerThen <= value > AlertIfHigherThen
 	//    values outside this range will triger an alert
 	switch alert.Type {
-	case OUTSIDE:
+	case outside:
 		alert.State = value < *alert.AlertIfLowerThan || value >= *alert.AlertIfHigherThan
-	case HIGHER_THAN:
+	case higherThan:
 		alert.State = value >= *alert.AlertIfHigherThan
-	case LOWER_THAN:
+	case lowerThan:
 		alert.State = value < *alert.AlertIfLowerThan
 	}
 }
@@ -91,13 +94,13 @@ func (a *AlertRules) Init() {
 		//   if we have only AlertIfHigherThen -> alert type is higher then
 		//   o/w                  -> alert if outside
 		if alert.AlertIfHigherThan == nil && alert.AlertIfLowerThan != nil {
-			alert.Type = LOWER_THAN
+			alert.Type = lowerThan
 		} else if alert.AlertIfHigherThan != nil && alert.AlertIfLowerThan == nil {
-			alert.Type = HIGHER_THAN
+			alert.Type = higherThan
 		} else if alert.AlertIfHigherThan != nil && alert.AlertIfLowerThan != nil {
-			alert.Type = OUTSIDE
+			alert.Type = outside
 		} else {
-			alert.Type = NONE
+			alert.Type = undefined
 		}
 
 		// fall back to _ops if no tenant given
@@ -192,6 +195,7 @@ func (a *AlertRules) post(s string) {
 	}
 }
 
+// FilterAlerts return a list of alerts, filter by tenant, id and state
 func (a *AlertRules) FilterAlerts(tenant string, id string, state string) []Alert {
 	res := make([]Alert, 0)
 	s := state == "T"

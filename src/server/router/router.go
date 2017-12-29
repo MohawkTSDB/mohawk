@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package router
+// Package router for http request routing
 package router
 
 import (
@@ -68,6 +68,7 @@ func (r Router) match(route route, method string, segments []string) (bool, map[
 	return true, argv
 }
 
+// SetNext sets the next handler in the routing list
 func (r *Router) SetNext(h http.Handler) {
 	r.next = h
 }

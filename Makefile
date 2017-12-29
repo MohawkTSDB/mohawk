@@ -11,6 +11,10 @@ mohawk: $(SOURCE)
 fmt: $(SOURCE)
 	gofmt -s -l -w $(SOURCE)
 
+.PHONY: lint
+lint: $(SOURCE)
+	golint src/...
+
 .PHONY: clean
 clean:
 	$(RM) mohawk

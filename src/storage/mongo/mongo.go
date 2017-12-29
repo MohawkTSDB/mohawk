@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package storage interface for metric data storage
+// Package mongo interface for mongo metric data storage
 package mongo
 
 import (
@@ -212,8 +212,8 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 
 func (r Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
 	// check if id exist
-	if !r.IdExist(tenant, id) {
-		r.createId(tenant, id)
+	if !r.IDExist(tenant, id) {
+		r.createID(tenant, id)
 	}
 
 	r.insertData(tenant, id, t, v)
@@ -222,8 +222,8 @@ func (r Storage) PostRawData(tenant string, id string, t int64, v float64) bool 
 
 func (r Storage) PutTags(tenant string, id string, tags map[string]string) bool {
 	// check if id exist
-	if !r.IdExist(tenant, id) {
-		r.createId(tenant, id)
+	if !r.IDExist(tenant, id) {
+		r.createID(tenant, id)
 	}
 
 	for k, v := range tags {
@@ -243,7 +243,7 @@ func (r Storage) DeleteTags(tenant string, id string, tags []string) bool {
 // Helper functions
 // Not required by storage interface
 
-func (r Storage) IdExist(tenant string, id string) bool {
+func (r Storage) IDExist(tenant string, id string) bool {
 	result := storage.Item{}
 
 	// copy storage session
@@ -256,7 +256,7 @@ func (r Storage) IdExist(tenant string, id string) bool {
 	return err == nil
 }
 
-func (r Storage) createId(tenant string, id string) bool {
+func (r Storage) createID(tenant string, id string) bool {
 	// copy storage session
 	sessionCopy := r.mongoSession.Copy()
 	defer sessionCopy.Close()

@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-var SEC_ERR = int64(10)
+var secErr = int64(10)
 
 func TestParseSec(t *testing.T) {
 	var err error
@@ -50,7 +50,7 @@ func TestParseSec(t *testing.T) {
 		if i, err = parseSec(tc.testStr); err != nil {
 			t.Errorf("error parsing '%s'", tc.testStr)
 		}
-		if i < (tc.testSec-SEC_ERR) || i > (tc.testSec+SEC_ERR) {
+		if i < (tc.testSec-secErr) || i > (tc.testSec+secErr) {
 			t.Errorf("error parsing '%s' [%d != %d]", tc.testStr, i, tc.testSec)
 		}
 	}
