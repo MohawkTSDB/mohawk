@@ -342,7 +342,7 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 	}
 
 	w.WriteHeader(200)
-	fmt.Fprintf(w, "{\"message\":\"Updated tags for %d items\"}", len(u), tenant)
+	fmt.Fprintf(w, "{\"message\":\"Updated tags for %d items\"}", len(u))
 }
 
 // DeleteTags delete a tag
