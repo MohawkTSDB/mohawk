@@ -104,35 +104,51 @@ func parseTenant(r *http.Request) string {
 	return tenant
 }
 
-func parseTimespanStrings(e string, s string, b string) (int64, int64, int64) {
+func badID(w http.ResponseWriter, v bool) {
+	w.WriteHeader(504)
+	fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Bad metrics IDe - 504\"}")
+
+	if v {
+		log.Printf("Bad metrics ID - 504\n")
+	}
+}
+
+func parseTimespanStrings(e string, s string, b string) (int64, int64, int64, error) {
+	var i int64
+	var err error
 	var start int64
 	var end int64
 	var bucketDuration int64
 
-	if i, err := parseSec(e); err == nil {
+	if e == "" {
+		end = int64(time.Now().UTC().Unix()) * 1000
+	} else if i, err = parseSec(e); err == nil {
 		end = i * 1000
 	} else {
-		end = int64(time.Now().UTC().Unix()) * 1000
+		return 0, 0, 0, err
 	}
 
-	if i, err := parseSec(s); err == nil {
+	if s == "" {
+		i, _ := parseSec(defaultStartTime)
+		start = i * 1000
+	} else if i, err = parseSec(s); err == nil {
 		start = i * 1000
 	} else {
-		if i, err := parseSec(defaultStartTime); err == nil {
-			start = i * 1000
-		}
+		return 0, 0, 0, err
 	}
 
-	if i, err := parseSec(b); err == nil {
+	if b == "" {
+		bucketDuration = int64(0)
+	} else if i, err = parseSec(b); err == nil {
 		bucketDuration = i * 1000
 	} else {
-		bucketDuration = int64(0)
+		return 0, 0, 0, err
 	}
 
-	return end, start, bucketDuration
+	return end, start, bucketDuration, nil
 }
 
-func parseTimespan(r *http.Request) (int64, int64, int64) {
+func parseTimespan(r *http.Request) (int64, int64, int64, error) {
 	var e string
 	var s string
 	var b string
@@ -150,15 +166,6 @@ func parseTimespan(r *http.Request) (int64, int64, int64) {
 	}
 
 	return parseTimespanStrings(e, s, b)
-}
-
-func badID(w http.ResponseWriter, v bool) {
-	w.WriteHeader(504)
-	fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Bad metrics IDe - 504\"}")
-
-	if v {
-		log.Printf("Bad metrics ID - 504\n")
-	}
 }
 
 func baseTime(t int) int64 {

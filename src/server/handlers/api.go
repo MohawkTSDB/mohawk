@@ -18,6 +18,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -73,7 +74,16 @@ func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[
 	}
 
 	// get data from the form arguments
-	r.ParseForm()
+	// get data from the form arguments
+	if err := r.ParseForm(); err != nil {
+		if h.Verbose {
+			log.Printf(err.Error())
+		}
+
+		w.WriteHeader(504)
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't parse request - 504\"}")
+		return
+	}
 
 	// get tenant
 	tenant := parseTenant(r)
@@ -102,13 +112,21 @@ func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map
 func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	var res []storage.Item
 
-	r.ParseForm()
+	// get data from the form arguments
+	if err := r.ParseForm(); err != nil {
+		if h.Verbose {
+			log.Printf(err.Error())
+		}
+
+		w.WriteHeader(504)
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't parse request - 504\"}")
+		return
+	}
 
 	// we only use gauges
 	if typeStr, ok := r.Form["type"]; ok && len(typeStr) > 0 && typeStr[0] != "gauge" {
 		w.WriteHeader(200)
 		fmt.Fprintln(w, "[]")
-
 		return
 	}
 
@@ -142,13 +160,30 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	}
 
 	// get data from the form arguments
-	r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+		if h.Verbose {
+			log.Printf(err.Error())
+		}
+
+		w.WriteHeader(504)
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't parse request - 504\"}")
+		return
+	}
 
 	// get tenant
 	tenant := parseTenant(r)
 
 	// get timespan
-	end, start, bucketDuration := parseTimespan(r)
+	end, start, bucketDuration, err := parseTimespan(r)
+	if err != nil {
+		if h.Verbose {
+			log.Printf(err.Error())
+		}
+
+		w.WriteHeader(504)
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
+		return
+	}
 
 	limit := int64(defaultLimit)
 	if v, ok := r.Form["limit"]; ok && len(v) > 0 {
@@ -183,13 +218,30 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	}
 
 	// get data from the form arguments
-	r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+		if h.Verbose {
+			log.Printf(err.Error())
+		}
+
+		w.WriteHeader(504)
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't parse request - 504\"}")
+		return
+	}
 
 	// get tenant
 	tenant := parseTenant(r)
 
 	// get timespan
-	end, start, _ := parseTimespan(r)
+	end, start, _, err := parseTimespan(r)
+	if err != nil {
+		if h.Verbose {
+			log.Printf(err.Error())
+		}
+
+		w.WriteHeader(504)
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
+		return
+	}
 
 	if h.Verbose {
 		log.Printf("ID: %s@%s, End: %d, Start: %d", tenant, id, end, start)
@@ -212,7 +264,12 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 // PostMQuery query data from storage + gauges
 func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	// parse query args
-	tenant, ids, end, start, limit, order, bucketDuration := h.parseQueryArgs(w, r, argv)
+	tenant, ids, end, start, limit, order, bucketDuration, err := h.parseQueryArgs(w, r, argv)
+	if err != nil {
+		w.WriteHeader(504)
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
+		return
+	}
 	numOfItems := len(ids) - 1
 
 	w.WriteHeader(200)
@@ -236,7 +293,12 @@ func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map
 // PostQuery query data from storage
 func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	// parse query args
-	tenant, ids, end, start, limit, order, bucketDuration := h.parseQueryArgs(w, r, argv)
+	tenant, ids, end, start, limit, order, bucketDuration, err := h.parseQueryArgs(w, r, argv)
+	if err != nil {
+		w.WriteHeader(504)
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
+		return
+	}
 	numOfItems := len(ids) - 1
 
 	w.WriteHeader(200)
@@ -366,16 +428,20 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 }
 
 // parseQueryArgs parse query request body args
-func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv map[string]string) (tenant string, ids []string, end int64, start int64, limit int64, order string, bucketDuration int64) {
+func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv map[string]string) (tenant string, ids []string, end int64, start int64, limit int64, order string, bucketDuration int64, err error) {
 	var u dataQuery
 	var endStr string
 	var startStr string
 	var bucketDurationStr string
-	var err error
 
 	decoder := json.NewDecoder(r.Body)
 	decoder.UseNumber()
-	decoder.Decode(&u)
+	if err = decoder.Decode(&u); err != nil {
+		if h.Verbose {
+			log.Printf("Can't parse request json")
+		}
+		return tenant, []string{}, end, start, limit, order, bucketDuration, err
+	}
 
 	// get tenant
 	tenant = parseTenant(r)
@@ -383,8 +449,11 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 	// get ids from explicit ids list
 	for _, id := range u.IDs {
 		if !validStr(id) {
-			badID(w, h.Verbose)
-			return
+			if h.Verbose {
+				log.Printf("Bad metrics ID - 504\n")
+			}
+			err = errors.New("Bad metrics ID - 504")
+			return tenant, u.IDs, end, start, limit, order, bucketDuration, err
 		}
 	}
 
@@ -400,6 +469,8 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 	switch v := u.Start.(type) {
 	case string:
 		startStr = u.Start.(string)
+	case nil:
+		startStr = ""
 	default:
 		startStr = fmt.Sprintf("%+v", v)
 	}
@@ -408,6 +479,8 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 	switch v := u.End.(type) {
 	case string:
 		endStr = u.End.(string)
+	case nil:
+		endStr = ""
 	default:
 		endStr = fmt.Sprintf("%+v", v)
 	}
@@ -416,6 +489,8 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 	switch v := u.BucketDuration.(type) {
 	case string:
 		bucketDurationStr = u.BucketDuration.(string)
+	case nil:
+		bucketDurationStr = ""
 	default:
 		bucketDurationStr = fmt.Sprintf("%+v", v)
 	}
@@ -423,6 +498,9 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 	// get query items limit
 	if limit, err = u.Limit.Int64(); err != nil || limit < 1 {
 		limit = int64(defaultLimit)
+
+		// using default value, remove error
+		err = nil
 	}
 
 	// get query order
@@ -432,14 +510,14 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 	}
 
 	// calc timestamps from end, start and bucket duration strings
-	end, start, bucketDuration = parseTimespanStrings(endStr, startStr, bucketDurationStr)
+	end, start, bucketDuration, err = parseTimespanStrings(endStr, startStr, bucketDurationStr)
 
 	if h.Verbose {
 		log.Printf("Tenant: %s, IDs: %+v", tenant, u.IDs)
 		log.Printf("End: %d(%s), Start: %d(%s), Limit: %d, Order: %s, bucketDuration: %ds", end, endStr, start, startStr, limit, order, bucketDuration)
 	}
 
-	return tenant, u.IDs, end, start, limit, order, bucketDuration
+	return tenant, u.IDs, end, start, limit, order, bucketDuration, err
 }
 
 // getData querys data from the storage, and send it to writer
