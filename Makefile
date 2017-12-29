@@ -13,7 +13,7 @@ fmt: $(SOURCE)
 
 .PHONY: lint
 lint: $(SOURCE)
-	golint src/...
+	golint -min_confidence 0.9 src/...
 
 .PHONY: clean
 clean:
