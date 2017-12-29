@@ -166,12 +166,11 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 		log.Printf("ID: %s@%s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", tenant, id, end, start, limit, order, bucketDuration)
 	}
 
-	// call storage for data
-	resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
-
 	// output to client
 	w.WriteHeader(200)
-	fmt.Fprintf(w, resStr)
+
+	// call storage for data
+	h.getData(w, tenant, id, end, start, limit, order, bucketDuration)
 }
 
 // DeleteData delete a list of metrics raw  data
@@ -220,12 +219,11 @@ func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map
 	fmt.Fprintf(w, "{\"gauge\":{")
 
 	for i, id := range ids {
-		// call storage for data
-		resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
-
 		// write data
 		fmt.Fprintf(w, "\"%s\":", id)
-		fmt.Fprintf(w, resStr)
+
+		// call storage for data, and send it to writer
+		h.getData(w, tenant, id, end, start, limit, order, bucketDuration)
 
 		if i < numOfItems {
 			fmt.Fprintf(w, ",")
@@ -245,12 +243,12 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 	fmt.Fprintf(w, "[")
 
 	for i, id := range ids {
-		// call storage for data
-		resStr := getData(h, tenant, id, end, start, limit, order, bucketDuration)
-
 		// write data
 		fmt.Fprintf(w, "{\"id\": \"%s\", \"data\":", id)
-		fmt.Fprintf(w, resStr)
+
+		// call storage for data, and send it to writer
+		h.getData(w, tenant, id, end, start, limit, order, bucketDuration)
+
 		fmt.Fprintf(w, "}")
 
 		if i < numOfItems {
@@ -444,8 +442,8 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 	return tenant, u.IDs, end, start, limit, order, bucketDuration
 }
 
-// getData querys data from the storage, and return a json string
-func getData(h APIHhandler, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) string {
+// getData querys data from the storage, and send it to writer
+func (h APIHhandler) getData(w http.ResponseWriter, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) {
 	var resStr string
 
 	// call storage for data
@@ -459,5 +457,5 @@ func getData(h APIHhandler, tenant string, id string, end int64, start int64, li
 		resStr = string(resJSON)
 	}
 
-	return resStr
+	fmt.Fprintf(w, resStr)
 }
