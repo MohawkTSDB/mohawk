@@ -351,7 +351,7 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 	}
 
 	w.WriteHeader(200)
-	fmt.Fprintf(w, "{\"message\":\"Recived %d data items\"}", len(u))
+	fmt.Fprintf(w, "{\"message\":\"Received %d data items\"}", len(u))
 }
 
 // PutTags send tag, value pairs to the storage
