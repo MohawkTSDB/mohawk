@@ -20,10 +20,12 @@ import (
 	"net/url"
 )
 
+// Tenant just the tenant name
 type Tenant struct {
 	ID string `json:"id"`
 }
 
+// Item one metric item
 type Item struct {
 	ID         string            `json:"id" bson:"_id"`
 	Type       string            `json:"type" bson:"type"`
@@ -31,11 +33,13 @@ type Item struct {
 	LastValues []DataItem        `json:"data,omitempty" bson:"data,omitempty"`
 }
 
+// DataItem one metric data point
 type DataItem struct {
 	Timestamp int64   `json:"timestamp" bson:"timestamp"`
 	Value     float64 `json:"value" bson:"value"`
 }
 
+// StatItem one statistics data point
 type StatItem struct {
 	Start   int64   `json:"start"`
 	End     int64   `json:"end"`
@@ -51,6 +55,7 @@ type StatItem struct {
 	Sum     float64 `json:"sum,omitempty"`
 }
 
+// Storage metric data interface
 type Storage interface {
 	Name() string
 	Open(options url.Values)
