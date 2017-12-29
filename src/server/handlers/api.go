@@ -79,9 +79,8 @@ func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-
 		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't parse request - 504\"}")
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
 		return
 	}
 
@@ -117,9 +116,8 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-
 		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't parse request - 504\"}")
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
 		return
 	}
 
@@ -164,9 +162,8 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-
 		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't parse request - 504\"}")
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
 		return
 	}
 
@@ -179,7 +176,6 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-
 		w.WriteHeader(504)
 		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
 		return
@@ -222,9 +218,8 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-
 		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't parse request - 504\"}")
+		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
 		return
 	}
 
@@ -237,7 +232,6 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-
 		w.WriteHeader(504)
 		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
 		return
