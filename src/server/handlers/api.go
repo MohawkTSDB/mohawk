@@ -150,7 +150,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	// get timespan
 	end, start, bucketDuration := parseTimespan(r)
 
-	limit := int64(20000)
+	limit := int64(defaultLimit)
 	if v, ok := r.Form["limit"]; ok && len(v) > 0 {
 		if i, err := strconv.Atoi(v[0]); err == nil && i > 0 {
 			limit = int64(i)
@@ -202,7 +202,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 
 		// output to client
 		w.WriteHeader(200)
-		fmt.Fprintf(w, "{}")
+		fmt.Fprintf(w, "{\"message\":\"Deleted %s@%s [%d-%d]\"}", tenant, id, end, start)
 		return
 	}
 
@@ -291,7 +291,7 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 	}
 
 	w.WriteHeader(200)
-	fmt.Fprintln(w, "{}")
+	fmt.Fprintf(w, "{\"message\":\"Recived %d data items\"}", len(u))
 }
 
 // PutTags send tag, value pairs to the storage
@@ -315,7 +315,7 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 	h.Storage.PutTags(tenant, id, tags)
 
 	w.WriteHeader(200)
-	fmt.Fprintln(w, "{}")
+	fmt.Fprintf(w, "{\"message\":\"Updated tags for %s@%s\"}", tenant, id)
 }
 
 // PutMultiTags send tags pet dataItem - tag, value pairs to the storage
@@ -344,7 +344,7 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 	}
 
 	w.WriteHeader(200)
-	fmt.Fprintln(w, "{}")
+	fmt.Fprintf(w, "{\"message\":\"Updated tags for %d items\"}", len(u), tenant)
 }
 
 // DeleteTags delete a tag
@@ -364,7 +364,7 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	h.Storage.DeleteTags(tenant, id, tags)
 
 	w.WriteHeader(200)
-	fmt.Fprintln(w, "{}")
+	fmt.Fprintf(w, "{\"message\":\"Deleted tags for %s@%s\"}", tenant, id)
 }
 
 // parseQueryArgs parse query request body args
