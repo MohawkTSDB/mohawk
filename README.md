@@ -83,6 +83,12 @@ Usage of mohawk:
 ...
 ```
 
+```bash
+mohawk --options=help
+Storage options:
+...
+```
+
 Running ``mohawk`` without ``tls`` and using the ``sqlite`` back end.
 
 ```bash
