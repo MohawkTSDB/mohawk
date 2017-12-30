@@ -78,7 +78,6 @@ func Serve() error {
 	var gzip = viper.GetBool("gzip")
 	var bearerAuth = viper.GetString("bearer-auth")
 	var basicAuth = viper.GetString("basic-auth")
-	var port = viper.GetInt("port")
 	var alertsInterval = viper.GetInt("alerts-interval")
 	var alertsServerURL = viper.GetString("alerts-server")
 	var alertsServerMethod = viper.GetString("alerts-server-method")
@@ -261,11 +260,12 @@ func Serve() error {
 	core := middleware.Append(routers, decorators...)
 
 	// start serving http/s requests
-	return RunServer(core, port)
+	return RunServer(core)
 }
 
 // RunServer run the http/s server
-func RunServer(core http.HandlerFunc, port int) error {
+func RunServer(core http.HandlerFunc) error {
+	var port = viper.GetInt("port")
 	var tls = viper.GetBool("tls")
 	var cert = viper.GetString("cert")
 	var key = viper.GetString("key")
