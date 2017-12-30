@@ -47,8 +47,7 @@ func (r Storage) Help() string {
 	return `Mongo storage [mongo]:
 	db-url   - comma separeted list of mongo servers.
 	username - (optional) username for db access.
-	password - (optional) password for db access.
-`
+	password - (optional) password for db access.`
 }
 
 // Open storage
