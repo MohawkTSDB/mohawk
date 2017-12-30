@@ -16,6 +16,11 @@
 // Package storage interface for metric data storage
 package storage
 
+import (
+	"log"
+	"strconv"
+)
+
 // FilterItems filters a list using a filter function
 func FilterItems(vs []Item, f func(Item) bool) []Item {
 	vsf := make([]Item, 0)
@@ -26,4 +31,45 @@ func FilterItems(vs []Item, f func(Item) bool) []Item {
 		}
 	}
 	return vsf
+}
+
+// ParseSec parse a time string into seconds,
+// posible postfix - s, mn, h, d
+// e.g. "2h" => 2 * 60 * 60
+func ParseSec(t string) int64 {
+	var err error
+	var i int
+
+	if len(t) < 2 {
+		log.Fatal("Can't parse time ", t)
+	}
+
+	// check for ms and mn
+	switch t[len(t)-2:] {
+	case "mn":
+		if i, err = strconv.Atoi(t[:len(t)-2]); err == nil {
+			return int64(i) * 60
+		}
+	}
+
+	// check for s, h and d
+	switch t[len(t)-1:] {
+	case "s":
+		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil {
+			return int64(i)
+		}
+	case "h":
+		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil {
+			return int64(i) * 60 * 60
+		}
+	case "d":
+		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil {
+			return int64(i) * 60 * 60 * 24
+		}
+	}
+
+	// if here must be an error
+	log.Fatal("Can't parse time ", t)
+
+	return 0
 }

@@ -21,6 +21,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/MohawkTSDB/mohawk/src/storage"
@@ -28,16 +29,29 @@ import (
 
 type Storage struct {
 	dbURL        string
+	dbUsername   string
+	dbPassword   string
 	mongoSession *mgo.Session
 }
 
 // Storage functions
 // Required by storage interface
 
+// Name return a human readable storage name
 func (r Storage) Name() string {
 	return "Storage-Mongo"
 }
 
+// Help return a human readable storage help message
+func (r Storage) Help() string {
+	return `Mongo storage [mongo]:
+	db-url   - comma separeted list of mongo servers.
+	username - (optional) username for db access.
+	password - (optional) password for db access.
+`
+}
+
+// Open storage
 func (r *Storage) Open(options url.Values) {
 	var err error
 
@@ -46,13 +60,15 @@ func (r *Storage) Open(options url.Values) {
 	if r.dbURL == "" {
 		r.dbURL = "127.0.0.1"
 	}
+	r.dbUsername = options.Get("username")
+	r.dbPassword = options.Get("password")
 
 	// We need this object to establish a session to our MongoDB.
 	mongoDBDialInfo := &mgo.DialInfo{
-		Addrs:    []string{r.dbURL},
+		Addrs:    strings.Split(r.dbURL, ","),
 		Timeout:  10 * time.Second,
-		Username: "",
-		Password: "",
+		Username: r.dbUsername,
+		Password: r.dbPassword,
 	}
 
 	// Create a session which maintains a pool of socket connections
@@ -63,6 +79,10 @@ func (r *Storage) Open(options url.Values) {
 	}
 
 	r.mongoSession.SetMode(mgo.Monotonic, true)
+
+	// log init arguments
+	log.Printf("Start mongo storage:")
+	log.Printf("  addrs: %+v", strings.Split(r.dbURL, ","))
 }
 
 func (r Storage) GetTenants() []storage.Tenant {

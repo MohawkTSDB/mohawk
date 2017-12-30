@@ -81,6 +81,21 @@ func Serve() error {
 	var alertsServerInsecure = viper.GetBool("alerts-server-insecure")
 	var configAlerts = viper.ConfigFileUsed() != "" && viper.Get("alerts") != ""
 
+	// if options is "help" print storage options help and exit
+	if optionsQuery == "help" {
+		fmt.Println("Storage options:\n")
+		fmt.Println(sqlite.Storage{}.Help())
+		fmt.Println(memory.Storage{}.Help())
+		fmt.Println(mongo.Storage{}.Help())
+
+		fmt.Println(`
+Examples:
+	--options=db-dirname=/data
+	--options=retention=6h&granularity=30s`)
+
+		return nil
+	}
+
 	// Create and init the storage
 	switch backendQuery {
 	case "sqlite":
