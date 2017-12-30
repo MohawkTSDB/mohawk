@@ -283,13 +283,6 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 				Avg:     sum / float64(samples),
 				Sum:     sum,
 			})
-		} else {
-			count++
-			res = append(res, storage.StatItem{
-				Start: startTimestamp,
-				End:   startTimestamp + stepMillisec,
-				Empty: true,
-			})
 		}
 	}
 
