@@ -186,7 +186,14 @@ func (r Storage) GetRawData(tenant string, id string, end int64, start int64, li
 }
 
 func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
-	var t int64
+	var samples int64
+	var startT int64
+	var endT int64
+	var min float64
+	var max float64
+	var avg float64
+	var sum float64
+
 	count := int64(0)
 	res := make([]storage.StatItem, 0)
 	db, _ := r.GetTenant(tenant)
@@ -207,37 +214,18 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 		from '%s'
 		where timestamp >= %d and timestamp < %d
 		group by start
-		order by start DESC`,
-		timeStep, timeStep, id, startTime, endTime)
+		order by start %s`,
+		timeStep, timeStep, id, startTime, endTime, order)
 	rows, err := db.Query(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 	}
 	defer rows.Close()
-	t = endTime
-	for rows.Next() && count < limit {
-		var samples int64
-		var startT int64
-		var endT int64
-		var min float64
-		var max float64
-		var avg float64
-		var sum float64
 
+	for rows.Next() && count < limit {
 		err = rows.Scan(&samples, &startT, &endT, &min, &max, &avg, &sum)
 		if err != nil {
 			log.Printf("%q\n", err)
-		}
-
-		// append missing
-		for t >= (endT+timeStep) && count < limit {
-			count++
-			res = append(res, storage.StatItem{
-				Start: t,
-				End:   t + timeStep,
-				Empty: true,
-			})
-			t -= timeStep
 		}
 
 		// add data
@@ -252,30 +240,10 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 			Avg:     avg,
 			Sum:     sum,
 		})
-		t -= timeStep
 	}
 	err = rows.Err()
 	if err != nil {
 		log.Printf("%q\n", err)
-	}
-
-	// append missing
-	for t >= (startTime+timeStep) && count < limit {
-		count++
-		res = append(res, storage.StatItem{
-			Start: t,
-			End:   t + timeStep,
-			Empty: true,
-		})
-		t -= timeStep
-	}
-
-	// order
-	if order == "ASC" {
-		for i := 0; i < len(res)/2; i++ {
-			j := len(res) - i - 1
-			res[i], res[j] = res[j], res[i]
-		}
 	}
 
 	return res
