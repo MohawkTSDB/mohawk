@@ -30,8 +30,15 @@ type Storage struct {
 // Storage functions
 // Required by storage interface
 
+// Help return a human readable storage name
 func (r Storage) Name() string {
 	return "Storage-Example"
+}
+
+// Help return a human readable storage help message
+func (r Storage) Help() string {
+	return `Example storage [example]: no options defined.
+`
 }
 
 func (r *Storage) Open(options url.Values) {

@@ -183,7 +183,6 @@ func baseTime(t int) int64 {
 func parseSec(t string) (int64, error) {
 	var err error
 	var i int
-	outSec := int64(0)
 
 	// check for simple int
 	if i, err = strconv.Atoi(t); err == nil {
@@ -208,8 +207,7 @@ func parseSec(t string) (int64, error) {
 	// check for s, h and d
 	switch t[len(t)-1:] {
 	case "s":
-		// if this is the "s" from "ms" then outSec != nil
-		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil && outSec == 0 {
+		if i, err = strconv.Atoi(t[:len(t)-1]); err == nil {
 			return baseTime(i), nil
 		}
 	case "h":

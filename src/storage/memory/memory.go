@@ -51,20 +51,47 @@ type Storage struct {
 // Storage functions
 // Required by storage interface
 
+// Name return a human readable storage name
 func (r Storage) Name() string {
 	return "Storage-Memory"
 }
 
+// Help return a human readable storage help message
+func (r Storage) Help() string {
+	return `Memory storage [memory]:
+	granularity - (optional) samples max granularity (default "30s").
+	retention   - (optional) samples max retention (default "1d").
+`
+}
+
 func (r *Storage) Open(options url.Values) {
+	granularity := int64(30)
+	retention := int64(24 * 60 * 60)
+
+	// check for user options
+	granularityStr := options.Get("granularity")
+	if granularityStr != "" {
+		granularity = storage.ParseSec(granularityStr)
+	}
+	retentionStr := options.Get("retention")
+	if retentionStr != "" {
+		retention = storage.ParseSec(retentionStr)
+	}
+
 	// set last entry time
 	r.timeLastSec = 0
 	// set time granularity to 30 sec
-	r.timeGranularitySec = 30
+	r.timeGranularitySec = granularity
 	// set time retention to 7 days
-	r.timeRetentionSec = 7 * 24 * 60 * 60
+	r.timeRetentionSec = retention
 
 	// open db connection
 	r.tenant = make(map[string]*Tenant, 0)
+
+	// log init arguments
+	log.Printf("Start memory storage:")
+	log.Printf("  granularity: %ds", r.timeGranularitySec)
+	log.Printf("  retention: %ds", r.timeRetentionSec)
 
 	// start a maintenance worker that will clean the db periodically
 	go r.maintenance()

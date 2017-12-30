@@ -69,7 +69,7 @@ func init() {
 	RootCmd.Flags().String("media", "./mohawk-webui", "path to media files")
 	RootCmd.Flags().String("key", defaultTLSKey, "path to TLS key file")
 	RootCmd.Flags().String("cert", defaultTLSCert, "path to TLS cert file")
-	RootCmd.Flags().String("options", "", "specific storage options [e.g. db-dirname, db-url]")
+	RootCmd.Flags().String("options", "", "specific storage options, use \"--options=help\" for help")
 	RootCmd.Flags().IntP("port", "p", 8080, "server port")
 	RootCmd.Flags().BoolP("tls", "t", false, "use TLS server")
 	RootCmd.Flags().BoolP("gzip", "g", false, "use gzip encoding")

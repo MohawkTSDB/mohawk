@@ -58,6 +58,7 @@ type StatItem struct {
 // Storage metric data interface
 type Storage interface {
 	Name() string
+	Help() string
 	Open(options url.Values)
 	GetTenants() []Tenant
 	GetItemList(tenant string, tags map[string]string) []Item

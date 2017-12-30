@@ -38,8 +38,16 @@ type Storage struct {
 // Storage functions
 // Required by storage interface
 
+// Name return a human readable storage name
 func (r Storage) Name() string {
 	return "Storage-Sqlite3"
+}
+
+// Help return a human readable storage help message
+func (r Storage) Help() string {
+	return `Mongo storage [mongo]:
+	db-dirname - a directory for sqlite db file storage.
+`
 }
 
 func (r *Storage) Open(options url.Values) {
@@ -50,6 +58,10 @@ func (r *Storage) Open(options url.Values) {
 	}
 
 	r.tenant = make(map[string]*sql.DB)
+
+	// log init arguments
+	log.Printf("Start sqlite storage:")
+	log.Printf("  db dirname: %+v", r.dbDirName)
 }
 
 func (r Storage) GetTenants() []storage.Tenant {
