@@ -41,6 +41,7 @@ func (r Storage) Help() string {
 `
 }
 
+// Open storage
 func (r *Storage) Open(options url.Values) {
 	// open db connection
 }
