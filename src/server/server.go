@@ -57,6 +57,17 @@ func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
 	fmt.Fprintln(w, res)
 }
 
+func printOptionsHelp() {
+	fmt.Println("Storage options:")
+	fmt.Println(sqlite.Storage{}.Help())
+	fmt.Println(memory.Storage{}.Help())
+	fmt.Println(mongo.Storage{}.Help())
+
+	fmt.Println(`Examples:
+--options=db-dirname=/data
+--options=retention=6h&granularity=30s`)
+}
+
 // Serve run the REST API server
 func Serve() error {
 	var db storage.Storage
@@ -68,13 +79,10 @@ func Serve() error {
 	var optionsQuery = viper.GetString("options")
 	var verbose = viper.GetBool("verbose")
 	var media = viper.GetString("media")
-	var tls = viper.GetBool("tls")
 	var gzip = viper.GetBool("gzip")
 	var bearerAuth = viper.GetString("bearer-auth")
 	var basicAuth = viper.GetString("basic-auth")
 	var port = viper.GetInt("port")
-	var cert = viper.GetString("cert")
-	var key = viper.GetString("key")
 	var alertsInterval = viper.GetInt("alerts-interval")
 	var alertsServerURL = viper.GetString("alerts-server")
 	var alertsServerMethod = viper.GetString("alerts-server-method")
@@ -83,16 +91,7 @@ func Serve() error {
 
 	// if options is "help" print storage options help and exit
 	if optionsQuery == "help" {
-		fmt.Println("Storage options:\n")
-		fmt.Println(sqlite.Storage{}.Help())
-		fmt.Println(memory.Storage{}.Help())
-		fmt.Println(mongo.Storage{}.Help())
-
-		fmt.Println(`
-Examples:
-	--options=db-dirname=/data
-	--options=retention=6h&granularity=30s`)
-
+		printOptionsHelp()
 		return nil
 	}
 
@@ -264,6 +263,16 @@ Examples:
 
 	// concat middlewars and routes (first logger until rRoot) with a fallback to BadRequest
 	core := middleware.Append(routers, decorators...)
+
+	// start serving http/s requests
+	return RunServer(core, port)
+}
+
+// RunServer run the http/s server
+func RunServer(core http.HandlerFunc, port int) error {
+	var tls = viper.GetBool("tls")
+	var cert = viper.GetString("cert")
+	var key = viper.GetString("key")
 
 	// Run the server
 	srv := &http.Server{
