@@ -46,14 +46,17 @@ func (r Storage) Name() string {
 // Help return a human readable storage help message
 func (r Storage) Help() string {
 	return `Mongo storage [mongo]:
-	db-dirname - a directory for sqlite db file storage.`
+	db-dirname - a directory for sqlite db file storage.
+	Examples:
+		--options=db-dirname=/data`
 }
 
+// Open storage
 func (r *Storage) Open(options url.Values) {
 	// get storage options
 	r.dbDirName = options.Get("db-dirname")
 	if r.dbDirName == "" {
-		r.dbDirName = "./"
+		r.dbDirName = "."
 	}
 
 	r.tenant = make(map[string]*sql.DB)

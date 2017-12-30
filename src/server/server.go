@@ -62,10 +62,6 @@ func printOptionsHelp() {
 	fmt.Println(sqlite.Storage{}.Help())
 	fmt.Println(memory.Storage{}.Help())
 	fmt.Println(mongo.Storage{}.Help())
-
-	fmt.Println(`Examples:
---options=db-dirname=/data
---options=retention=6h&granularity=30s`)
 }
 
 // Serve run the REST API server

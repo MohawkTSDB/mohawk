@@ -60,9 +60,12 @@ func (r Storage) Name() string {
 func (r Storage) Help() string {
 	return `Memory storage [memory]:
 	granularity - (optional) samples max granularity (default "30s").
-	retention   - (optional) samples max retention (default "1d").`
+	retention   - (optional) samples max retention (default "1d").
+	Examples:
+		--options=retention=6h&granularity=30s`
 }
 
+// Open storage
 func (r *Storage) Open(options url.Values) {
 	granularity := int64(30)
 	retention := int64(24 * 60 * 60)
