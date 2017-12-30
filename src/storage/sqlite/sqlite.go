@@ -46,8 +46,7 @@ func (r Storage) Name() string {
 // Help return a human readable storage help message
 func (r Storage) Help() string {
 	return `Mongo storage [mongo]:
-	db-dirname - a directory for sqlite db file storage.
-`
+	db-dirname - a directory for sqlite db file storage.`
 }
 
 func (r *Storage) Open(options url.Values) {
