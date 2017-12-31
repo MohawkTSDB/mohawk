@@ -124,6 +124,7 @@ func parseTimespanStrings(e string, s string, b string) (int64, int64, int64, er
 	if e == "" {
 		end = int64(time.Now().UTC().Unix()) * 1000
 	} else if i, err = parseSec(e); err == nil {
+		// end is in ms, multiply by 1e3
 		end = i * 1000
 	} else {
 		return 0, 0, 0, err
@@ -131,6 +132,7 @@ func parseTimespanStrings(e string, s string, b string) (int64, int64, int64, er
 
 	if s == "" {
 		i, _ := parseSec(defaultStartTime)
+		// start is in ms, multiply by 1e3
 		start = i * 1000
 	} else if i, err = parseSec(s); err == nil {
 		start = i * 1000
@@ -141,7 +143,8 @@ func parseTimespanStrings(e string, s string, b string) (int64, int64, int64, er
 	if b == "" {
 		bucketDuration = int64(0)
 	} else if i, err = parseSec(b); err == nil {
-		bucketDuration = i * 1000
+		// bucketDuration is in sec [ we do not multiply by 1e3 ]
+		bucketDuration = i
 	} else {
 		return 0, 0, 0, err
 	}
