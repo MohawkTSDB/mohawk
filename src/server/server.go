@@ -50,11 +50,18 @@ var BackendName string
 
 // GetStatus return a json status struct
 func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkBackend":"%s"}`
+	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkStorage":"%s"}`
 	res := fmt.Sprintf(resTemplate, defaultAPI, VER, BackendName)
 
 	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
+}
+
+// OptionsResponse return a response for OPTIONS request
+func OptionsResponse(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	w.Header().Set("Allow", "GET,PUT,POST,DELETE,OPTIONS")
+
+	w.WriteHeader(200)
 }
 
 func printOptionsHelp() {
@@ -158,6 +165,7 @@ func Serve() error {
 		Prefix: "/hawkular/metrics/m/",
 	}
 	rM.Add("POST", "stats/query", h.PostMQuery)
+	rM.Add("OPTIONS", "stats/query", OptionsResponse)
 
 	// Metrics Routing tables
 	rGauges := router.Router{
@@ -171,6 +179,7 @@ func Serve() error {
 	rGauges.Add("PUT", ":id/tags", h.PutTags)
 	rGauges.Add("DELETE", ":id/raw", h.DeleteData)
 	rGauges.Add("DELETE", ":id/tags/:tags", h.DeleteTags)
+	rGauges.Add("OPTIONS", "raw/query", OptionsResponse)
 
 	// deprecated
 	rGauges.Add("GET", ":id/data", h.GetData)
