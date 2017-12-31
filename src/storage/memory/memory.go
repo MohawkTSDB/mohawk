@@ -302,8 +302,11 @@ func (r *Storage) PostRawData(tenant string, id string, t int64, v float64) bool
 	r.checkID(tenant, id)
 
 	// update time value pair to the time serias
+	// unless slot already have valid value
 	p := r.getPosForTimestamp(t)
-	r.tenant[tenant].ts[id].data[p] = TimeValuePair{timeStamp: t, value: v}
+	if r.tenant[tenant].ts[id].data[p].timeStamp < (t - r.timeGranularitySec*1000) {
+		r.tenant[tenant].ts[id].data[p] = TimeValuePair{timeStamp: t, value: v}
+	}
 
 	// update last value
 	if r.tenant[tenant].ts[id].lastValue.timeStamp < t {

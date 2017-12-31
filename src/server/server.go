@@ -179,12 +179,20 @@ func Serve() error {
 	rGauges.Add("PUT", ":id/tags", h.PutTags)
 	rGauges.Add("DELETE", ":id/raw", h.DeleteData)
 	rGauges.Add("DELETE", ":id/tags/:tags", h.DeleteTags)
+
+	rGauges.Add("OPTIONS", ":id/raw", OptionsResponse)
+	rGauges.Add("OPTIONS", ":id/stats", OptionsResponse)
+	rGauges.Add("OPTIONS", "raw", OptionsResponse)
 	rGauges.Add("OPTIONS", "raw/query", OptionsResponse)
 
 	// deprecated
 	rGauges.Add("GET", ":id/data", h.GetData)
 	rGauges.Add("POST", "data", h.PostData)
 	rGauges.Add("POST", "stats/query", h.PostQuery)
+
+	rGauges.Add("OPTIONS", ":id/data", OptionsResponse)
+	rGauges.Add("OPTIONS", "data", OptionsResponse)
+	rGauges.Add("OPTIONS", "stats/query", OptionsResponse)
 
 	rCounters := router.Router{
 		Prefix: "/hawkular/metrics/counters/",
