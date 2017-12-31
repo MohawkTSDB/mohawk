@@ -50,7 +50,7 @@ var BackendName string
 
 // GetStatus return a json status struct
 func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
-	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkBackend":"%s"}`
+	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkStorage":"%s"}`
 	res := fmt.Sprintf(resTemplate, defaultAPI, VER, BackendName)
 
 	w.WriteHeader(200)
