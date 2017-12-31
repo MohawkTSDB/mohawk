@@ -36,13 +36,13 @@ var defaultStartTime = "-8h"
 
 // json struct used to query data by the POST http request
 type dataQuery struct {
-	IDs            []string          `json:"ids"`
-	Tags           map[string]string `json:"tags"`
-	End            interface{}       `json:"end"`
-	Start          interface{}       `json:"start"`
-	BucketDuration interface{}       `json:"bucketDuration"`
-	Limit          json.Number       `json:"limit"`
-	Order          string            `json:"order"`
+	IDs            []string    `json:"ids"`
+	Tags           string      `json:"tags"`
+	End            interface{} `json:"end"`
+	Start          interface{} `json:"start"`
+	BucketDuration interface{} `json:"bucketDuration"`
+	Limit          json.Number `json:"limit"`
+	Order          string      `json:"order"`
 }
 
 // json struct used to parse post data http request

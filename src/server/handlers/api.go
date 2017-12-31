@@ -448,8 +448,8 @@ func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQu
 	}
 
 	// add ids from tags query
-	if len(u.Tags) != 0 {
-		res := h.Storage.GetItemList(tenant, u.Tags)
+	if u.Tags != "" {
+		res := h.Storage.GetItemList(tenant, parseTags(u.Tags))
 		for _, r := range res {
 			u.IDs = append(u.IDs, r.ID)
 		}
