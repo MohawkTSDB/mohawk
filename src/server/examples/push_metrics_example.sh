@@ -12,7 +12,7 @@ while true; do
   VAL=$(($RANDOM % 100))
   curl http://${MOHAWK_URL}/hawkular/metrics/gauges/raw \
        -H "Content-Type: application/json" \
-       -d "[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":\"$(date +%s%N | cut -b1-13)\",\"value\":\"${VAL}\"}]}]"
+       -d "[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$(date +%s)000,\"value\":${VAL}}]}]"
 
   # Wait 30 sec
   sleep ${SLEEP}

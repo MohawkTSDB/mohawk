@@ -33,10 +33,10 @@ import (
 const defaultLimit = 2000
 
 // const defaultOrder default REST API call query order
-const defaultOrder = "DESC"
+const defaultOrder = "ASC"
 
 // const secondaryOrder secondary REST API call query order
-const secondaryOrder = "ASC"
+const secondaryOrder = "DESC"
 
 // APIHhandler common variables to be used by all APIHhandler functions
 // 	version the version of the Hawkular server we are mocking
