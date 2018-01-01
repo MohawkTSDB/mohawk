@@ -230,7 +230,7 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 
 	// fill data out array
 	count := int64(0)
-	for b := pEnd; count < limit && b > pStart && startTimestamp >= stepMillisec; b -= pStep {
+	for b := pEnd; count < limit && b >= pStart && startTimestamp >= stepMillisec; b -= pStep {
 		samples := int64(0)
 		sum := float64(0)
 		first := float64(0)
