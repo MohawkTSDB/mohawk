@@ -44,6 +44,7 @@ type Storage struct {
 	timeGranularitySec int64
 	timeRetentionSec   int64
 	timeLastSec        int64
+	arraySize          int64
 
 	tenant map[string]*Tenant
 }
@@ -86,6 +87,8 @@ func (r *Storage) Open(options url.Values) {
 	r.timeGranularitySec = granularity
 	// set time retention to 7 days
 	r.timeRetentionSec = retention
+	// calculate array size
+	r.arraySize = r.timeRetentionSec / r.timeGranularitySec
 
 	// open db connection
 	r.tenant = make(map[string]*Tenant, 0)
@@ -141,25 +144,18 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
 	res := make([]storage.DataItem, 0)
 
-	arraySize := r.timeRetentionSec / r.timeGranularitySec
 	pStart := r.getPosForTimestamp(start)
 	pEnd := r.getPosForTimestamp(end)
-
-	// make sure start and end times is in the retention time
-	start, end = r.checkTimespan(start, end)
-
-	// sanity check pEnd
-	if pEnd <= pStart {
-		pEnd += arraySize
-	}
 
 	// check if tenant and id exists, create them if necessary
 	r.checkID(tenant, id)
 
 	// fill data out array
 	count := int64(0)
-	for i := pEnd; count < limit && i >= pStart; i-- {
-		d := r.tenant[tenant].ts[id].data[i%arraySize]
+	ts := r.tenant[tenant].ts[id]
+
+	for i := pStart; count < limit && i <= pEnd; i++ {
+		d := ts.data[i%r.arraySize]
 
 		// if this is a valid point
 		if d.timeStamp < end && d.timeStamp >= start {
@@ -172,7 +168,7 @@ func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, l
 	}
 
 	// order
-	if order == "ASC" {
+	if order == "DESC" {
 		for i := 0; i < len(res)/2; i++ {
 			j := len(res) - i - 1
 			res[i], res[j] = res[j], res[i]
@@ -182,66 +178,47 @@ func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
-func (r Storage) GetStatTimes(end int64, start int64, limit int64, bucketDuration int64) (int64, int64, int64, int64, int64, int64) {
-	// make sure start and end times is in the retention time
-	start, end = r.checkTimespan(start, end)
-
-	// bucketDuration can't be smaller then granularity
-	if bucketDuration < r.timeGranularitySec {
-		bucketDuration = r.timeGranularitySec
-	}
-	bucketDuration = r.timeGranularitySec * (bucketDuration / r.timeGranularitySec)
-
-	// start and tend must be integer multiplections of bucketDuration
-	bucketDurationMilli := bucketDuration * 1000
-	start = bucketDurationMilli * (start / bucketDurationMilli)
-	end = bucketDurationMilli * (1 + end/bucketDurationMilli)
-
-	arraySize := r.timeRetentionSec / r.timeGranularitySec
+func (r Storage) GetStatTimes(end int64, start int64, bucketDuration int64) (int64, int64, int64) {
 	pStep := bucketDuration / r.timeGranularitySec
 	pStart := r.getPosForTimestamp(start)
 	pEnd := r.getPosForTimestamp(end)
-
-	// sanity check pEnd
-	if pEnd <= pStart {
-		pEnd += arraySize
-	}
 
 	// sanity check step
 	if pStep < 1 {
 		pStep = 1
 	}
-	if pStep > (pEnd - pStart) {
-		pStep = pEnd - pStart
-	}
 
-	return end, start, pEnd, pStart, pStep, arraySize
+	return pEnd, pStart, pStep
 }
 
 func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
-	res := make([]storage.StatItem, 0)
-	end, start, pEnd, pStart, pStep, arraySize := r.GetStatTimes(end, start, limit, bucketDuration)
+	var samples int64
+	var sum float64
+	var first float64
+	var last float64
+	var min float64
+	var max float64
 
-	startTimestamp := end
-	stepMillisec := pStep * r.timeGranularitySec * 1000
+	res := make([]storage.StatItem, 0)
+	pEnd, pStart, pStep := r.GetStatTimes(end, start, bucketDuration)
 
 	// check if tenant and id exists, create them if necessary
 	r.checkID(tenant, id)
 
 	// fill data out array
 	count := int64(0)
-	for b := pEnd; count < limit && b >= pStart && startTimestamp >= stepMillisec; b -= pStep {
-		samples := int64(0)
-		sum := float64(0)
-		first := float64(0)
-		last := float64(0)
-		min := float64(0)
-		max := float64(0)
+	ts := r.tenant[tenant].ts[id]
+	stepMili := r.timeGranularitySec * 1000
+
+	for b := pStart; count < limit && b <= pEnd; b = b + pStep {
+		samples = 0
+		sum = 0
 
 		// loop on all points in bucket
-		for i := (b - pStep); i < b; i++ {
-			d := r.tenant[tenant].ts[id].data[i%arraySize]
-			if d.timeStamp <= end && d.timeStamp > start {
+		for i := b; i < (b + pStep); i++ {
+			d := ts.data[i%r.arraySize]
+
+			if d.timeStamp <= end && d.timeStamp >= start {
 				samples++
 
 				// calculate bucket stat values
@@ -261,19 +238,17 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 				}
 
 				last = d.value
-				sum += d.value
+				sum = sum + d.value
 			}
 		}
 
 		// all points are valid
-		startTimestamp -= stepMillisec
-		count++
-
-		// all points are valid
 		if samples > 0 {
+			count++
+
 			res = append(res, storage.StatItem{
-				Start:   startTimestamp,
-				End:     startTimestamp + stepMillisec,
+				Start:   start + (b-pStart)*stepMili,
+				End:     start + (b-pStart+pStep)*stepMili,
 				Empty:   false,
 				Samples: samples,
 				First:   first,
@@ -287,7 +262,7 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 	}
 
 	// order
-	if order == "ASC" {
+	if order == "DESC" {
 		for i := 0; i < len(res)/2; i++ {
 			j := len(res) - i - 1
 			res[i], res[j] = res[j], res[i]
@@ -304,8 +279,8 @@ func (r *Storage) PostRawData(tenant string, id string, t int64, v float64) bool
 	// update time value pair to the time serias
 	// unless slot already have valid value
 	p := r.getPosForTimestamp(t)
-	if r.tenant[tenant].ts[id].data[p].timeStamp < (t - r.timeGranularitySec*1000) {
-		r.tenant[tenant].ts[id].data[p] = TimeValuePair{timeStamp: t, value: v}
+	if r.tenant[tenant].ts[id].data[p%r.arraySize].timeStamp < (t - r.timeGranularitySec*1000) {
+		r.tenant[tenant].ts[id].data[p%r.arraySize] = TimeValuePair{timeStamp: t, value: v}
 	}
 
 	// update last value
@@ -348,26 +323,8 @@ func (r *Storage) DeleteTags(tenant string, id string, tags []string) bool {
 // Helper functions
 // Not required by storage interface
 
-func (r *Storage) checkTimespan(start int64, end int64) (int64, int64) {
-	memFirstTime := (r.timeLastSec - r.timeRetentionSec) * 1000
-	memLastTime := r.timeLastSec * 1000
-
-	// make sure start and end times is in the retention time
-	if start < memFirstTime {
-		start = memFirstTime
-	}
-	if end > memLastTime {
-		end = memLastTime + 1
-	}
-
-	return start, end
-}
-
 func (r *Storage) getPosForTimestamp(timestamp int64) int64 {
-	arraySize := r.timeRetentionSec / r.timeGranularitySec
-	arrayPos := timestamp / 1000 / r.timeGranularitySec
-
-	return arrayPos % arraySize
+	return timestamp / 1000 / r.timeGranularitySec
 }
 
 func (r *Storage) checkID(tenant string, id string) {
