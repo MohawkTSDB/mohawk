@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.30.4
+Version:        0.30.8
 Release:        1%{?dist}
 Summary:        Time series metric data storage
 License:        Apache
@@ -47,7 +47,7 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %{_bindir}/mohawk
 
 %changelog
-* Wed Dec 31 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.30.4-1
+* Wed Dec 31 2017 Yaacov Zamir <kobi.zamir@gmail.com> 0.30.8-1
 - Add options response
 - Fix query by tags
 
