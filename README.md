@@ -171,4 +171,4 @@ curl -ks -H "Content-Encoding: gzip" -X PUT "https://localhost:8443/hawkular/met
 
 #### Issues? Questions?
 
-[Github Project](https://github.com/MohawkTSDB) / [Mohawk TSDB](https://mohawktsdb.github.io) / [Slack Channel](https://mohawktsdb.slack.com)
+[Github Project](https://github.com/MohawkTSDB) / [Mohawk TSDB](https://mohawktsdb.github.io)
