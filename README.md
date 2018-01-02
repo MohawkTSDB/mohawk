@@ -148,7 +148,7 @@ curl -ks https://localhost:8443/hawkular/metrics/gauges/machine%2Fexample.com%2F
 ```
 # set tags
 curl -ks -X PUT https://localhost:8443/hawkular/metrics/gauges/tags \
-     -d "[{\"id\":\"machine/example.com/test\", \"tags\":{\"type\": \"node\", \"hostname\": \"example.com\"}}]"
+     -d "[{\"id\":\"machine/example.com/test\",\"tags\":{\"type\":\"node\",\"hostname\":\"example.com\"}}]"
 
 # look for metrics by tag value (using a regexp)
 curl -ks https://localhost:8443/hawkular/metrics/metrics?tags=hostname:.*\.com
