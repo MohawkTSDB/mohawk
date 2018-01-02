@@ -138,22 +138,36 @@ curl -ks https://localhost:8443/hawkular/metrics/status
 curl -ks https://localhost:8443/hawkular/metrics/metrics
 
 # post some data (timestamp is in ms)
-curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw -d "[{\"id\":\"machine/example.com/test\", \"data\":[{\"timestamp\": 1492434911769, \"value\": 42}]}]"
+curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw \
+     -d "[{\"id\":\"machine/example.com/test\", \"data\":[{\"timestamp\": 1492434911769, \"value\": 42}]}]"
 
 # read some data (variables can be start, end and bucketDuration)
 curl -ks https://localhost:8443/hawkular/metrics/gauges/machine%2Fexample.com%2Ftest/raw?start=1492434911760
-
+```
+#### Tags
+```
 # set tags
-curl -ks -X PUT https://localhost:8443/hawkular/metrics/gauges/tags -d "[{\"id\":\"machine/example.com/test\", \"tags\":{\"type\": \"node\", \"hostname\": \"example.com\"}}]"
+curl -ks -X PUT https://localhost:8443/hawkular/metrics/gauges/tags \
+     -d "[{\"id\":\"machine/example.com/test\", \"tags\":{\"type\": \"node\", \"hostname\": \"example.com\"}}]"
 
 # look for metrics by tag value (using a regexp)
 curl -ks https://localhost:8443/hawkular/metrics/metrics?tags=hostname:.*\.com
+```
+#### Search
+```
+# read multiple data points using an ids list
+curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query \
+     -d "{\"ids\": [\"machine/example.com/test\"], \"start\": 1492434811769, \"end\": 1492435911769}"
 
-# read multiple data points
-curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query -d "{\"ids\": [\"machine/example.com/test\"], \"start\": 1492434811769, \"end\": 1492435911769}"
-
-# read multiple data points with aggregation statistics
-curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query -d "{\"ids\": [\"machine/example.com/test\"], \"start\": 1492434811769, \"end\": 1492435911769, \"bucketDuration\": \"1000s\"}"
+# read multiple data points using a regexp search on tags
+curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query \
+     -d "{\"tags\": [\".*test|.*machine\"], \"start\": 1492434811769, \"end\": 1492435911769}"
+```
+#### Aggregation
+```
+# using relative start time, and aggregation time of 2mn
+curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query \
+     -d "{\"ids\": [\"machine/example.com/test\"], \"start\":  \"-6h\", \"bucketDuration\": \"2mn\"}"
 ```
 
 #### Data encoding, using gzip data encoding
@@ -165,7 +179,8 @@ curl -ks -H "Accept-Encoding: gzip" https://localhost:8443/hawkular/metrics/metr
 
 ```
 # sendig gziped data file with curl's --data-binary flag
-curl -ks -H "Content-Encoding: gzip" -X PUT "https://localhost:8443/hawkular/metrics/gauges/tags" --data-binary @tags.json.gz
+curl -ks -H "Content-Encoding: gzip" -X PUT "https://localhost:8443/hawkular/metrics/gauges/tags" \
+     --data-binary @tags.json.gz
 ```
 
 
