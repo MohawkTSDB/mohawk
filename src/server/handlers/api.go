@@ -30,7 +30,7 @@ import (
 )
 
 // const defaultLimit default REST API call query limit
-const defaultLimit = 2000
+const defaultLimit = 20000
 
 // const defaultOrder default REST API call query order
 const defaultOrder = "ASC"
