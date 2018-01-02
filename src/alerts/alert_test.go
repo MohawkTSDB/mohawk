@@ -17,26 +17,26 @@ func initTestEnv() (*memory.Storage, []*Alert, AlertRules) {
 		{
 			ID:                "cpu usage too high",
 			Tenant:            "_ops",
-			Metric:            "cpu_usage",
+			Metrics:           []string{"cpu_usage"},
 			AlertIfHigherThan: createFloatPtr(0.9),
 		},
 		{
 			ID:               "free memory too low ",
 			Tenant:           "_ops",
-			Metric:           "free_memory",
+			Metrics:          []string{"free_memory"},
 			AlertIfLowerThan: createFloatPtr(2000),
 		},
 		{
 			ID:                "free memory in between ",
 			Tenant:            "_ops",
-			Metric:            "free_memory",
+			Metrics:           []string{"free_memory"},
 			AlertIfLowerThan:  createFloatPtr(1000),
 			AlertIfHigherThan: createFloatPtr(9000),
 		},
 		{
 			ID:                "free memory in too high ",
 			Tenant:            "_ops",
-			Metric:            "free_memory",
+			Metrics:           []string{"free_memory"},
 			AlertIfHigherThan: createFloatPtr(4000),
 		},
 	}
@@ -66,7 +66,7 @@ func TestAlertsInit1(test *testing.T) {
 
 	// Create some fake data
 	// Firing alert 1
-	t := int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
+	t := int64(time.Now().UTC().Unix()*1000) - int64(2*60*1000)
 	v := float64(1500)
 	b.PostRawData("_ops", "free_memory", t, v)
 
@@ -84,7 +84,7 @@ func TestAlertsInit2(test *testing.T) {
 
 	// Create some more fake data
 	// firing alerts 1 and 2
-	t := int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
+	t := int64(time.Now().UTC().Unix()*1000) - int64(2*60*1000)
 	v := float64(500)
 	b.PostRawData("_ops", "free_memory", t, v)
 
@@ -102,7 +102,7 @@ func TestAlertsInit3(test *testing.T) {
 
 	// Create some more fake data
 	// firing none
-	t := int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
+	t := int64(time.Now().UTC().Unix()*1000) - int64(2*60*1000)
 	v := float64(2500)
 	b.PostRawData("_ops", "free_memory", t, v)
 
@@ -120,7 +120,7 @@ func TestAlertsInit4(test *testing.T) {
 
 	// Create some more fake data
 	// firing alert 3
-	t := int64(time.Now().UTC().Unix()*1000) - int64(30*60*1000)
+	t := int64(time.Now().UTC().Unix()*1000) - int64(2*60*1000)
 	v := float64(5000)
 	b.PostRawData("_ops", "free_memory", t, v)
 

@@ -2,9 +2,13 @@ backend: "memory"
 port: 8080
 alerts:
 - id: "free_memory is low or high"
-  metric: "free_memory"
+  annotations:
+    name: "low or high"
+  metrics:
+  - "free_memory"
+  - "cpu_usage"
   alert-if-lower-than: 2000
   alert-if-higher-than: 8000
-- id: "free_memory is extremly low"
-  metric: "free_memory"
+- id: "a metric taged with hostname ending with .com is extremly low"
+  tags: "hostname:.*.com"
   alert-if-lower-than: 500

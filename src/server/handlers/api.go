@@ -133,7 +133,7 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 
 	// get a list of gauges
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
-		tags := parseTags(tagsStr[0])
+		tags := storage.ParseTags(tagsStr[0])
 		if !validTags(tags) {
 			badID(w, h.Verbose)
 			return
@@ -449,7 +449,7 @@ func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQu
 
 	// add ids from tags query
 	if u.Tags != "" {
-		res := h.Storage.GetItemList(tenant, parseTags(u.Tags))
+		res := h.Storage.GetItemList(tenant, storage.ParseTags(u.Tags))
 		for _, r := range res {
 			u.IDs = append(u.IDs, r.ID)
 		}

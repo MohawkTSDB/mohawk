@@ -32,13 +32,16 @@ type AlertType int
 
 // Alert defines one alert
 type Alert struct {
-	ID                string   `mapstructure:"id"`
-	Metric            string   `mapstructure:"metric"`
-	Tenant            string   `mapstructure:"tenant"`
-	AlertIfHigherThan *float64 `mapstructure:"alert-if-higher-than"`
-	AlertIfLowerThan  *float64 `mapstructure:"alert-if-lower-than"`
+	ID                string            `mapstructure:"id"`
+	Annotations       map[string]string `mapstructure:"annotations"`
+	Metrics           []string          `mapstructure:"metrics"`
+	Tags              string            `mapstructure:"tags"`
+	Tenant            string            `mapstructure:"tenant"`
+	AlertIfHigherThan *float64          `mapstructure:"alert-if-higher-than"`
+	AlertIfLowerThan  *float64          `mapstructure:"alert-if-lower-than"`
 	Type              AlertType
 	State             bool
+	TrigerMetric      string
 	TrigerValue       float64
 	TrigerTimestamp   int64
 }
@@ -64,10 +67,10 @@ const (
 
 // Alert
 
-// updateAlertState update the alert status
-func (alert *Alert) updateAlertState(value float64) {
+// alertState calculate the alert status
+func (alert *Alert) alertState(value float64) bool {
 	if alert.Type == undefined {
-		return
+		return false
 	}
 
 	// valid metric values are:
@@ -75,12 +78,14 @@ func (alert *Alert) updateAlertState(value float64) {
 	//    values outside this range will triger an alert
 	switch alert.Type {
 	case outside:
-		alert.State = value < *alert.AlertIfLowerThan || value >= *alert.AlertIfHigherThan
+		return value < *alert.AlertIfLowerThan || value >= *alert.AlertIfHigherThan
 	case higherThan:
-		alert.State = value >= *alert.AlertIfHigherThan
+		return value >= *alert.AlertIfHigherThan
 	case lowerThan:
-		alert.State = value < *alert.AlertIfLowerThan
+		return value < *alert.AlertIfLowerThan
 	}
+
+	return false
 }
 
 // AlertRules
@@ -128,40 +133,70 @@ func (a *AlertRules) run() {
 func (a *AlertRules) checkAlerts() {
 	var end int64
 	var start int64
+	var limit int64
 	var tenant string
-	var metric string
 	var oldState bool
+	var newState bool
 
-	// check only for current data
+	// check last 15 minutes
 	end = int64(time.Now().UTC().Unix() * 1000)
-	start = end - 60*60*1000
+	start = end - 5*60*1000
+	limit = 5 * 2
 
 	for _, alert := range a.Alerts {
 		// check out values for the alert metric
 		tenant = alert.Tenant
-		metric = alert.Metric
-		rawData := a.Storage.GetRawData(tenant, metric, end, start, 1, "DESC")
+		oldState = alert.State
+		newState = false
 
-		// if we have new data check for alert status change
-		// [ if no new data found, leave alert status un changed ]
-		if len(rawData) > 0 {
-			oldState = alert.State
+		// copy the metrics we need to check for this alert
+		metrics := make([]string, len(alert.Metrics))
+		copy(metrics, alert.Metrics)
 
-			// update alert state and report to user if changed.
-			alert.updateAlertState(rawData[0].Value)
-			if alert.State != oldState {
-				// set triger values
-				alert.TrigerValue = rawData[0].Value
-				alert.TrigerTimestamp = rawData[0].Timestamp
+		// add metrics from tags query
+		if alert.Tags != "" {
+			res := a.Storage.GetItemList(tenant, storage.ParseTags(alert.Tags))
+			for _, r := range res {
+				metrics = append(metrics, r.ID)
+			}
+		}
 
-				if b, err := json.Marshal(alert); err == nil {
-					s := string(b)
-					a.post(s)
+		for _, metric := range metrics {
+			rawData := a.Storage.GetRawData(tenant, metric, end, start, limit, "DESC")
 
-					// log alert status change
-					if a.Verbose {
-						log.Println(s)
-					}
+			// if we have new data check for alert status change
+			// [ if no new data found, leave alert status un changed ]
+			if len(rawData) > 0 {
+
+				// update alert state and report to user if changed.
+				newState = alert.alertState(rawData[0].Value)
+
+				// if new state is true, remember the metrics
+				if newState {
+					// set triger values
+					alert.TrigerMetric = metric
+					alert.TrigerValue = rawData[0].Value
+					alert.TrigerTimestamp = rawData[0].Timestamp
+
+					// if this alert is on, just exit
+					break
+				}
+			}
+		}
+
+		// if alert state changed, update state and triger event
+		if newState != oldState {
+			// update alert state
+			alert.State = newState
+
+			// triger event
+			if b, err := json.Marshal(alert); err == nil {
+				s := string(b)
+				a.post(s)
+
+				// log alert status change
+				if a.Verbose {
+					log.Println(s)
 				}
 			}
 		}
