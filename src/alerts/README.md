@@ -38,8 +38,8 @@ $ curl http://localhost:8080/hawkular/metrics/gauges/raw -d "[{\"id\":\"free_mem
 ## Configuring Alerts
 
 Alerting Configuration is done using the config.yaml file.
-Using the alerts key, we set a list of alerts, each alert has a unique name, metric id and a valid range for that metric.
-If a metric value change from being valid to not valid or from not valid to valid, an error status change is triggered and sent to allert buffer.
+Using the alerts key, we set a list of alerts, each alert has a unique name, list of metric ids ( or tags search string ) and a valid range for that metrics.
+If a metric value change from being valid to not valid or from not valid to valid, an alert status change is triggered and sent to allert buffer.
 
 For example:
 
