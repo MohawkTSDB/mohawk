@@ -19,6 +19,7 @@ package storage
 import (
 	"log"
 	"strconv"
+	"strings"
 )
 
 // FilterItems filters a list using a filter function
@@ -72,4 +73,20 @@ func ParseSec(t string) int64 {
 	log.Fatal("Can't parse time ", t)
 
 	return 0
+}
+
+// ParseTags takes a comma separeted key:value list string and returns a map[string]string
+// 	e.g.
+// 	"warm:kitty,soft:kitty" => {"warm": "kitty", "soft": "kitty"}
+func ParseTags(tags string) map[string]string {
+	vsf := make(map[string]string)
+
+	tagsList := strings.Split(tags, ",")
+	for _, tag := range tagsList {
+		t := strings.Split(tag, ":")
+		if len(t) == 2 {
+			vsf[t[0]] = t[1]
+		}
+	}
+	return vsf
 }

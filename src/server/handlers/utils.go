@@ -24,7 +24,6 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -59,22 +58,6 @@ type postDataItems struct {
 type putTags struct {
 	ID   string            `json:"id"`
 	Tags map[string]string `json:"tags"`
-}
-
-// parseTags takes a comma separeted key:value list string and returns a map[string]string
-// 	e.g.
-// 	"warm:kitty,soft:kitty" => {"warm": "kitty", "soft": "kitty"}
-func parseTags(tags string) map[string]string {
-	vsf := make(map[string]string)
-
-	tagsList := strings.Split(tags, ",")
-	for _, tag := range tagsList {
-		t := strings.Split(tag, ":")
-		if len(t) == 2 {
-			vsf[t[0]] = t[1]
-		}
-	}
-	return vsf
 }
 
 func validStr(s string) bool {

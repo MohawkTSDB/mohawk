@@ -45,14 +45,21 @@ For example:
 
 ```yaml
 alerts:
-- id: "free_memory is lower then 1000 or higher then 8000"
-  metric: "free_memory"
+- id: "free_memory or cpu_usage are lower then 1000 or higher then 8000"
+  metrics:
+  - "free_memory"
+  - "cpu_usage"
   alert-if-lower-than: 1000
   alert-if-higher-than: 8000
 - id: "free_memory is lower then 500"
-  metric: "free_memory"
+  metrics:
+  - "free_memory"
   alert-if-lower-than: 500
 - id: "cpu_usage is above 95%"
-  metric: "cpu_usage"
+  metrics:
+  - "cpu_usage"
+  alert-if-higher-than: 95
+- id: "this alert use tags"
+  tags: "hostname:.*.com"
   alert-if-higher-than: 95
 ```
