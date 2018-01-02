@@ -1,4 +1,4 @@
-// Copyright 2016,2017 Yaacov Zamir <kobi.zamir@gmail.com>
+// Copyright 2016,2017,2018 Yaacov Zamir <kobi.zamir@gmail.com>
 // and other contributors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ import (
 )
 
 // VER the server version
-const VER = "0.30.8"
+const VER = "0.31.1"
 
 // defaults
 const defaultAPI = "0.21.0"
