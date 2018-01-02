@@ -161,7 +161,7 @@ curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query \
 
 # read multiple data points using a regexp search on tags
 curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw/query \
-     -d "{\"tags\": [\".*test|.*machine\"], \"start\": 1492434811769, \"end\": 1492435911769}"
+     -d "{\"tags\": \"name:.*test|.*machine\", \"start\": \"-12h\"}"
 ```
 #### Aggregation
 ```
