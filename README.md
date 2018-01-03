@@ -5,7 +5,7 @@
 
 ![Mohawk](/images/logo-128.png?raw=true "Mohawk Logo")
 
-[Mohawk](https://mohawktsdb.github.io/) is a metric data storage engine, it's fun, fast, light and easy to use.
+Mohawk is a metric data storage engine, it's fun, fast, light and easy to use.
 
 #### Table of contents
 
