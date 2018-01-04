@@ -63,6 +63,14 @@ curl -ks -X POST https://localhost:8443/hawkular/metrics/gauges/raw -d @data.jso
 
 This is a request to insert gauge data points for the com.acme tenant. If that tenant does not already exist, it will be request when storing the metric data. Specific details on inserting data can be found in Inserting Data.
 
+#### Query system tenant
+
+```
+curl -ks https://localhost:8443/hawkular/metrics/tenant
+```
+
+Query system tenants. 
+
 #### Tenant Header
 
 As previously stated all data is partitioned by tenant. Mohawk Metrics enforces this by allowing the Hawkular-Tenant HTTP header in requests. The value of the header is the tenant id. We saw this already with the implicit tenant creation.
