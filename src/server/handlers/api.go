@@ -134,7 +134,7 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
 		tags := storage.ParseTags(tagsStr[0])
 		if !validTags(tags) {
-			return apperrors.BadRequest(apperrors.BadMetricIDErr)
+			return apperrors.BadRequest(apperrors.ErrBadMetricID)
 		}
 		res = h.Storage.GetItemList(tenant, tags)
 	} else {
@@ -154,7 +154,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		return apperrors.BadRequest(apperrors.BadMetricIDErr)
+		return apperrors.BadRequest(apperrors.ErrBadMetricID)
 	}
 
 	// get data from the form arguments
@@ -201,7 +201,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		return apperrors.BadRequest(apperrors.BadMetricIDErr)
+		return apperrors.BadRequest(apperrors.ErrBadMetricID)
 	}
 
 	// get data from the form arguments
@@ -315,7 +315,7 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			return apperrors.BadRequest(apperrors.BadMetricIDErr)
+			return apperrors.BadRequest(apperrors.ErrBadMetricID)
 		}
 	}
 
@@ -350,7 +350,7 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) || !validTags(tags) {
-		return apperrors.BadRequest(apperrors.BadMetricIDErr)
+		return apperrors.BadRequest(apperrors.ErrBadMetricID)
 	}
 
 	// get tenant
@@ -374,7 +374,7 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			return apperrors.BadRequest(apperrors.BadMetricIDErr)
+			return apperrors.BadRequest(apperrors.ErrBadMetricID)
 		}
 	}
 
@@ -401,7 +401,7 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	id := argv["id"]
 	tagsStr := argv["tags"]
 	if !validStr(id) || !validStr(tagsStr) {
-		return apperrors.BadRequest(apperrors.BadMetricIDErr)
+		return apperrors.BadRequest(apperrors.ErrBadMetricID)
 	}
 	tags := strings.Split(tagsStr, ",")
 
@@ -429,7 +429,7 @@ func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQu
 	// get ids from explicit ids list
 	for _, id := range u.IDs {
 		if !validStr(id) {
-			return tenant, u, apperrors.BadRequest(apperrors.BadMetricIDErr)
+			return tenant, u, apperrors.BadRequest(apperrors.ErrBadMetricID)
 		}
 	}
 
