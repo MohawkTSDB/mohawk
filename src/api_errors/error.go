@@ -17,12 +17,13 @@
 package apiErrors
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
 
 // ErrBadMetricID a new error with bad metrics id message
-var ErrBadMetricID = fmt.Errorf("Bad metrics ID")
+var ErrBadMetricID = errors.New("Bad metrics ID")
 
 // Error represent an error that occurred and its status code.
 type Error struct {
