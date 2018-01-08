@@ -21,7 +21,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/MohawkTSDB/mohawk/src/api_errors"
+	"github.com/MohawkTSDB/mohawk/src/server/api_errors"
 )
 
 type route struct {

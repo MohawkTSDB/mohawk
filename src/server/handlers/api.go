@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	"github.com/MohawkTSDB/mohawk/src/alerts"
-	"github.com/MohawkTSDB/mohawk/src/api_errors"
+	"github.com/MohawkTSDB/mohawk/src/server/api_errors"
 	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
