@@ -21,7 +21,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/MohawkTSDB/mohawk/src/apperrors"
+	"github.com/MohawkTSDB/mohawk/src/api_errors"
 )
 
 type route struct {
@@ -43,7 +43,7 @@ func (r *Router) Add(method string, path string, handler func(http.ResponseWrite
 }
 
 func handleError(err error, w http.ResponseWriter) {
-	if mErr, ok := err.(apperrors.Error); ok {
+	if mErr, ok := err.(apiErrors.Error); ok {
 		mErr.JSON(w)
 		return
 	}
