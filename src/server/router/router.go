@@ -20,12 +20,14 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/MohawkTSDB/mohawk/src/apperrors"
 )
 
 type route struct {
 	method   string
 	segments []string
-	handler  func(http.ResponseWriter, *http.Request, map[string]string)
+	handler  func(http.ResponseWriter, *http.Request, map[string]string) error
 }
 
 // Router ah http request router
@@ -36,8 +38,17 @@ type Router struct {
 }
 
 // Add add a new route into the router routing table
-func (r *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request, map[string]string)) {
+func (r *Router) Add(method string, path string, handler func(http.ResponseWriter, *http.Request, map[string]string) error) {
 	r.Routes = append(r.Routes, route{method, strings.Split(path, "/"), handler})
+}
+
+func handleError(err error, w http.ResponseWriter) {
+	if mErr, ok := err.(apperrors.Error); ok {
+		mErr.JSON(w)
+		return
+	}
+	w.WriteHeader(500)
+	w.Write([]byte(http.StatusText(500)))
 }
 
 // match match a request to a route, and parse the arguments embedded in the route path
@@ -97,7 +108,9 @@ func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 		// if found a match, run the handler for this route
 		if found {
-			route.handler(writer, request, argv)
+			if err := route.handler(writer, request, argv); err != nil {
+				handleError(err, writer)
+			}
 			return
 		}
 	}

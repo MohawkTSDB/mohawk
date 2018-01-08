@@ -12,8 +12,9 @@ func TestAppendMiddleware(t *testing.T) {
 	myRoute := router.Router{
 		Prefix: "/hawkular/bla/",
 	}
-	myRoute.Add("GET", ":id/info", func(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+	myRoute.Add("GET", ":id/info", func(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 		fmt.Fprintf(w, "{\"msg\":\"got data\"")
+		return nil
 	})
 
 }

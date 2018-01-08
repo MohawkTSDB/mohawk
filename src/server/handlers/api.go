@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/MohawkTSDB/mohawk/src/alerts"
+	"github.com/MohawkTSDB/mohawk/src/apperrors"
 	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
@@ -48,40 +49,35 @@ type APIHhandler struct {
 }
 
 // GetAlertsStatus return a json alerts status struct
-func (h APIHhandler) GetAlertsStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) GetAlertsStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	if h.Alerts == nil {
-		w.WriteHeader(200)
 		fmt.Fprintln(w, `{"AlertsService":"UNAVAILABLE"}`)
-		return
+		return nil
 	}
 
 	resTemplate := `{"AlertsService":"STARTED","AlertsInterval":"%ds","Heartbeat":"%d","ServerURL":"%s"}`
 	res := fmt.Sprintf(resTemplate, h.Alerts.AlertsInterval, h.Alerts.Heartbeat, h.Alerts.ServerURL)
 
-	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
+	return nil
 }
 
 // GetAlerts return a list of alerts
-func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var res []alerts.Alert
 
 	// if no alerts return empty list
 	if h.Alerts == nil {
-		w.WriteHeader(200)
 		fmt.Fprintln(w, `[]`)
-		return
+		return nil
 	}
 
-	// get data from the form arguments
 	// get data from the form arguments
 	if err := r.ParseForm(); err != nil {
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
-		return
+		return apperrors.BadRequest(err)
 	}
 
 	// get tenant
@@ -90,25 +86,31 @@ func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[
 	state := r.Form.Get("state")
 
 	res = h.Alerts.FilterAlerts(tenant, id, state)
-	resJSON, _ := json.Marshal(res)
+	resJSON, err := json.Marshal(res)
+	if err != nil {
+		return apperrors.InternalError(err)
+	}
 
-	w.WriteHeader(200)
 	fmt.Fprintln(w, string(resJSON))
+	return nil
 }
 
 // GetTenants return a list of metrics tenants
-func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var res []storage.Tenant
 
 	res = h.Storage.GetTenants()
-	resJSON, _ := json.Marshal(res)
+	resJSON, err := json.Marshal(res)
+	if err != nil {
+		return apperrors.InternalError(err)
+	}
 
-	w.WriteHeader(200)
 	fmt.Fprintln(w, string(resJSON))
+	return nil
 }
 
 // GetMetrics return a list of metrics definitions
-func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var res []storage.Item
 
 	// get data from the form arguments
@@ -116,16 +118,13 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
-		return
+		return apperrors.BadRequest(err)
 	}
 
 	// we only use gauges
 	if typeStr, ok := r.Form["type"]; ok && len(typeStr) > 0 && typeStr[0] != "gauge" {
-		w.WriteHeader(200)
 		fmt.Fprintln(w, "[]")
-		return
+		return nil
 	}
 
 	// get tenant
@@ -135,26 +134,27 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
 		tags := storage.ParseTags(tagsStr[0])
 		if !validTags(tags) {
-			badID(w, h.Verbose)
-			return
+			return apperrors.BadRequest(apperrors.BadMetricIDErr)
 		}
 		res = h.Storage.GetItemList(tenant, tags)
 	} else {
 		res = h.Storage.GetItemList(tenant, map[string]string{})
 	}
-	resJSON, _ := json.Marshal(res)
+	resJSON, err := json.Marshal(res)
+	if err != nil {
+		return apperrors.InternalError(err)
+	}
 
-	w.WriteHeader(200)
 	fmt.Fprintln(w, string(resJSON))
+	return nil
 }
 
 // GetData return a list of metrics raw / stat data
-func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		badID(w, h.Verbose)
-		return
+		return apperrors.BadRequest(apperrors.BadMetricIDErr)
 	}
 
 	// get data from the form arguments
@@ -162,9 +162,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
-		return
+		return apperrors.BadRequest(err)
 	}
 
 	// get tenant
@@ -176,9 +174,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
-		return
+		return apperrors.InternalError(err)
 	}
 
 	limit := int64(defaultLimit)
@@ -196,21 +192,16 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	if h.Verbose {
 		log.Printf("ID: %s@%s, End: %d, Start: %d, Limit: %d, Order: %s, bucketDuration: %ds", tenant, id, end, start, limit, order, bucketDuration)
 	}
-
-	// output to client
-	w.WriteHeader(200)
-
 	// call storage for data
-	h.getData(w, tenant, id, end, start, limit, order, bucketDuration)
+	return h.getData(w, tenant, id, end, start, limit, order, bucketDuration)
 }
 
 // DeleteData delete a list of metrics raw  data
-func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		badID(w, h.Verbose)
-		return
+		return apperrors.BadRequest(apperrors.BadMetricIDErr)
 	}
 
 	// get data from the form arguments
@@ -218,9 +209,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
-		return
+		return apperrors.BadRequest(err)
 	}
 
 	// get tenant
@@ -232,9 +221,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
-		return
+		return apperrors.InternalError(err)
 	}
 
 	if h.Verbose {
@@ -246,30 +233,25 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 		h.Storage.DeleteData(tenant, id, end, start)
 
 		// output to client
-		w.WriteHeader(200)
 		fmt.Fprintf(w, "{\"message\":\"Deleted %s@%s [%d-%d]\"}", tenant, id, end, start)
-		return
+		return nil
 	}
 
-	w.WriteHeader(504)
-	fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Can't delete time rage - 504\"}")
+	return apperrors.BadRequest(errors.New("Can't delete time range"))
 }
 
 // PostMQuery query data from storage + gauges
-func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	// parse query args
 	tenant, ids, end, start, limit, order, bucketDuration, err := h.parseQueryArgs(w, r, argv)
 	if err != nil {
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
-		return
+		return apperrors.InternalError(err)
 	}
 	numOfItems := len(ids) - 1
 
-	w.WriteHeader(200)
 	fmt.Fprintf(w, "{\"gauge\":{")
 
 	for i, id := range ids {
@@ -277,7 +259,9 @@ func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map
 		fmt.Fprintf(w, "\"%s\":", id)
 
 		// call storage for data, and send it to writer
-		h.getData(w, tenant, id, end, start, limit, order, bucketDuration)
+		if err := h.getData(w, tenant, id, end, start, limit, order, bucketDuration); err != nil {
+			return err
+		}
 
 		if i < numOfItems {
 			fmt.Fprintf(w, ",")
@@ -285,23 +269,21 @@ func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map
 	}
 
 	fmt.Fprintf(w, "}}")
+	return nil
 }
 
 // PostQuery query data from storage
-func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	// parse query args
 	tenant, ids, end, start, limit, order, bucketDuration, err := h.parseQueryArgs(w, r, argv)
 	if err != nil {
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		w.WriteHeader(504)
-		fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"%s\"}", err.Error())
-		return
+		return apperrors.InternalError(err)
 	}
 	numOfItems := len(ids) - 1
 
-	w.WriteHeader(200)
 	fmt.Fprintf(w, "[")
 
 	for i, id := range ids {
@@ -309,7 +291,9 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 		fmt.Fprintf(w, "{\"id\": \"%s\", \"data\":", id)
 
 		// call storage for data, and send it to writer
-		h.getData(w, tenant, id, end, start, limit, order, bucketDuration)
+		if err := h.getData(w, tenant, id, end, start, limit, order, bucketDuration); err != nil {
+			return err
+		}
 
 		fmt.Fprintf(w, "}")
 
@@ -319,17 +303,19 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 	}
 
 	fmt.Fprintf(w, "]")
+	return nil
 }
 
 // PostData send timestamp, value to the storage
-func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var u []postDataItems
-	json.NewDecoder(r.Body).Decode(&u)
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		return apperrors.BadRequest(err)
+	}
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			badID(w, h.Verbose)
-			return
+			return apperrors.BadRequest(apperrors.BadMetricIDErr)
 		}
 	}
 
@@ -350,20 +336,21 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 		}
 	}
 
-	w.WriteHeader(200)
 	fmt.Fprintf(w, "{\"message\":\"Received %d data items\"}", len(u))
+	return nil
 }
 
 // PutTags send tag, value pairs to the storage
-func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var tags map[string]string
-	json.NewDecoder(r.Body).Decode(&tags)
+	if err := json.NewDecoder(r.Body).Decode(&tags); err != nil {
+		return apperrors.BadRequest(err)
+	}
 
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) || !validTags(tags) {
-		badID(w, h.Verbose)
-		return
+		return apperrors.BadRequest(apperrors.BadMetricIDErr)
 	}
 
 	// get tenant
@@ -374,19 +361,20 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 	}
 	h.Storage.PutTags(tenant, id, tags)
 
-	w.WriteHeader(200)
 	fmt.Fprintf(w, "{\"message\":\"Updated tags for %s@%s\"}", tenant, id)
+	return nil
 }
 
 // PutMultiTags send tags pet dataItem - tag, value pairs to the storage
-func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var u []putTags
-	json.NewDecoder(r.Body).Decode(&u)
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		return apperrors.BadRequest(err)
+	}
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			badID(w, h.Verbose)
-			return
+			return apperrors.BadRequest(apperrors.BadMetricIDErr)
 		}
 	}
 
@@ -403,18 +391,17 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 		}
 	}
 
-	w.WriteHeader(200)
 	fmt.Fprintf(w, "{\"message\":\"Updated tags for %d items\"}", len(u))
+	return nil
 }
 
 // DeleteTags delete a tag
-func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	// use the id from the argv list
 	id := argv["id"]
 	tagsStr := argv["tags"]
 	if !validStr(id) || !validStr(tagsStr) {
-		badID(w, h.Verbose)
-		return
+		return apperrors.BadRequest(apperrors.BadMetricIDErr)
 	}
 	tags := strings.Split(tagsStr, ",")
 
@@ -423,8 +410,8 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 
 	h.Storage.DeleteTags(tenant, id, tags)
 
-	w.WriteHeader(200)
 	fmt.Fprintf(w, "{\"message\":\"Deleted tags for %s@%s\"}", tenant, id)
+	return nil
 }
 
 // decodeRequestBody parse request body
@@ -436,14 +423,13 @@ func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQu
 	decoder := json.NewDecoder(r.Body)
 	decoder.UseNumber()
 	if err = decoder.Decode(&u); err != nil {
-		return tenant, u, err
+		return tenant, u, apperrors.BadRequest(err)
 	}
 
 	// get ids from explicit ids list
 	for _, id := range u.IDs {
 		if !validStr(id) {
-			err = errors.New("Bad metrics ID - 504")
-			return tenant, u, err
+			return tenant, u, apperrors.BadRequest(apperrors.BadMetricIDErr)
 		}
 	}
 
@@ -455,7 +441,7 @@ func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQu
 		}
 	}
 
-	return tenant, u, err
+	return tenant, u, nil
 }
 
 // parseQueryArgs parse query request body args
@@ -525,19 +511,23 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 }
 
 // getData querys data from the storage, and send it to writer
-func (h APIHhandler) getData(w http.ResponseWriter, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) {
-	var resStr string
+func (h APIHhandler) getData(w http.ResponseWriter, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) error {
+	var (
+		resJSON []byte
+		err     error
+	)
 
 	// call storage for data
 	if bucketDuration == 0 {
 		res := h.Storage.GetRawData(tenant, id, end, start, limit, order)
-		resJSON, _ := json.Marshal(res)
-		resStr = string(resJSON)
+		resJSON, err = json.Marshal(res)
 	} else {
 		res := h.Storage.GetStatData(tenant, id, end, start, limit, order, bucketDuration)
-		resJSON, _ := json.Marshal(res)
-		resStr = string(resJSON)
+		resJSON, err = json.Marshal(res)
 	}
-
-	fmt.Fprintf(w, resStr)
+	if err != nil {
+		return apperrors.InternalError(err)
+	}
+	fmt.Fprintf(w, string(resJSON))
+	return nil
 }
