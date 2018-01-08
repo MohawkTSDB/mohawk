@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	"github.com/MohawkTSDB/mohawk/src/alerts"
-	"github.com/MohawkTSDB/mohawk/src/apperrors"
+	"github.com/MohawkTSDB/mohawk/src/api_errors"
 	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
@@ -77,7 +77,7 @@ func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		return apperrors.BadRequest(err)
+		return apiErrors.BadRequest(err)
 	}
 
 	// get tenant
@@ -88,7 +88,7 @@ func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[
 	res = h.Alerts.FilterAlerts(tenant, id, state)
 	resJSON, err := json.Marshal(res)
 	if err != nil {
-		return apperrors.InternalError(err)
+		return apiErrors.InternalError(err)
 	}
 
 	fmt.Fprintln(w, string(resJSON))
@@ -102,7 +102,7 @@ func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map
 	res = h.Storage.GetTenants()
 	resJSON, err := json.Marshal(res)
 	if err != nil {
-		return apperrors.InternalError(err)
+		return apiErrors.InternalError(err)
 	}
 
 	fmt.Fprintln(w, string(resJSON))
@@ -118,7 +118,7 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		return apperrors.BadRequest(err)
+		return apiErrors.BadRequest(err)
 	}
 
 	// we only use gauges
@@ -134,7 +134,7 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
 		tags := storage.ParseTags(tagsStr[0])
 		if !validTags(tags) {
-			return apperrors.BadRequest(apperrors.ErrBadMetricID)
+			return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
 		}
 		res = h.Storage.GetItemList(tenant, tags)
 	} else {
@@ -142,7 +142,7 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 	}
 	resJSON, err := json.Marshal(res)
 	if err != nil {
-		return apperrors.InternalError(err)
+		return apiErrors.InternalError(err)
 	}
 
 	fmt.Fprintln(w, string(resJSON))
@@ -154,7 +154,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		return apperrors.BadRequest(apperrors.ErrBadMetricID)
+		return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
 	}
 
 	// get data from the form arguments
@@ -162,7 +162,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		return apperrors.BadRequest(err)
+		return apiErrors.BadRequest(err)
 	}
 
 	// get tenant
@@ -174,7 +174,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		return apperrors.InternalError(err)
+		return apiErrors.InternalError(err)
 	}
 
 	limit := int64(defaultLimit)
@@ -201,7 +201,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		return apperrors.BadRequest(apperrors.ErrBadMetricID)
+		return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
 	}
 
 	// get data from the form arguments
@@ -209,7 +209,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		return apperrors.BadRequest(err)
+		return apiErrors.BadRequest(err)
 	}
 
 	// get tenant
@@ -221,7 +221,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		return apperrors.InternalError(err)
+		return apiErrors.InternalError(err)
 	}
 
 	if h.Verbose {
@@ -237,7 +237,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 		return nil
 	}
 
-	return apperrors.BadRequest(errors.New("Can't delete time range"))
+	return apiErrors.BadRequest(errors.New("Can't delete time range"))
 }
 
 // PostMQuery query data from storage + gauges
@@ -248,7 +248,7 @@ func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		return apperrors.InternalError(err)
+		return apiErrors.InternalError(err)
 	}
 	numOfItems := len(ids) - 1
 
@@ -280,7 +280,7 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 		if h.Verbose {
 			log.Printf(err.Error())
 		}
-		return apperrors.InternalError(err)
+		return apiErrors.InternalError(err)
 	}
 	numOfItems := len(ids) - 1
 
@@ -310,12 +310,12 @@ func (h APIHhandler) PostQuery(w http.ResponseWriter, r *http.Request, argv map[
 func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var u []postDataItems
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		return apperrors.BadRequest(err)
+		return apiErrors.BadRequest(err)
 	}
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			return apperrors.BadRequest(apperrors.ErrBadMetricID)
+			return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
 		}
 	}
 
@@ -344,13 +344,13 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var tags map[string]string
 	if err := json.NewDecoder(r.Body).Decode(&tags); err != nil {
-		return apperrors.BadRequest(err)
+		return apiErrors.BadRequest(err)
 	}
 
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) || !validTags(tags) {
-		return apperrors.BadRequest(apperrors.ErrBadMetricID)
+		return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
 	}
 
 	// get tenant
@@ -369,12 +369,12 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var u []putTags
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		return apperrors.BadRequest(err)
+		return apiErrors.BadRequest(err)
 	}
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			return apperrors.BadRequest(apperrors.ErrBadMetricID)
+			return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
 		}
 	}
 
@@ -401,7 +401,7 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	id := argv["id"]
 	tagsStr := argv["tags"]
 	if !validStr(id) || !validStr(tagsStr) {
-		return apperrors.BadRequest(apperrors.ErrBadMetricID)
+		return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
 	}
 	tags := strings.Split(tagsStr, ",")
 
@@ -423,13 +423,13 @@ func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQu
 	decoder := json.NewDecoder(r.Body)
 	decoder.UseNumber()
 	if err = decoder.Decode(&u); err != nil {
-		return tenant, u, apperrors.BadRequest(err)
+		return tenant, u, apiErrors.BadRequest(err)
 	}
 
 	// get ids from explicit ids list
 	for _, id := range u.IDs {
 		if !validStr(id) {
-			return tenant, u, apperrors.BadRequest(apperrors.ErrBadMetricID)
+			return tenant, u, apiErrors.BadRequest(apiErrors.ErrBadMetricID)
 		}
 	}
 
@@ -526,7 +526,7 @@ func (h APIHhandler) getData(w http.ResponseWriter, tenant string, id string, en
 		resJSON, err = json.Marshal(res)
 	}
 	if err != nil {
-		return apperrors.InternalError(err)
+		return apiErrors.InternalError(err)
 	}
 	fmt.Fprintf(w, string(resJSON))
 	return nil
