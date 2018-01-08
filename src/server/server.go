@@ -49,19 +49,19 @@ const publicPath = "^/hawkular/metrics/status$"
 var BackendName string
 
 // GetStatus return a json status struct
-func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func GetStatus(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	resTemplate := `{"MetricsService":"STARTED","Implementation-Version":"%s","MohawkVersion":"%s","MohawkStorage":"%s"}`
 	res := fmt.Sprintf(resTemplate, defaultAPI, VER, BackendName)
 
-	w.WriteHeader(200)
 	fmt.Fprintln(w, res)
+	return nil
 }
 
 // OptionsResponse return a response for OPTIONS request
-func OptionsResponse(w http.ResponseWriter, r *http.Request, argv map[string]string) {
+func OptionsResponse(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	w.Header().Set("Allow", "GET,PUT,POST,DELETE,OPTIONS")
 
-	w.WriteHeader(200)
+	return nil
 }
 
 func printOptionsHelp() {
