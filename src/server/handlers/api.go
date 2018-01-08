@@ -30,6 +30,9 @@ import (
 	"github.com/MohawkTSDB/mohawk/src/storage"
 )
 
+// errBadMetricID a new error with bad metrics id message
+var errBadMetricID = errors.New("Bad metrics ID")
+
 // const defaultLimit default REST API call query limit
 const defaultLimit = 20000
 
@@ -134,7 +137,7 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
 		tags := storage.ParseTags(tagsStr[0])
 		if !validTags(tags) {
-			return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
+			return apiErrors.BadRequest(errBadMetricID)
 		}
 		res = h.Storage.GetItemList(tenant, tags)
 	} else {
@@ -154,7 +157,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
+		return apiErrors.BadRequest(errBadMetricID)
 	}
 
 	// get data from the form arguments
@@ -201,7 +204,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) {
-		return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
+		return apiErrors.BadRequest(errBadMetricID)
 	}
 
 	// get data from the form arguments
@@ -315,7 +318,7 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
+			return apiErrors.BadRequest(errBadMetricID)
 		}
 	}
 
@@ -350,7 +353,7 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 	// use the id from the argv list
 	id := argv["id"]
 	if !validStr(id) || !validTags(tags) {
-		return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
+		return apiErrors.BadRequest(errBadMetricID)
 	}
 
 	// get tenant
@@ -374,7 +377,7 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 
 	for _, item := range u {
 		if !validStr(item.ID) {
-			return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
+			return apiErrors.BadRequest(errBadMetricID)
 		}
 	}
 
@@ -401,7 +404,7 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	id := argv["id"]
 	tagsStr := argv["tags"]
 	if !validStr(id) || !validStr(tagsStr) {
-		return apiErrors.BadRequest(apiErrors.ErrBadMetricID)
+		return apiErrors.BadRequest(errBadMetricID)
 	}
 	tags := strings.Split(tagsStr, ",")
 
@@ -429,7 +432,7 @@ func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQu
 	// get ids from explicit ids list
 	for _, id := range u.IDs {
 		if !validStr(id) {
-			return tenant, u, apiErrors.BadRequest(apiErrors.ErrBadMetricID)
+			return tenant, u, apiErrors.BadRequest(errBadMetricID)
 		}
 	}
 
