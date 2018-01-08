@@ -7,7 +7,7 @@ import (
 
 var BadMetricIDErr = fmt.Errorf("Bad metrics ID")
 
-// Error represent an error that occured and its status code.
+// Error represent an error that occurred and its status code.
 type Error struct {
 	code    int
 	message string
