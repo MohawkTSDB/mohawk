@@ -5,7 +5,8 @@ import (
 	"net/http"
 )
 
-var BadMetricIDErr = fmt.Errorf("Bad metrics ID")
+// ErrBadMetricID a new error with bad metrics id message
+var ErrBadMetricID = fmt.Errorf("Bad metrics ID")
 
 // Error represent an error that occurred and its status code.
 type Error struct {
