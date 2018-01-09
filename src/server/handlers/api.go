@@ -490,10 +490,8 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 
 // getData querys data from the storage, and send it to writer
 func (h APIHhandler) getData(w http.ResponseWriter, tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) error {
-	var (
-		resJSON []byte
-		err     error
-	)
+	var resJSON []byte
+	var err error
 
 	// call storage for data
 	if bucketDuration == 0 {
