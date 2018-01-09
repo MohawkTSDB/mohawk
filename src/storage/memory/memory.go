@@ -272,7 +272,8 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
-func (r *Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
+// PostRawData handle posting data to db
+func (r *Storage) PostRawData(tenant string, id string, t int64, v float64) error {
 	// check if tenant and id exists, create them if necessary
 	r.checkID(tenant, id)
 
@@ -295,10 +296,11 @@ func (r *Storage) PostRawData(tenant string, id string, t int64, v float64) bool
 		r.timeLastSec = tSec
 	}
 
-	return true
+	return nil
 }
 
-func (r *Storage) PutTags(tenant string, id string, tags map[string]string) bool {
+// PutTags handle posting tags to db
+func (r *Storage) PutTags(tenant string, id string, tags map[string]string) error {
 	// check if tenant and id exists, create them if necessary
 	r.checkID(tenant, id)
 
@@ -309,15 +311,17 @@ func (r *Storage) PutTags(tenant string, id string, tags map[string]string) bool
 		}
 	}
 
-	return true
+	return nil
 }
 
-func (r *Storage) DeleteData(tenant string, id string, end int64, start int64) bool {
-	return true
+// DeleteData handle delete data fron db
+func (r *Storage) DeleteData(tenant string, id string, end int64, start int64) error {
+	return nil
 }
 
-func (r *Storage) DeleteTags(tenant string, id string, tags []string) bool {
-	return true
+// DeleteTags handle delete tags fron db
+func (r *Storage) DeleteTags(tenant string, id string, tags []string) error {
+	return nil
 }
 
 // Helper functions
