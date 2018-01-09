@@ -17,11 +17,11 @@
 package router
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/MohawkTSDB/mohawk/src/server/api_errors"
 )
 
 type route struct {
@@ -32,9 +32,10 @@ type route struct {
 
 // Router ah http request router
 type Router struct {
-	Prefix string
-	Routes []route
-	next   http.Handler
+	Verbose bool
+	Prefix  string
+	Routes  []route
+	next    http.Handler
 }
 
 // Add add a new route into the router routing table
@@ -42,13 +43,18 @@ func (r *Router) Add(method string, path string, handler func(http.ResponseWrite
 	r.Routes = append(r.Routes, route{method, strings.Split(path, "/"), handler})
 }
 
-func handleError(err error, w http.ResponseWriter) {
-	if mErr, ok := err.(apiErrors.Error); ok {
-		mErr.JSON(w)
-		return
+// writes error as JSON to http.ResponseWriter
+func (r Router) handleError(e error, w http.ResponseWriter) {
+	msg := e.Error()
+
+	// if on verbose mode, log error
+	if r.Verbose {
+		log.Printf(msg)
 	}
+
+	// All errors we catch are 500 - internal error
 	w.WriteHeader(500)
-	w.Write([]byte(http.StatusText(500)))
+	w.Write([]byte(fmt.Sprintf(`{"code":500,"message":"%s"}`, msg)))
 }
 
 // match match a request to a route, and parse the arguments embedded in the route path
@@ -109,7 +115,7 @@ func (r Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		// if found a match, run the handler for this route
 		if found {
 			if err := route.handler(writer, request, argv); err != nil {
-				handleError(err, writer)
+				r.handleError(err, writer)
 			}
 			return
 		}

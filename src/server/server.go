@@ -153,7 +153,8 @@ func Serve() error {
 	// Create the routers
 	// Requests not handled by the routers will be forworded to BadRequest Handler
 	rRoot := router.Router{
-		Prefix: "/hawkular/metrics/",
+		Verbose: verbose,
+		Prefix:  "/hawkular/metrics/",
 	}
 	// Root Routing table
 	rRoot.Add("GET", "status", GetStatus)
@@ -162,14 +163,16 @@ func Serve() error {
 
 	// M (Global Metrics) Routing tables
 	rM := router.Router{
-		Prefix: "/hawkular/metrics/m/",
+		Verbose: verbose,
+		Prefix:  "/hawkular/metrics/m/",
 	}
 	rM.Add("POST", "stats/query", h.PostMQuery)
 	rM.Add("OPTIONS", "stats/query", OptionsResponse)
 
 	// Metrics Routing tables
 	rGauges := router.Router{
-		Prefix: "/hawkular/metrics/gauges/",
+		Verbose: verbose,
+		Prefix:  "/hawkular/metrics/gauges/",
 	}
 	rGauges.Add("GET", ":id/raw", h.GetData)
 	rGauges.Add("GET", ":id/stats", h.GetData)
@@ -195,7 +198,8 @@ func Serve() error {
 	rGauges.Add("OPTIONS", "stats/query", OptionsResponse)
 
 	rCounters := router.Router{
-		Prefix: "/hawkular/metrics/counters/",
+		Verbose: verbose,
+		Prefix:  "/hawkular/metrics/counters/",
 	}
 	rCounters.Add("GET", ":id/raw", h.GetData)
 	rCounters.Add("GET", ":id/stats", h.GetData)
@@ -209,14 +213,16 @@ func Serve() error {
 	rCounters.Add("POST", "stats/query", h.PostQuery)
 
 	rAvailability := router.Router{
-		Prefix: "/hawkular/metrics/availability/",
+		Verbose: verbose,
+		Prefix:  "/hawkular/metrics/availability/",
 	}
 	rAvailability.Add("GET", ":id/raw", h.GetData)
 	rAvailability.Add("GET", ":id/stats", h.GetData)
 
 	// Requests not handled by the routers will be forworded to BadRequest Handler
 	rAlerts := router.Router{
-		Prefix: "/hawkular/alerts/",
+		Verbose: verbose,
+		Prefix:  "/hawkular/alerts/",
 	}
 	rAlerts.Add("GET", "status", h.GetAlertsStatus)
 	rAlerts.Add("GET", "raw", h.GetAlerts)
