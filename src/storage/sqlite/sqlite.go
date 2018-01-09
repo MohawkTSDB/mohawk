@@ -18,6 +18,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -82,7 +83,7 @@ func (r Storage) GetTenants() []storage.Tenant {
 
 func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
 	res := make([]storage.Item, 0)
-	db, _ := r.GetTenant(tenant)
+	db, _ := r.getTenant(tenant)
 
 	// create one item per id
 	sqlStmt := "select id from ids"
@@ -124,7 +125,7 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 		if err != nil {
 			log.Printf("%q\n", err)
 		}
-		res = r.UpdateTag(res, tenant, id, tag, value)
+		res = r.updateTag(res, tenant, id, tag, value)
 	}
 	err = rows.Err()
 	if err != nil {
@@ -146,7 +147,7 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 
 func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
 	res := make([]storage.DataItem, 0)
-	db, _ := r.GetTenant(tenant)
+	db, _ := r.getTenant(tenant)
 
 	// check if id exist
 	if !r.IDExist(tenant, id) {
@@ -196,7 +197,7 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 
 	count := int64(0)
 	res := make([]storage.StatItem, 0)
-	db, _ := r.GetTenant(tenant)
+	db, _ := r.getTenant(tenant)
 
 	timeStep := bucketDuration * 1000
 	startTime := int64(start/timeStep) * timeStep
@@ -249,17 +250,19 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 	return res
 }
 
-func (r Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
+// PostRawData handle posting data to db
+func (r Storage) PostRawData(tenant string, id string, t int64, v float64) error {
 	// check if id exist
 	if !r.IDExist(tenant, id) {
 		r.createID(tenant, id)
 	}
 
 	r.insertData(tenant, id, t, v)
-	return true
+	return nil
 }
 
-func (r Storage) PutTags(tenant string, id string, tags map[string]string) bool {
+// PutTags handle posting tags to db
+func (r Storage) PutTags(tenant string, id string, tags map[string]string) error {
 	// check if id exist
 	if !r.IDExist(tenant, id) {
 		r.createID(tenant, id)
@@ -268,35 +271,37 @@ func (r Storage) PutTags(tenant string, id string, tags map[string]string) bool 
 	for k, v := range tags {
 		r.insertTag(tenant, id, k, v)
 	}
-	return true
+	return nil
 }
 
-func (r Storage) DeleteData(tenant string, id string, end int64, start int64) bool {
+// DeleteData handle delete data fron db
+func (r Storage) DeleteData(tenant string, id string, end int64, start int64) error {
 	// check if id exist
 	if r.IDExist(tenant, id) {
 		r.deleteData(tenant, id, end, start)
-		return true
+		return nil
 	}
 
-	return false
+	return errors.New("ID not found")
 }
 
-func (r Storage) DeleteTags(tenant string, id string, tags []string) bool {
+// DeleteTags handle delete tags fron db
+func (r Storage) DeleteTags(tenant string, id string, tags []string) error {
 	// check if id exist
 	if r.IDExist(tenant, id) {
 		for _, k := range tags {
 			r.deleteTag(tenant, id, k)
 		}
-		return true
+		return nil
 	}
 
-	return false
+	return errors.New("ID not found")
 }
 
 // Helper functions
 // Not required by storage interface
 
-func (r *Storage) GetTenant(name string) (*sql.DB, error) {
+func (r *Storage) getTenant(name string) (*sql.DB, error) {
 	var filename string
 
 	if tenant, ok := r.tenant[name]; ok {
@@ -335,61 +340,56 @@ func (r *Storage) GetTenant(name string) (*sql.DB, error) {
 
 func (r Storage) IDExist(tenant string, id string) bool {
 	var _id string
-	db, _ := r.GetTenant(tenant)
+	db, _ := r.getTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("select id from ids where id='%s'", id)
 	err := db.QueryRow(sqlStmt).Scan(&_id)
 	return err != sql.ErrNoRows
 }
 
-func (r Storage) insertData(tenant string, id string, t int64, v float64) {
-	db, _ := r.GetTenant(tenant)
+func (r Storage) insertData(tenant string, id string, t int64, v float64) error {
+	db, _ := r.getTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("insert into '%s' values (%d, %f)", id, t, v)
 	_, err := db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-	}
+
+	return err
 }
 
-func (r Storage) insertTag(tenant string, id string, k string, v string) {
-	db, _ := r.GetTenant(tenant)
+func (r Storage) insertTag(tenant string, id string, k string, v string) error {
+	db, _ := r.getTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
 	_, err := db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-	}
+
+	return err
 }
 
-func (r Storage) deleteData(tenant string, id string, end int64, start int64) {
-	db, _ := r.GetTenant(tenant)
+func (r Storage) deleteData(tenant string, id string, end int64, start int64) error {
+	db, _ := r.getTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("delete from '%s' where timestamp >= %d and timestamp < %d", id, start, end)
 	_, err := db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-	}
+
+	return err
 }
 
-func (r Storage) deleteTag(tenant string, id string, k string) {
-	db, _ := r.GetTenant(tenant)
+func (r Storage) deleteTag(tenant string, id string, k string) error {
+	db, _ := r.getTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("delete from tags where id='%s' and tag='%s'", id, k)
 	_, err := db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-	}
+
+	return err
 }
 
-func (r Storage) createID(tenant string, id string) bool {
-	db, _ := r.GetTenant(tenant)
+func (r Storage) createID(tenant string, id string) error {
+	db, _ := r.getTenant(tenant)
 
 	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
 	_, err := db.Exec(sqlStmt)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-		return false
+		return err
 	}
 
 	sqlStmt = fmt.Sprintf(`
@@ -400,15 +400,11 @@ func (r Storage) createID(tenant string, id string) bool {
 	`, id)
 
 	_, err = db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-		return false
-	}
 
-	return true
+	return err
 }
 
-func (r Storage) UpdateTag(items []storage.Item, tenant string, id string, tag string, value string) []storage.Item {
+func (r Storage) updateTag(items []storage.Item, tenant string, id string, tag string, value string) []storage.Item {
 	// try to update tag if item exist
 	for i, item := range items {
 		if item.ID == id {

@@ -138,20 +138,24 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 
 // unimplemented requests should fail silently
 
-func (r Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
-	return true
+// PostRawData handle posting data to db
+func (r Storage) PostRawData(tenant string, id string, t int64, v float64) error {
+	return nil
 }
 
-func (r Storage) PutTags(tenant string, id string, tags map[string]string) bool {
-	return true
+// PutTags handle posting tags to db
+func (r Storage) PutTags(tenant string, id string, tags map[string]string) error {
+	return nil
 }
 
-func (r Storage) DeleteData(tenant string, id string, end int64, start int64) bool {
-	return true
+// DeleteData handle delete data fron db
+func (r Storage) DeleteData(tenant string, id string, end int64, start int64) error {
+	return nil
 }
 
-func (r Storage) DeleteTags(tenant string, id string, tags []string) bool {
-	return true
+// DeleteTags handle delete tags from db
+func (r Storage) DeleteTags(tenant string, id string, tags []string) error {
+	return nil
 }
 
 // Helper functions

@@ -64,8 +64,8 @@ type Storage interface {
 	GetItemList(tenant string, tags map[string]string) []Item
 	GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []DataItem
 	GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem
-	PostRawData(tenant string, id string, t int64, v float64) bool
-	PutTags(tenant string, id string, tags map[string]string) bool
-	DeleteData(tenant string, id string, end int64, start int64) bool
-	DeleteTags(tenant string, id string, tags []string) bool
+	PostRawData(tenant string, id string, t int64, v float64) error
+	PutTags(tenant string, id string, tags map[string]string) error
+	DeleteData(tenant string, id string, end int64, start int64) error
+	DeleteTags(tenant string, id string, tags []string) error
 }

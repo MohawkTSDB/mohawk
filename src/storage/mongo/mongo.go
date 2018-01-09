@@ -231,34 +231,45 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 
 // unimplemented requests should fail silently
 
-func (r Storage) PostRawData(tenant string, id string, t int64, v float64) bool {
+// PostRawData handle posting data to db
+func (r Storage) PostRawData(tenant string, id string, t int64, v float64) error {
 	// check if id exist
 	if !r.IDExist(tenant, id) {
-		r.createID(tenant, id)
+		if err := r.createID(tenant, id); err != nil {
+			return err
+		}
 	}
 
-	r.insertData(tenant, id, t, v)
-	return true
+	err := r.insertData(tenant, id, t, v)
+	return err
 }
 
-func (r Storage) PutTags(tenant string, id string, tags map[string]string) bool {
+// PutTags handle posting tags to db
+func (r Storage) PutTags(tenant string, id string, tags map[string]string) error {
 	// check if id exist
 	if !r.IDExist(tenant, id) {
-		r.createID(tenant, id)
+		if err := r.createID(tenant, id); err != nil {
+			return err
+		}
 	}
 
 	for k, v := range tags {
-		r.insertTag(tenant, id, k, v)
+		if err := r.insertTag(tenant, id, k, v); err != nil {
+			return err
+		}
 	}
-	return true
+
+	return nil
 }
 
-func (r Storage) DeleteData(tenant string, id string, end int64, start int64) bool {
-	return true
+// DeleteData handle delete data from db
+func (r Storage) DeleteData(tenant string, id string, end int64, start int64) error {
+	return nil
 }
 
-func (r Storage) DeleteTags(tenant string, id string, tags []string) bool {
-	return true
+// DeleteTags handle delete tags from db
+func (r Storage) DeleteTags(tenant string, id string, tags []string) error {
+	return nil
 }
 
 // Helper functions
@@ -277,7 +288,7 @@ func (r Storage) IDExist(tenant string, id string) bool {
 	return err == nil
 }
 
-func (r Storage) createID(tenant string, id string) bool {
+func (r Storage) createID(tenant string, id string) error {
 	// copy storage session
 	sessionCopy := r.mongoSession.Copy()
 	defer sessionCopy.Close()
@@ -286,14 +297,13 @@ func (r Storage) createID(tenant string, id string) bool {
 
 	err := c.Insert(&storage.Item{ID: id, Type: "gauge", Tags: map[string]string{}, LastValues: []storage.DataItem{}})
 	if err != nil {
-		log.Printf("%q\n", err)
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }
 
-func (r Storage) insertTag(tenant string, id string, k string, v string) {
+func (r Storage) insertTag(tenant string, id string, k string, v string) error {
 	result := storage.Item{}
 
 	// copy storage session
@@ -305,18 +315,20 @@ func (r Storage) insertTag(tenant string, id string, k string, v string) {
 	// get current tags
 	err := c.Find(bson.M{"_id": id}).One(&result)
 	if err != nil {
-		log.Printf("%q\n", err)
+		return err
 	}
 
 	// Update
 	result.Tags[k] = v
 	err = c.Update(bson.M{"_id": id}, bson.M{"$set": bson.M{"tags": result.Tags}})
 	if err != nil {
-		log.Printf("%q\n", err)
+		return err
 	}
+
+	return nil
 }
 
-func (r Storage) insertData(tenant string, id string, t int64, v float64) {
+func (r Storage) insertData(tenant string, id string, t int64, v float64) error {
 	// copy storage session
 	sessionCopy := r.mongoSession.Copy()
 	defer sessionCopy.Close()
@@ -324,7 +336,5 @@ func (r Storage) insertData(tenant string, id string, t int64, v float64) {
 	c := sessionCopy.DB(tenant).C(id)
 	err := c.Insert(&storage.DataItem{Timestamp: t, Value: v})
 
-	if err != nil {
-		log.Printf("%q\n", err)
-	}
+	return err
 }
