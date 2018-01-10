@@ -155,14 +155,14 @@ func (a *AlertRules) checkAlerts() {
 
 		// add metrics from tags query
 		if alert.Tags != "" {
-			res := a.Storage.GetItemList(tenant, storage.ParseTags(alert.Tags))
+			res, _ := a.Storage.GetItemList(tenant, storage.ParseTags(alert.Tags))
 			for _, r := range res {
 				metrics = append(metrics, r.ID)
 			}
 		}
 
 		for _, metric := range metrics {
-			rawData := a.Storage.GetRawData(tenant, metric, end, start, limit, "DESC")
+			rawData, _ := a.Storage.GetRawData(tenant, metric, end, start, limit, "DESC")
 
 			// if we have new data check for alert status change
 			// [ if no new data found, leave alert status un changed ]

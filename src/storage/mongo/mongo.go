@@ -86,7 +86,7 @@ func (r *Storage) Open(options url.Values) {
 	log.Printf("  addrs: %+v", strings.Split(r.dbURL, ","))
 }
 
-func (r Storage) GetTenants() []storage.Tenant {
+func (r Storage) GetTenants() ([]storage.Tenant, error) {
 	res := make([]storage.Tenant, 0)
 
 	// copy storage session
@@ -96,8 +96,7 @@ func (r Storage) GetTenants() []storage.Tenant {
 	// return a list of tenants
 	names, err := sessionCopy.DatabaseNames()
 	if err != nil {
-		log.Printf("%q\n", err)
-		return res
+		return res, err
 	}
 	for _, t := range names {
 		if t != "admin" && t != "local" {
@@ -105,10 +104,10 @@ func (r Storage) GetTenants() []storage.Tenant {
 		}
 	}
 
-	return res
+	return res, nil
 }
 
-func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
+func (r Storage) GetItemList(tenant string, tags map[string]string) ([]storage.Item, error) {
 	var query bson.M
 	res := make([]storage.Item, 0)
 
@@ -128,15 +127,11 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 	}
 
 	err := c.Find(query).Sort("_id").All(&res)
-	if err != nil {
-		log.Printf("%q\n", err)
-		return res
-	}
 
-	return res
+	return res, err
 }
 
-func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) ([]storage.DataItem, error) {
 	var sort string
 	res := make([]storage.DataItem, 0)
 
@@ -155,15 +150,11 @@ func (r Storage) GetRawData(tenant string, id string, end int64, start int64, li
 
 	// Query
 	err := c.Find(bson.M{"timestamp": bson.M{"$gte": start, "$lt": end}}).Sort(sort).Limit(int(limit)).All(&res)
-	if err != nil {
-		log.Printf("%q\n", err)
-		return res
-	}
 
-	return res
+	return res, err
 }
 
-func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) ([]storage.StatItem, error) {
 	var sort int
 	res := make([]storage.StatItem, 0)
 
@@ -222,11 +213,8 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 			},
 		},
 	).All(&res)
-	if err != nil {
-		log.Printf("%q\n", err)
-		return res
-	}
-	return res
+
+	return res, err
 }
 
 // unimplemented requests should fail silently

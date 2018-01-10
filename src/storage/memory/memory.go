@@ -17,6 +17,7 @@
 package memory
 
 import (
+	"errors"
 	"log"
 	"net/url"
 	"regexp"
@@ -102,7 +103,7 @@ func (r *Storage) Open(options url.Values) {
 	go r.maintenance()
 }
 
-func (r Storage) GetTenants() []storage.Tenant {
+func (r Storage) GetTenants() ([]storage.Tenant, error) {
 	res := make([]storage.Tenant, 0, len(r.tenant))
 
 	// return a list of tenants
@@ -110,16 +111,16 @@ func (r Storage) GetTenants() []storage.Tenant {
 		res = append(res, storage.Tenant{ID: key})
 	}
 
-	return res
+	return res, nil
 }
 
-func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
+func (r Storage) GetItemList(tenant string, tags map[string]string) ([]storage.Item, error) {
 	res := make([]storage.Item, 0)
 	t, ok := r.tenant[tenant]
 
 	// check tenant
 	if !ok {
-		return res
+		return res, errors.New("memory: Can't set tenant")
 	}
 
 	for key, ts := range t.ts {
@@ -138,10 +139,10 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 		}
 	}
 
-	return res
+	return res, nil
 }
 
-func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) ([]storage.DataItem, error) {
 	res := make([]storage.DataItem, 0)
 
 	pStart := r.getPosForTimestamp(start)
@@ -175,23 +176,10 @@ func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, l
 		}
 	}
 
-	return res
+	return res, nil
 }
 
-func (r Storage) GetStatTimes(end int64, start int64, bucketDuration int64) (int64, int64, int64) {
-	pStep := bucketDuration / r.timeGranularitySec
-	pStart := r.getPosForTimestamp(start)
-	pEnd := r.getPosForTimestamp(end)
-
-	// sanity check step
-	if pStep < 1 {
-		pStep = 1
-	}
-
-	return pEnd, pStart, pStep
-}
-
-func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) ([]storage.StatItem, error) {
 	var samples int64
 	var sum float64
 	var first float64
@@ -200,7 +188,7 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 	var max float64
 
 	res := make([]storage.StatItem, 0)
-	pEnd, pStart, pStep := r.GetStatTimes(end, start, bucketDuration)
+	pEnd, pStart, pStep := r.getStatTimes(end, start, bucketDuration)
 
 	// check if tenant and id exists, create them if necessary
 	r.checkID(tenant, id)
@@ -269,7 +257,7 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 		}
 	}
 
-	return res
+	return res, nil
 }
 
 // PostRawData handle posting data to db
@@ -326,6 +314,19 @@ func (r *Storage) DeleteTags(tenant string, id string, tags []string) error {
 
 // Helper functions
 // Not required by storage interface
+
+func (r Storage) getStatTimes(end int64, start int64, bucketDuration int64) (int64, int64, int64) {
+	pStep := bucketDuration / r.timeGranularitySec
+	pStart := r.getPosForTimestamp(start)
+	pEnd := r.getPosForTimestamp(end)
+
+	// sanity check step
+	if pStep < 1 {
+		pStep = 1
+	}
+
+	return pEnd, pStart, pStep
+}
 
 func (r *Storage) getPosForTimestamp(timestamp int64) int64 {
 	return timestamp / 1000 / r.timeGranularitySec
