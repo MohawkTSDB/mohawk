@@ -97,11 +97,14 @@ func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[
 // GetTenants return a list of metrics tenants
 func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var res []storage.Tenant
+	var resJSON []byte
+	var err error
 
-	res, _ = h.Storage.GetTenants()
-	resJSON, err := json.Marshal(res)
-	if err != nil {
-		return err
+	if res, err = h.Storage.GetTenants(); err == nil {
+		resJSON, err = json.Marshal(res)
+		if err != nil {
+			return err
+		}
 	}
 
 	fmt.Fprintln(w, string(resJSON))
@@ -111,9 +114,10 @@ func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map
 // GetMetrics return a list of metrics definitions
 func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var res []storage.Item
+	var err error
 
 	// get data from the form arguments
-	if err := r.ParseForm(); err != nil {
+	if err = r.ParseForm(); err != nil {
 		return err
 	}
 
@@ -132,13 +136,15 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 		if !validTags(tags) {
 			return errBadMetricID
 		}
-		res, _ = h.Storage.GetItemList(tenant, tags)
+		res, err = h.Storage.GetItemList(tenant, tags)
 	} else {
-		res, _ = h.Storage.GetItemList(tenant, map[string]string{})
+		res, err = h.Storage.GetItemList(tenant, map[string]string{})
 	}
-	resJSON, err := json.Marshal(res)
+
 	if err == nil {
-		fmt.Fprintln(w, string(resJSON))
+		if resJSON, err := json.Marshal(res); err == nil {
+			fmt.Fprintln(w, string(resJSON))
+		}
 	}
 
 	return err
@@ -213,11 +219,14 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 
 	// call storage for data
 	if start < end {
-		h.Storage.DeleteData(tenant, id, end, start)
+		err = h.Storage.DeleteData(tenant, id, end, start)
 
 		// output to client
-		fmt.Fprintf(w, "{\"message\":\"Deleted %s@%s [%d-%d]\"}", tenant, id, end, start)
-		return nil
+		if err == nil {
+			fmt.Fprintf(w, "{\"message\":\"Deleted %s@%s [%d-%d]\"}", tenant, id, end, start)
+		}
+
+		return err
 	}
 
 	return errors.New("Can't delete time range")
@@ -239,7 +248,7 @@ func (h APIHhandler) PostMQuery(w http.ResponseWriter, r *http.Request, argv map
 		fmt.Fprintf(w, "\"%s\":", id)
 
 		// call storage for data, and send it to writer
-		if err := h.getData(w, tenant, id, end, start, limit, order, bucketDuration); err != nil {
+		if err = h.getData(w, tenant, id, end, start, limit, order, bucketDuration); err != nil {
 			return err
 		}
 
@@ -309,7 +318,10 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 			if h.Verbose {
 				log.Printf("Tenant: %s, ID: %+v {timestamp: %+v, value: %+v}\n", tenant, id, timestamp, value)
 			}
-			h.Storage.PostRawData(tenant, id, timestamp, value)
+
+			if err := h.Storage.PostRawData(tenant, id, timestamp, value); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -336,7 +348,10 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 	if h.Verbose {
 		log.Printf("Tenant: %s, ID: %+v {tags: %+v}\n", tenant, id, tags)
 	}
-	h.Storage.PutTags(tenant, id, tags)
+
+	if err := h.Storage.PutTags(tenant, id, tags); err != nil {
+		return err
+	}
 
 	fmt.Fprintf(w, "{\"message\":\"Updated tags for %s@%s\"}", tenant, id)
 	return nil
@@ -364,7 +379,9 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 			if h.Verbose {
 				log.Printf("Tenant: %s, ID: %+v {tags: %+v}\n", tenant, id, item.Tags)
 			}
-			h.Storage.PutTags(tenant, id, item.Tags)
+			if err := h.Storage.PutTags(tenant, id, item.Tags); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -385,7 +402,9 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	// get tenant
 	tenant := parseTenant(r)
 
-	h.Storage.DeleteTags(tenant, id, tags)
+	if err := h.Storage.DeleteTags(tenant, id, tags); err != nil {
+		return err
+	}
 
 	fmt.Fprintf(w, "{\"message\":\"Deleted tags for %s@%s\"}", tenant, id)
 	return nil
@@ -494,11 +513,13 @@ func (h APIHhandler) getData(w http.ResponseWriter, tenant string, id string, en
 
 	// call storage for data
 	if bucketDuration == 0 {
-		res, _ := h.Storage.GetRawData(tenant, id, end, start, limit, order)
-		resJSON, err = json.Marshal(res)
+		if res, errQuery := h.Storage.GetRawData(tenant, id, end, start, limit, order); errQuery == nil {
+			resJSON, err = json.Marshal(res)
+		}
 	} else {
-		res, _ := h.Storage.GetStatData(tenant, id, end, start, limit, order, bucketDuration)
-		resJSON, err = json.Marshal(res)
+		if res, errQuery := h.Storage.GetStatData(tenant, id, end, start, limit, order, bucketDuration); errQuery == nil {
+			resJSON, err = json.Marshal(res)
+		}
 	}
 	if err == nil {
 		fmt.Fprintf(w, string(resJSON))
