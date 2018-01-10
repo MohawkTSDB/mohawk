@@ -251,22 +251,28 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 func (r Storage) PostRawData(tenant string, id string, t int64, v float64) error {
 	// check if id exist
 	if !r.IDExist(tenant, id) {
-		r.createID(tenant, id)
+		if err := r.createID(tenant, id); err != nil {
+			return err
+		}
 	}
 
-	r.insertData(tenant, id, t, v)
-	return nil
+	err := r.insertData(tenant, id, t, v)
+	return err
 }
 
 // PutTags handle posting tags to db
 func (r Storage) PutTags(tenant string, id string, tags map[string]string) error {
 	// check if id exist
 	if !r.IDExist(tenant, id) {
-		r.createID(tenant, id)
+		if err := r.createID(tenant, id); err != nil {
+			return err
+		}
 	}
 
 	for k, v := range tags {
-		r.insertTag(tenant, id, k, v)
+		if err := r.insertTag(tenant, id, k, v); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -275,11 +281,11 @@ func (r Storage) PutTags(tenant string, id string, tags map[string]string) error
 func (r Storage) DeleteData(tenant string, id string, end int64, start int64) error {
 	// check if id exist
 	if r.IDExist(tenant, id) {
-		r.deleteData(tenant, id, end, start)
-		return nil
+		err := r.deleteData(tenant, id, end, start)
+		return err
 	}
 
-	return errors.New("ID not found")
+	return errors.New("slite: ID not found")
 }
 
 // DeleteTags handle delete tags fron db
@@ -287,12 +293,14 @@ func (r Storage) DeleteTags(tenant string, id string, tags []string) error {
 	// check if id exist
 	if r.IDExist(tenant, id) {
 		for _, k := range tags {
-			r.deleteTag(tenant, id, k)
+			if err := r.deleteTag(tenant, id, k); err != nil {
+				return err
+			}
 		}
 		return nil
 	}
 
-	return errors.New("ID not found")
+	return errors.New("sqlite: ID not found")
 }
 
 // Helper functions
@@ -309,7 +317,6 @@ func (r *Storage) getTenant(name string) (*sql.DB, error) {
 
 	db, err := sql.Open("sqlite3", filename)
 	if err != nil {
-		log.Printf("%q\n", err)
 		return nil, err
 	}
 	db.SetMaxOpenConns(1)
@@ -326,65 +333,80 @@ func (r *Storage) getTenant(name string) (*sql.DB, error) {
 		`
 
 	_, err = db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-		return db, err
+	if err == nil {
+		r.tenant[name] = db
 	}
 
-	r.tenant[name] = db
-	return db, nil
+	return db, err
 }
 
 func (r Storage) IDExist(tenant string, id string) bool {
 	var _id string
-	db, _ := r.getTenant(tenant)
+	db, err := r.getTenant(tenant)
+	if err != nil {
+		return false
+	}
 
 	sqlStmt := fmt.Sprintf("select id from ids where id='%s'", id)
-	err := db.QueryRow(sqlStmt).Scan(&_id)
+	err = db.QueryRow(sqlStmt).Scan(&_id)
 	return err != sql.ErrNoRows
 }
 
 func (r Storage) insertData(tenant string, id string, t int64, v float64) error {
-	db, _ := r.getTenant(tenant)
+	db, err := r.getTenant(tenant)
+	if err != nil {
+		return err
+	}
 
 	sqlStmt := fmt.Sprintf("insert into '%s' values (%d, %f)", id, t, v)
-	_, err := db.Exec(sqlStmt)
+	_, err = db.Exec(sqlStmt)
 
 	return err
 }
 
 func (r Storage) insertTag(tenant string, id string, k string, v string) error {
-	db, _ := r.getTenant(tenant)
-
+	db, err := r.getTenant(tenant)
+	if err != nil {
+		return err
+	}
 	sqlStmt := fmt.Sprintf("insert or replace into tags values ('%s', '%s', '%s')", id, k, v)
-	_, err := db.Exec(sqlStmt)
+	_, err = db.Exec(sqlStmt)
 
 	return err
 }
 
 func (r Storage) deleteData(tenant string, id string, end int64, start int64) error {
-	db, _ := r.getTenant(tenant)
+	db, err := r.getTenant(tenant)
+	if err != nil {
+		return err
+	}
 
 	sqlStmt := fmt.Sprintf("delete from '%s' where timestamp >= %d and timestamp < %d", id, start, end)
-	_, err := db.Exec(sqlStmt)
+	_, err = db.Exec(sqlStmt)
 
 	return err
 }
 
 func (r Storage) deleteTag(tenant string, id string, k string) error {
-	db, _ := r.getTenant(tenant)
+	db, err := r.getTenant(tenant)
+	if err != nil {
+		return err
+	}
 
 	sqlStmt := fmt.Sprintf("delete from tags where id='%s' and tag='%s'", id, k)
-	_, err := db.Exec(sqlStmt)
+	_, err = db.Exec(sqlStmt)
 
 	return err
 }
 
 func (r Storage) createID(tenant string, id string) error {
-	db, _ := r.getTenant(tenant)
+	db, err := r.getTenant(tenant)
+	if err != nil {
+		return err
+	}
 
 	sqlStmt := fmt.Sprintf("insert into ids values ('%s')", id)
-	_, err := db.Exec(sqlStmt)
+	_, err = db.Exec(sqlStmt)
 	if err != nil {
 		return err
 	}
