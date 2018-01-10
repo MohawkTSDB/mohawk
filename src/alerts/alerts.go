@@ -155,18 +155,28 @@ func (a *AlertRules) checkAlerts() {
 
 		// add metrics from tags query
 		if alert.Tags != "" {
-			res, _ := a.Storage.GetItemList(tenant, storage.ParseTags(alert.Tags))
-			for _, r := range res {
-				metrics = append(metrics, r.ID)
+			if res, err := a.Storage.GetItemList(tenant, storage.ParseTags(alert.Tags)); err != nil {
+				// add query items, if no errors
+				for _, r := range res {
+					metrics = append(metrics, r.ID)
+				}
+			} else if a.Verbose {
+				// log query errors
+				log.Println(err)
 			}
 		}
 
 		for _, metric := range metrics {
-			rawData, _ := a.Storage.GetRawData(tenant, metric, end, start, limit, "DESC")
+			rawData, err := a.Storage.GetRawData(tenant, metric, end, start, limit, "DESC")
+
+			// log query errors
+			if a.Verbose && err != nil {
+				log.Println(err)
+			}
 
 			// if we have new data check for alert status change
 			// [ if no new data found, leave alert status un changed ]
-			if len(rawData) > 0 {
+			if err == nil && len(rawData) > 0 {
 
 				// update alert state and report to user if changed.
 				newState = alert.alertState(rawData[0].Value)
