@@ -31,6 +31,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// errBadMetricID a new error with bad metrics id message
+var errBadMetricID = errors.New("sqlite: Bad metrics ID")
+
 type Storage struct {
 	dbDirName string
 	tenant    map[string]*sql.DB
@@ -67,7 +70,7 @@ func (r *Storage) Open(options url.Values) {
 	log.Printf("  db dirname: %+v", r.dbDirName)
 }
 
-func (r Storage) GetTenants() []storage.Tenant {
+func (r Storage) GetTenants() ([]storage.Tenant, error) {
 	res := make([]storage.Tenant, 0)
 
 	files, _ := ioutil.ReadDir(r.dbDirName)
@@ -78,10 +81,10 @@ func (r Storage) GetTenants() []storage.Tenant {
 		}
 	}
 
-	return res
+	return res, nil
 }
 
-func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
+func (r Storage) GetItemList(tenant string, tags map[string]string) ([]storage.Item, error) {
 	res := make([]storage.Item, 0)
 	db, _ := r.getTenant(tenant)
 
@@ -89,7 +92,7 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 	sqlStmt := "select id from ids"
 	rows, err := db.Query(sqlStmt)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
+		return res, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -97,7 +100,7 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 
 		err = rows.Scan(&id)
 		if err != nil {
-			log.Printf("%q\n", err)
+			return res, err
 		}
 		res = append(res, storage.Item{
 			ID:   id,
@@ -107,13 +110,13 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Printf("%q\n", err)
+		return res, err
 	}
 
 	// update item tags
 	rows, err = db.Query("select id, tag, value from tags")
 	if err != nil {
-		log.Printf("%q\n", err)
+		return res, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -123,13 +126,13 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 
 		err = rows.Scan(&id, &tag, &value)
 		if err != nil {
-			log.Printf("%q\n", err)
+			return res, err
 		}
 		res = r.updateTag(res, tenant, id, tag, value)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Printf("%q\n", err)
+		return res, err
 	}
 
 	// filter using tags
@@ -142,16 +145,16 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 		}
 	}
 
-	return res
+	return res, err
 }
 
-func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) ([]storage.DataItem, error) {
 	res := make([]storage.DataItem, 0)
 	db, _ := r.getTenant(tenant)
 
 	// check if id exist
 	if !r.IDExist(tenant, id) {
-		return res
+		return res, errBadMetricID
 	}
 
 	// id exist, get timestamp, value pairs
@@ -162,7 +165,7 @@ func (r Storage) GetRawData(tenant string, id string, end int64, start int64, li
 		id, start, end, order, limit)
 	rows, err := db.Query(sqlStmt)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
+		return res, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -171,7 +174,7 @@ func (r Storage) GetRawData(tenant string, id string, end int64, start int64, li
 
 		err = rows.Scan(&timestamp, &value)
 		if err != nil {
-			log.Printf("%q\n", err)
+			return res, err
 		}
 		res = append(res, storage.DataItem{
 			Timestamp: timestamp,
@@ -179,14 +182,11 @@ func (r Storage) GetRawData(tenant string, id string, end int64, start int64, li
 		})
 	}
 	err = rows.Err()
-	if err != nil {
-		log.Printf("%q\n", err)
-	}
 
-	return res
+	return res, err
 }
 
-func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) ([]storage.StatItem, error) {
 	var samples int64
 	var startT int64
 	var endT int64
@@ -205,7 +205,7 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 
 	// check if id exist
 	if !r.IDExist(tenant, id) {
-		return res
+		return res, errBadMetricID
 	}
 
 	// id exist, get timestamp, value pairs
@@ -219,14 +219,14 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 		timeStep, timeStep, id, startTime, endTime, order)
 	rows, err := db.Query(sqlStmt)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
+		return res, err
 	}
 	defer rows.Close()
 
 	for rows.Next() && count < limit {
 		err = rows.Scan(&samples, &startT, &endT, &min, &max, &avg, &sum)
 		if err != nil {
-			log.Printf("%q\n", err)
+			return res, err
 		}
 
 		// add data
@@ -243,11 +243,8 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 		})
 	}
 	err = rows.Err()
-	if err != nil {
-		log.Printf("%q\n", err)
-	}
 
-	return res
+	return res, err
 }
 
 // PostRawData handle posting data to db

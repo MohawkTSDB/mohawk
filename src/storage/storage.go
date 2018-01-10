@@ -60,10 +60,10 @@ type Storage interface {
 	Name() string
 	Help() string
 	Open(options url.Values)
-	GetTenants() []Tenant
-	GetItemList(tenant string, tags map[string]string) []Item
-	GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []DataItem
-	GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []StatItem
+	GetTenants() ([]Tenant, error)
+	GetItemList(tenant string, tags map[string]string) ([]Item, error)
+	GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) ([]DataItem, error)
+	GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) ([]StatItem, error)
 	PostRawData(tenant string, id string, t int64, v float64) error
 	PutTags(tenant string, id string, tags map[string]string) error
 	DeleteData(tenant string, id string, end int64, start int64) error

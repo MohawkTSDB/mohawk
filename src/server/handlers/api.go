@@ -98,7 +98,7 @@ func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[
 func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
 	var res []storage.Tenant
 
-	res = h.Storage.GetTenants()
+	res, _ = h.Storage.GetTenants()
 	resJSON, err := json.Marshal(res)
 	if err != nil {
 		return err
@@ -132,17 +132,16 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 		if !validTags(tags) {
 			return errBadMetricID
 		}
-		res = h.Storage.GetItemList(tenant, tags)
+		res, _ = h.Storage.GetItemList(tenant, tags)
 	} else {
-		res = h.Storage.GetItemList(tenant, map[string]string{})
+		res, _ = h.Storage.GetItemList(tenant, map[string]string{})
 	}
 	resJSON, err := json.Marshal(res)
-	if err != nil {
-		return err
+	if err == nil {
+		fmt.Fprintln(w, string(resJSON))
 	}
 
-	fmt.Fprintln(w, string(resJSON))
-	return nil
+	return err
 }
 
 // GetData return a list of metrics raw / stat data
@@ -413,7 +412,7 @@ func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQu
 
 	// add ids from tags query
 	if u.Tags != "" {
-		res := h.Storage.GetItemList(tenant, storage.ParseTags(u.Tags))
+		res, _ := h.Storage.GetItemList(tenant, storage.ParseTags(u.Tags))
 		for _, r := range res {
 			u.IDs = append(u.IDs, r.ID)
 		}
@@ -495,15 +494,14 @@ func (h APIHhandler) getData(w http.ResponseWriter, tenant string, id string, en
 
 	// call storage for data
 	if bucketDuration == 0 {
-		res := h.Storage.GetRawData(tenant, id, end, start, limit, order)
+		res, _ := h.Storage.GetRawData(tenant, id, end, start, limit, order)
 		resJSON, err = json.Marshal(res)
 	} else {
-		res := h.Storage.GetStatData(tenant, id, end, start, limit, order, bucketDuration)
+		res, _ := h.Storage.GetStatData(tenant, id, end, start, limit, order, bucketDuration)
 		resJSON, err = json.Marshal(res)
 	}
-	if err != nil {
-		return err
+	if err == nil {
+		fmt.Fprintf(w, string(resJSON))
 	}
-	fmt.Fprintf(w, string(resJSON))
-	return nil
+	return err
 }

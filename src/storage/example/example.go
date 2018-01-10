@@ -46,16 +46,16 @@ func (r *Storage) Open(options url.Values) {
 	// open db connection
 }
 
-func (r Storage) GetTenants() []storage.Tenant {
+func (r Storage) GetTenants() ([]storage.Tenant, error) {
 	res := make([]storage.Tenant, 0)
 
 	// return a list of tenants
 	res = append(res, storage.Tenant{ID: "Example tenant"})
 
-	return res
+	return res, nil
 }
 
-func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.Item {
+func (r Storage) GetItemList(tenant string, tags map[string]string) ([]storage.Item, error) {
 	res := make([]storage.Item, 0)
 	maxSize := 42
 
@@ -81,10 +81,10 @@ func (r Storage) GetItemList(tenant string, tags map[string]string) []storage.It
 		}
 	*/
 
-	return res
+	return res, nil
 }
 
-func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) []storage.DataItem {
+func (r Storage) GetRawData(tenant string, id string, end int64, start int64, limit int64, order string) ([]storage.DataItem, error) {
 	res := make([]storage.DataItem, 0)
 	var sampleDuration int64
 	var l int64
@@ -103,10 +103,10 @@ func (r Storage) GetRawData(tenant string, id string, end int64, start int64, li
 		})
 	}
 
-	return res
+	return res, nil
 }
 
-func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) []storage.StatItem {
+func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) ([]storage.StatItem, error) {
 	res := make([]storage.StatItem, 0)
 	var l int64
 	var i int64
@@ -133,7 +133,7 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 		})
 	}
 
-	return res
+	return res, nil
 }
 
 // unimplemented requests should fail silently
