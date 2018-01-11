@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.31.1
+Version:        0.32.1
 Release:        1%{?dist}
 Summary:        Time series metric data storage
 License:        Apache
@@ -47,6 +47,10 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %{_bindir}/mohawk
 
 %changelog
+* Tue Jan 11 2018 Yaacov Zamir <kobi.zamir@gmail.com> 0.32.1-1
+- Add error handlers to api calls
+- Alerts accept a list of metrics or a tags regex
+
 * Tue Jan 2 2018 Yaacov Zamir <kobi.zamir@gmail.com> 0.31.1-1
 - Storage default to ASC insdead of DESC
 - Default limit changed from 2000 to 20000
