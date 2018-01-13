@@ -14,7 +14,7 @@ where:
     -s  sleep after each data push in sec (default: 30)
 
 example:
-    [ run mohawk: ./mohawk --options=granularity=1s --storage=memory]
+    [ run mohawk: ./mohawk --options=granularity=1s --storage=memory ]
 
     # run push \"cpu_usage\" metrics each 1s using the \"_system\" tenant
     ./push_metrics_example.sh -t _ops -s 1 -d cpu_usage
