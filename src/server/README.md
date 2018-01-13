@@ -41,7 +41,7 @@ Mohawk Metrics offers a rich set of features around querying that are ideal for 
   - Downsampling and aggregation
   - Limit and order results
 
-###### See query examples in the [Examples directory](/src/server/examples/).
+###### See query examples in the [Examples directory](/examples/).
 
 #### Token authentication
 
@@ -69,7 +69,7 @@ This is a request to insert gauge data points for the com.acme tenant. If that t
 curl -ks https://localhost:8443/hawkular/metrics/tenant
 ```
 
-Query system tenants. 
+Query system tenants.
 
 #### Tenant Header
 
