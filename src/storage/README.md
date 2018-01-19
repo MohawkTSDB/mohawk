@@ -12,13 +12,13 @@ Mohawk can use different storage [plugins](/storage) for different use cases. Di
 
 ## Plugin Development
 
-A storage plugin should implement the [Storage interface](/storage/storage.go). Each storage plugin is built for specific use case, with features that best suite this use case.
+A storage plugin should implement the [Storage interface](/src/storage.go). Each storage plugin is built for specific use case, with features that best suite this use case.
 
 Implementation of a feature should not interfere with the storage plugin functionality, for example, a plugin built for speed may choose not to implement a feature that may slow it down.
 
 Plugins that implement a subset of the interface, must fail silently for unimplemented requests.
 
-For a starting template of a storage plugin, look at the [storage example](/storage/example) directory.
+For a starting template of a storage plugin, look at the [storage example](/src/storage/example) directory.
 
 ## Plugins Comparison
 
