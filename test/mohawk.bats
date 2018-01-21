@@ -2,6 +2,7 @@
 
 NOW="$(($(date +%s) - 10))000"
 NOW_5MN="$(($(date +%s) - 5 * 60))000"
+NOW_2D="$(($(date +%s) - 2 *24 * 60 * 60))000"
 
 wait_for_mohawk() {
   mohawk $args &
@@ -154,4 +155,19 @@ wait_for_alert() {
   kill_mohawk
 
   [[ "$result" =~ "\"rss\":" ]]
+}
+
+@test "query the stats endpoint currectly" {
+  data1="[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW_5MN,\"value\":40}]}]"
+  data2="[{\"id\":\"free_memory\",\"data\":[{\"timestamp\":$NOW_2D,\"value\":50}]}]"
+  query="{\"ids\":[\"free_memory\"],\"start\":\"-4d\",\"bucketDuration\":\"30mn\"}"
+
+  wait_for_mohawk
+  curl http://127.0.0.1:8080/hawkular/metrics/gauges/raw -d "$data1"
+  curl http://127.0.0.1:8080/hawkular/metrics/gauges/raw -d "$data2"
+  result="$(curl http://127.0.0.1:8080/hawkular/metrics/m/stats/query -d $query)"
+  kill_mohawk
+
+  buckets=$(echo $result | tr "},{" "},\n{" | grep "avg" | wc -l)
+  [ "$buckets" = "2" ]
 }
