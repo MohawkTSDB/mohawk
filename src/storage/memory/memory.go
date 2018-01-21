@@ -181,6 +181,8 @@ func (r *Storage) GetRawData(tenant string, id string, end int64, start int64, l
 
 func (r Storage) GetStatData(tenant string, id string, end int64, start int64, limit int64, order string, bucketDuration int64) ([]storage.StatItem, error) {
 	var samples int64
+	var bucketStart int64
+	var bucketEnd int64
 	var sum float64
 	var first float64
 	var last float64
@@ -197,16 +199,20 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 	count := int64(0)
 	ts := r.tenant[tenant].ts[id]
 	stepMili := r.timeGranularitySec * 1000
+	stepSizeMili := pStep * stepMili
+	bucketStart = start
 
 	for b := pStart; count < limit && b <= pEnd; b = b + pStep {
 		samples = 0
 		sum = 0
 
+		bucketEnd = bucketStart + stepSizeMili
+
 		// loop on all points in bucket
 		for i := b; i < (b + pStep); i++ {
 			d := ts.data[i%r.arraySize]
 
-			if d.timeStamp <= end && d.timeStamp >= start {
+			if d.timeStamp < bucketEnd && d.timeStamp >= bucketStart {
 				samples++
 
 				// calculate bucket stat values
@@ -235,8 +241,8 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 			count++
 
 			res = append(res, storage.StatItem{
-				Start:   start + (b-pStart)*stepMili,
-				End:     start + (b-pStart+pStep)*stepMili,
+				Start:   bucketStart,
+				End:     bucketEnd,
 				Empty:   false,
 				Samples: samples,
 				First:   first,
@@ -247,6 +253,9 @@ func (r Storage) GetStatData(tenant string, id string, end int64, start int64, l
 				Sum:     sum,
 			})
 		}
+
+		// move to next bucket
+		bucketStart = bucketEnd
 	}
 
 	// order
