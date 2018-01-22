@@ -17,8 +17,11 @@ where:
 example:
     [ run mohawk: ./mohawk --options=granularity=1s --storage=memory ]
 
-    # run push \"cpu_usage\" metrics each 1s using the \"_system\" tenant
-    ./push_metrics_example.sh -t _ops -s 1 -d cpu_usage -g name:cpu_usage
+    # run push \"machine/example.com/cpu_usage\" metrics each 1s using the \"_system\" tenant
+    # and add the labels \"name\" with value \"cpu_usage\" and \"hostname\" with value \"ecample.com\"
+    ./push_metrics_example.sh -t _system -s 1 \\
+        -d machine/example.com/cpu_usage \\
+        -g name:cpu_usage,hostname:example.com
 "
 
 MOHAWK_URL=http://127.0.0.1:8080
