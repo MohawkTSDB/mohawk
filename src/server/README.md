@@ -97,7 +97,7 @@ A data point in Mohawk Metrics is a tuple that in its simplest form consists of 
 
 ##### Timestamps
 
-Timestamps are unix timestamps in milliseconds.
+Timestamps are unix timestamps in milliseconds. When quering start and end times can be relative using s, mn, h and d postfixes (e.g. -25mn, -5s or -3d).
 
 ##### Insert data points
 
