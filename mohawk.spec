@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.32.2
+Version:        0.33.1
 Release:        1%{?dist}
 Summary:        Time series metric data storage
 License:        Apache
@@ -47,6 +47,10 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %{_bindir}/mohawk
 
 %changelog
+* Tue Feb 14 2018 Yaacov Zamir <kobi.zamir@gmail.com> 0.33.1-1
+- Add optional default tenant
+- Add Prometheus export endpoint
+
 * Tue Jan 21 2018 Yaacov Zamir <kobi.zamir@gmail.com> 0.32.2-1
 - Fix duplicate buckets for stats requests
 
