@@ -45,9 +45,10 @@ const secondaryOrder = "DESC"
 // 	version the version of the Hawkular server we are mocking
 // 	storage the storage to be used by the APIHhandler functions
 type APIHhandler struct {
-	Verbose bool
-	Storage storage.Storage
-	Alerts  *alerts.AlertRules
+	Verbose       bool
+	Storage       storage.Storage
+	Alerts        *alerts.AlertRules
+	DefaultTenant string
 }
 
 // GetAlertsStatus return a json alerts status struct
@@ -80,7 +81,7 @@ func (h APIHhandler) GetAlerts(w http.ResponseWriter, r *http.Request, argv map[
 	}
 
 	// get tenant
-	tenant := parseTenant(r)
+	tenant := h.parseTenant(r)
 	id := r.Form.Get("id")
 	state := r.Form.Get("state")
 
@@ -128,7 +129,7 @@ func (h APIHhandler) GetMetricsHelper(w http.ResponseWriter, r *http.Request, ar
 	}
 
 	// get tenant
-	tenant := parseTenant(r)
+	tenant := h.parseTenant(r)
 
 	// get a list of gauges
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
@@ -222,7 +223,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	}
 
 	// get tenant
-	tenant := parseTenant(r)
+	tenant := h.parseTenant(r)
 
 	// get timespan
 	end, start, bucketDuration, err := parseTimespan(r)
@@ -263,7 +264,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	}
 
 	// get tenant
-	tenant := parseTenant(r)
+	tenant := h.parseTenant(r)
 
 	// get timespan
 	end, start, _, err := parseTimespan(r)
@@ -364,7 +365,7 @@ func (h APIHhandler) PostData(w http.ResponseWriter, r *http.Request, argv map[s
 	}
 
 	// get tenant
-	tenant := parseTenant(r)
+	tenant := h.parseTenant(r)
 
 	for _, item := range u {
 		id := item.ID
@@ -401,7 +402,7 @@ func (h APIHhandler) PutTags(w http.ResponseWriter, r *http.Request, argv map[st
 	}
 
 	// get tenant
-	tenant := parseTenant(r)
+	tenant := h.parseTenant(r)
 
 	if h.Verbose {
 		log.Printf("Tenant: %s, ID: %+v {tags: %+v}\n", tenant, id, tags)
@@ -429,7 +430,7 @@ func (h APIHhandler) PutMultiTags(w http.ResponseWriter, r *http.Request, argv m
 	}
 
 	// get tenant
-	tenant := parseTenant(r)
+	tenant := h.parseTenant(r)
 
 	for _, item := range u {
 		id := item.ID
@@ -458,7 +459,7 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 	tags := strings.Split(tagsStr, ",")
 
 	// get tenant
-	tenant := parseTenant(r)
+	tenant := h.parseTenant(r)
 
 	if err := h.Storage.DeleteTags(tenant, id, tags); err != nil {
 		return err
@@ -471,7 +472,7 @@ func (h APIHhandler) DeleteTags(w http.ResponseWriter, r *http.Request, argv map
 // decodeRequestBody parse request body
 func (h APIHhandler) decodeRequestBody(r *http.Request) (tenant string, u dataQuery, err error) {
 	// get tenant
-	tenant = parseTenant(r)
+	tenant = h.parseTenant(r)
 
 	// decode query body
 	decoder := json.NewDecoder(r.Body)
@@ -583,4 +584,14 @@ func (h APIHhandler) getData(w http.ResponseWriter, tenant string, id string, en
 		fmt.Fprintf(w, string(resJSON))
 	}
 	return err
+}
+
+// ParseTenant return the tenant header value or the default Tenant
+func (h APIHhandler) parseTenant(r *http.Request) string {
+	tenant := r.Header.Get("Hawkular-Tenant")
+	if tenant == "" {
+		tenant = h.DefaultTenant
+	}
+
+	return tenant
 }
