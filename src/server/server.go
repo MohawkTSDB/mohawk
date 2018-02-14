@@ -160,6 +160,7 @@ func Serve() error {
 	rRoot.Add("GET", "status", GetStatus)
 	rRoot.Add("GET", "tenants", h.GetTenants)
 	rRoot.Add("GET", "metrics", h.GetMetrics)
+	rRoot.Add("GET", "exports", h.GetExports)
 
 	// M (Global Metrics) Routing tables
 	rM := router.Router{
