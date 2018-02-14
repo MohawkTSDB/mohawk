@@ -31,6 +31,8 @@ Mohawk can use different storage plugins for different use cases. Different stor
 
 Mohawk is tested(1) with [Hawkular](http://www.hawkular.org/) plugins, like [Hawkular Grafana Plugin](https://grafana.com/plugins/hawkular-datasource) and clients like [Python](https://github.com/hawkular/hawkular-client-python) and [Ruby](https://github.com/hawkular/hawkular-client-ruby). Mohawk also work with [Heapster](https://github.com/kubernetes/heapster) to automagically scrape metrics from [Kubernetes](https://kubernetes.io/) / [OpenShift](https://www.openshift.com/) clusters.
 
+Mohawk can also serve as [Prometheus](https://prometheus.io/) scraping endpoint.
+
 (1) Mohawk implement only a subset of Hawkular's API, some functionality may be missing.
 
 ## Installation
