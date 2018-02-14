@@ -111,20 +111,20 @@ func (h APIHhandler) GetTenants(w http.ResponseWriter, r *http.Request, argv map
 	return nil
 }
 
-// GetMetrics return a list of metrics definitions
-func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
+// GetMetricsHelper helper function to return a list of metrics definitions
+func (h APIHhandler) GetMetricsHelper(w http.ResponseWriter, r *http.Request, argv map[string]string) ([]storage.Item, error) {
 	var res []storage.Item
 	var err error
+	var tags = map[string]string{}
 
 	// get data from the form arguments
 	if err = r.ParseForm(); err != nil {
-		return err
+		return res, err
 	}
 
 	// we only use gauges
 	if typeStr, ok := r.Form["type"]; ok && len(typeStr) > 0 && typeStr[0] != "gauge" {
-		fmt.Fprintln(w, "[]")
-		return nil
+		return res, nil
 	}
 
 	// get tenant
@@ -132,19 +132,77 @@ func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map
 
 	// get a list of gauges
 	if tagsStr, ok := r.Form["tags"]; ok && len(tagsStr) > 0 {
-		tags := storage.ParseTags(tagsStr[0])
+		tags = storage.ParseTags(tagsStr[0])
 		if !validTags(tags) {
-			return errBadMetricID
+			return res, errBadMetricID
 		}
-		res, err = h.Storage.GetItemList(tenant, tags)
-	} else {
-		res, err = h.Storage.GetItemList(tenant, map[string]string{})
 	}
 
-	if err == nil {
-		if resJSON, err := json.Marshal(res); err == nil {
-			fmt.Fprintln(w, string(resJSON))
+	return h.Storage.GetItemList(tenant, tags)
+}
+
+// GetMetrics return a list of metrics definitions
+func (h APIHhandler) GetMetrics(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
+	var res []storage.Item
+	var resJSON []byte
+	var err error
+
+	res, err = h.GetMetricsHelper(w, r, argv)
+	if err != nil {
+		return err
+	}
+
+	if resJSON, err = json.Marshal(res); err == nil {
+		fmt.Fprintln(w, string(resJSON))
+	}
+
+	return err
+}
+
+// GetExports return a list of metrics if prmetheus export format
+func (h APIHhandler) GetExports(w http.ResponseWriter, r *http.Request, argv map[string]string) error {
+	var res []storage.Item
+	var err error
+	var first bool
+
+	res, err = h.GetMetricsHelper(w, r, argv)
+	if err != nil {
+		return err
+	}
+
+	for _, i := range res {
+		// check for last values
+		if len(i.LastValues) < 1 {
+			continue
 		}
+
+		// print name
+		if name, ok := i.Tags["__name__"]; ok {
+			fmt.Fprintf(w, name)
+		} else {
+			fmt.Fprintf(w, i.ID)
+		}
+
+		// print tags
+		first = true
+		fmt.Fprintf(w, "{")
+		for k, v := range i.Tags {
+			// __name__ is not a real tag
+			if k == "__name__" {
+				continue
+			}
+
+			if first {
+				fmt.Fprintf(w, "%s=\"%s\"", k, v)
+				first = false
+			} else {
+				fmt.Fprintf(w, ",%s=\"%s\"", k, v)
+			}
+		}
+		fmt.Fprintf(w, "} ")
+
+		// print value (if we are here i.LastValues[0] should exist)
+		fmt.Fprintf(w, "%f\n", i.LastValues[0].Value)
 	}
 
 	return err
