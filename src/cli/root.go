@@ -80,6 +80,7 @@ func init() {
 	RootCmd.Flags().String("alerts-server", "http://localhost:9099/append", "Alert buffer URL")
 	RootCmd.Flags().String("alerts-server-method", "POST", "Alert server http method")
 	RootCmd.Flags().Bool("alerts-server-insecure", false, "Alert server https skip verify")
+	RootCmd.Flags().String("default-tenant", "_ops", "Default tenant to use.")
 
 	// Viper Binding
 	viper.BindPFlag("storage", RootCmd.Flags().Lookup("storage"))

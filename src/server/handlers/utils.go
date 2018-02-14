@@ -78,16 +78,6 @@ func validTags(tags map[string]string) bool {
 	return true
 }
 
-// ParseTenant return the tenant header value or "_ops"
-func parseTenant(r *http.Request) string {
-	tenant := r.Header.Get("Hawkular-Tenant")
-	if tenant == "" {
-		tenant = "_ops"
-	}
-
-	return tenant
-}
-
 func badID(w http.ResponseWriter, v bool) {
 	w.WriteHeader(504)
 	fmt.Fprintf(w, "{\"error\":\"504\",\"message\":\"Bad metrics IDe - 504\"}")

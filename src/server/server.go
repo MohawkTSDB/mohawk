@@ -89,6 +89,7 @@ func Serve() error {
 	var alertsServerURL = viper.GetString("alerts-server")
 	var alertsServerMethod = viper.GetString("alerts-server-method")
 	var alertsServerInsecure = viper.GetBool("alerts-server-insecure")
+	var defaultTenant = viper.GetString("default-tenant")
 	var configAlerts = viper.ConfigFileUsed() != "" && viper.Get("alerts") != ""
 
 	// if options is "help" print storage options help and exit
@@ -145,9 +146,10 @@ func Serve() error {
 	// h common variables to be used for the storage Handler functions
 	// Storage the storage to use for metrics source
 	h := handler.APIHhandler{
-		Verbose: verbose,
-		Storage: db,
-		Alerts:  alertRules,
+		Verbose:       verbose,
+		Storage:       db,
+		Alerts:        alertRules,
+		DefaultTenant: defaultTenant,
 	}
 
 	// Create the routers
