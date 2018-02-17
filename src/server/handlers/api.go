@@ -45,10 +45,11 @@ const secondaryOrder = "DESC"
 // 	version the version of the Hawkular server we are mocking
 // 	storage the storage to be used by the APIHhandler functions
 type APIHhandler struct {
-	Verbose       bool
-	Storage       storage.Storage
-	Alerts        *alerts.AlertRules
-	DefaultTenant string
+	Verbose          bool
+	Storage          storage.Storage
+	Alerts           *alerts.AlertRules
+	DefaultTenant    string
+	DefaultStartTime string
 }
 
 // GetAlertsStatus return a json alerts status struct
@@ -226,7 +227,7 @@ func (h APIHhandler) GetData(w http.ResponseWriter, r *http.Request, argv map[st
 	tenant := h.parseTenant(r)
 
 	// get timespan
-	end, start, bucketDuration, err := parseTimespan(r)
+	end, start, bucketDuration, err := parseTimespan(r, h.DefaultStartTime)
 	if err != nil {
 		return err
 	}
@@ -267,7 +268,7 @@ func (h APIHhandler) DeleteData(w http.ResponseWriter, r *http.Request, argv map
 	tenant := h.parseTenant(r)
 
 	// get timespan
-	end, start, _, err := parseTimespan(r)
+	end, start, _, err := parseTimespan(r, h.DefaultStartTime)
 	if err != nil {
 		return err
 	}
@@ -555,7 +556,7 @@ func (h APIHhandler) parseQueryArgs(w http.ResponseWriter, r *http.Request, argv
 	}
 
 	// calc timestamps from end, start and bucket duration strings
-	end, start, bucketDuration, err = parseTimespanStrings(endStr, startStr, bucketDurationStr)
+	end, start, bucketDuration, err = parseTimespanStrings(endStr, startStr, bucketDurationStr, h.DefaultStartTime)
 
 	if h.Verbose {
 		log.Printf("Tenant: %s, IDs: %+v", tenant, u.IDs)
