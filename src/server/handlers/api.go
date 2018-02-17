@@ -178,6 +178,10 @@ func (h APIHhandler) GetExports(w http.ResponseWriter, r *http.Request, argv map
 		return err
 	}
 
+	// exports is a plain text file
+	// overide the json default header
+	w.Header().Set("Content-Type", "text/plain")
+
 	for _, i := range res {
 		// check for last values
 		if len(i.LastValues) < 1 {

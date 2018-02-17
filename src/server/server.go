@@ -246,7 +246,9 @@ func Serve() error {
 	}
 
 	// add headers to response
-	headers := handler.Headers{}
+	headers := handler.Headers{
+		Verbose: verbose,
+	}
 
 	// static a file server handler
 	static := handler.Static{
