@@ -17,6 +17,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -37,6 +38,10 @@ func (l Headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type,hawkular-tenant")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+
+	if l.Verbose {
+		log.Printf("set http headers")
+	}
 
 	l.next.ServeHTTP(w, r)
 }
