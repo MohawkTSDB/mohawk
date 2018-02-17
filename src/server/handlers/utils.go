@@ -30,9 +30,6 @@ import (
 // validRegex regexp for validating sql variables
 var validRegex = regexp.MustCompile(`^[ A-Za-z0-9_@,|:/\[\]\(\)\.\+\*-]*$`)
 
-// const defaultStartTime default REST API query start time value
-var defaultStartTime = "-8h"
-
 // json struct used to query data by the POST http request
 type dataQuery struct {
 	IDs            []string    `json:"ids"`
@@ -87,7 +84,7 @@ func badID(w http.ResponseWriter, v bool) {
 	}
 }
 
-func parseTimespanStrings(e string, s string, b string) (int64, int64, int64, error) {
+func parseTimespanStrings(e string, s string, b string, defaultStartTime string) (int64, int64, int64, error) {
 	var i int64
 	var err error
 	var start int64
@@ -125,7 +122,7 @@ func parseTimespanStrings(e string, s string, b string) (int64, int64, int64, er
 	return end, start, bucketDuration, nil
 }
 
-func parseTimespan(r *http.Request) (int64, int64, int64, error) {
+func parseTimespan(r *http.Request, defaultStartTime string) (int64, int64, int64, error) {
 	var e string
 	var s string
 	var b string
@@ -142,7 +139,7 @@ func parseTimespan(r *http.Request) (int64, int64, int64, error) {
 		b = v[0]
 	}
 
-	return parseTimespanStrings(e, s, b)
+	return parseTimespanStrings(e, s, b, defaultStartTime)
 }
 
 func baseTime(t int) int64 {
