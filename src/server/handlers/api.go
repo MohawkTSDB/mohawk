@@ -167,6 +167,12 @@ func (h APIHhandler) GetExports(w http.ResponseWriter, r *http.Request, argv map
 	var err error
 	var first bool
 
+	// get timespan
+	_, start, _, err := parseTimespan(r, h.DefaultStartTime)
+	if err != nil {
+		return err
+	}
+
 	res, err = h.GetMetricsHelper(w, r, argv)
 	if err != nil {
 		return err
@@ -175,6 +181,11 @@ func (h APIHhandler) GetExports(w http.ResponseWriter, r *http.Request, argv map
 	for _, i := range res {
 		// check for last values
 		if len(i.LastValues) < 1 {
+			continue
+		}
+
+		// check time of last update
+		if i.LastValues[0].Timestamp < start {
 			continue
 		}
 
