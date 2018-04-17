@@ -48,5 +48,4 @@ install: fmt mohawk
 
 .PHONY: vendor
 vendor:
-	[ -d ${GOPATH}/src/github.com/LK4D4/vndr ] || go get -u -v github.com/LK4D4/vndr
-	[ -d ${GOPATH}/src/github.com/MohawkTSDB/mohawk/vendor ] || $(shell echo ${GOPATH} | cut -d: -f1 -)/bin/vndr
+	dep ensure
