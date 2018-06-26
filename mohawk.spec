@@ -8,7 +8,7 @@
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           %{repo}
-Version:        0.33.2
+Version:        0.33.3
 Release:        1%{?dist}
 Summary:        Time series metric data storage
 License:        Apache
@@ -47,6 +47,9 @@ install -p -m 0755 ./mohawk %{buildroot}%{_bindir}/mohawk
 %{_bindir}/mohawk
 
 %changelog
+* Tue Jun 26 2018 Yaacov Zamir <kobi.zamir@gmail.com> 0.33.3-1
+- Do not allow .. in static files path
+
 * Sat Feb 17 2018 Yaacov Zamir <kobi.zamir@gmail.com> 0.33.2-1
 - Set exports http header to text
 - Do not export old data
