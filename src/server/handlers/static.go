@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Static handler to serve static file
@@ -38,6 +39,13 @@ func (s *Static) SetNext(h http.Handler) {
 // ServeHTTP http serve func
 func (s Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := s.MediaPath + r.URL.EscapedPath()
+
+	// Check for ".." in the url path,
+	// if we find ".." in the path we will not serve static files
+	if strings.Contains(path, "..") {
+		s.next.ServeHTTP(w, r)
+		return
+	}
 
 	// Add index.html to path if it ends with /
 	if path[len(path)-1:] == "/" {
